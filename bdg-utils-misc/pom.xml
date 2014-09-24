@@ -7,7 +7,7 @@
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-misc</artifactId>
+  <artifactId>bdg-utils-misc</artifactId>
   <packaging>jar</packaging>
   <name>bdg-utils-misc: Miscellaneous Spark helper code</name>
   <build>
