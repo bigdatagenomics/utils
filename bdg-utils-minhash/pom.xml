@@ -7,9 +7,9 @@
     <version>0.0.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>bdg-utils-misc</artifactId>
+  <artifactId>bdg-utils-minhash</artifactId>
   <packaging>jar</packaging>
-  <name>bdg-utils-misc: Miscellaneous Spark helper code</name>
+  <name>bdg-utils-minhash: MinHash-based Jaccard similarity estimator</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -27,7 +27,7 @@
         <configuration>
           <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
           <junitxml>.</junitxml>
-          <filereports>BDGUtilsMiscTestSuite.txt</filereports>
+          <filereports>BDGUtilsMinhashTestSuite.txt</filereports>
           <!--
               As explained here: http://stackoverflow.com/questions/1660441/java-flag-to-enable-extended-serialization-debugging-info
               The second option allows us better debugging for serialization-based errors.
@@ -111,6 +111,16 @@
   </build>
 
   <dependencies>
+    <dependency>
+      <groupId>org.bdgenomics.bdg-utils</groupId>
+      <artifactId>bdg-utils-misc</artifactId>
+      <scope>test</scope>
+      <type>test-jar</type>
+    </dependency>
+    <dependency>
+      <groupId>org.bdgenomics.bdg-utils</groupId>
+      <artifactId>bdg-utils-misc</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.scala-lang</groupId>
       <artifactId>scala-library</artifactId>
