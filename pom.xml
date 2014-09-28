@@ -30,6 +30,7 @@
   <modules>
     <module>bdg-utils-misc</module>
     <module>bdg-utils-minhash</module>
+    <module>bdg-utils-metrics</module>
   </modules>
   
   <licenses>
@@ -285,6 +286,11 @@
         <groupId>org.bdgenomics.bdg-utils</groupId>
         <artifactId>bdg-utils-misc</artifactId>
         <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.netflix.servo</groupId>
+        <artifactId>servo-core</artifactId>
+        <version>0.5.5</version>
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
