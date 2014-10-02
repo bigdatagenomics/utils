@@ -8,7 +8,7 @@
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.bdgenomics.utils</groupId>
+  <groupId>org.bdgenomics.bdg-utils</groupId>
   <artifactId>bdg-utils-parent</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
@@ -29,6 +29,7 @@
   
   <modules>
     <module>bdg-utils-misc</module>
+    <module>bdg-utils-minhash</module>
   </modules>
   
   <licenses>
@@ -273,6 +274,18 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>org.bdgenomics.bdg-utils</groupId>
+        <artifactId>bdg-utils-misc</artifactId>
+        <version>${project.version}</version>
+        <scope>test</scope>
+        <type>test-jar</type>
+      </dependency>
+      <dependency>
+        <groupId>org.bdgenomics.bdg-utils</groupId>
+        <artifactId>bdg-utils-misc</artifactId>
+        <version>${project.version}</version>
+      </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
         <artifactId>scalatest_${scala.artifact.suffix}</artifactId>
