@@ -20,3 +20,8 @@ package org.bdgenomics.utils.misc
 import org.scalatest.Tag
 
 object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+
+object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+
+object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
+
