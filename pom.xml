@@ -32,6 +32,7 @@
     <module>bdg-utils-minhash</module>
     <module>bdg-utils-metrics</module>
     <module>bdg-utils-parquet</module>
+    <module>bdg-utils-statistics</module>
   </modules>
   
   <licenses>
@@ -362,6 +363,11 @@
         </exclusions>
       </dependency>
       <dependency>
+        <groupId>org.scalanlp</groupId>
+        <artifactId>breeze_2.10</artifactId>
+        <version>0.10</version>
+      </dependency>
+      <dependency>
         <groupId>com.twitter</groupId>
         <artifactId>parquet-avro</artifactId>
         <version>${parquet.version}</version>
@@ -381,6 +387,16 @@
         <artifactId>mockito-core</artifactId>
         <version>1.9.5</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.spark</groupId>
+        <artifactId>spark-mllib_${scala.artifact.suffix}</artifactId>
+        <version>${spark.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-math3</artifactId>
+        <version>3.3</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
