@@ -25,14 +25,12 @@ import org.apache.log4j.Level
 trait SparkFunSuite extends FunSuite with BeforeAndAfter {
 
   var sc: SparkContext = _
-  var maybeLevels: Option[Map[String, Level]] = None
   val appName: String = "bdg-utils"
   val master: String = "local[4]"
   val properties: Map[String, String] = Map()
 
-  def setupSparkContext(sparkName: String, silenceSpark: Boolean = true) {
+  def setupSparkContext(sparkName: String) {
     // Silence the Spark logs if requested
-    maybeLevels = if (silenceSpark) Some(SparkLogUtil.silenceSpark()) else None
     synchronized {
       // Find an unused port
       val s = new ServerSocket(0)
@@ -53,19 +51,11 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
     // Stop the context
     sc.stop()
     sc = null
-
-    maybeLevels match {
-      case None =>
-      case Some(levels) =>
-        for ((className, level) <- levels) {
-          SparkLogUtil.setLogLevels(level, List(className))
-        }
-    }
   }
 
-  def sparkBefore(beforeName: String, silenceSpark: Boolean = true)(body: => Unit) {
+  def sparkBefore(beforeName: String)(body: => Unit) {
     before {
-      setupSparkContext(beforeName, silenceSpark)
+      setupSparkContext(beforeName)
       try {
         // Run the before block
         body
@@ -75,9 +65,9 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
     }
   }
 
-  def sparkAfter(beforeName: String, silenceSpark: Boolean = true)(body: => Unit) {
+  def sparkAfter(beforeName: String)(body: => Unit) {
     after {
-      setupSparkContext(beforeName, silenceSpark)
+      setupSparkContext(beforeName)
       try {
         // Run the after block
         body
@@ -87,9 +77,9 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
     }
   }
 
-  def sparkTest(name: String, silenceSpark: Boolean, tags: Tag*)(body: => Unit) {
+  def sparkTest(name: String, tags: Tag*)(body: => Unit) {
     test(name, SparkTest +: tags: _*) {
-      setupSparkContext(name, silenceSpark)
+      setupSparkContext(name)
       try {
         // Run the test
         body
@@ -97,10 +87,6 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
         teardownSparkContext()
       }
     }
-  }
-
-  def sparkTest(name: String)(body: => Unit) {
-    sparkTest(name, silenceSpark = true)(body)
   }
 
   /**
