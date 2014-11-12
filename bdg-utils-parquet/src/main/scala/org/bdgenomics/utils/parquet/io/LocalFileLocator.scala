@@ -15,13 +15,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.io
 
-import org.scalatest.Tag
+import java.io.File
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+class LocalFileLocator(val file: File) extends FileLocator {
+  override def relativeLocator(relativePath: String): FileLocator = new LocalFileLocator(new File(file, relativePath))
+  override def bytes: ByteAccess = new LocalFileByteAccess(file)
 
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+  override def parentLocator(): Option[FileLocator] = file.getParentFile match {
+    case null             => None
+    case parentFile: File => Some(new LocalFileLocator(parentFile))
+  }
 
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
-
+  override def hashCode(): Int = file.hashCode()
+  override def equals(x: Any): Boolean = {
+    x match {
+      case loc: LocalFileLocator => file.equals(loc.file)
+      case _                     => false
+    }
+  }
+}

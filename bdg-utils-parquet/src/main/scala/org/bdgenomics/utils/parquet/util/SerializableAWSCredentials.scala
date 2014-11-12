@@ -15,13 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.util
 
-import org.scalatest.Tag
+import com.amazonaws.auth.AWSCredentials
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
-
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
-
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
-
+class SerializableAWSCredentials(accessKey: String, secretKey: String) extends AWSCredentials with Serializable {
+  def this() = this(System.getenv("AWS_ACCESS_KEY_ID"), System.getenv("AWS_SECRET_KEY"))
+  def getAWSAccessKeyId: String = accessKey
+  def getAWSSecretKey: String = secretKey
+}

@@ -15,13 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.index
 
-import org.scalatest.Tag
+trait RowGroupIndexWriter[Entry <: RowGroupIndexEntry] {
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
-
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
-
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
-
+  def write(entry: Entry)
+  def close()
+}

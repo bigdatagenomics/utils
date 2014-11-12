@@ -15,13 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.io
 
-import org.scalatest.Tag
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.model.GetObjectRequest
+import java.io.InputStream
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+class S3ByteAccess(client: AmazonS3, bucket: String, keyName: String) extends ByteAccess {
+  assert(bucket != null)
+  assert(keyName != null)
 
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+  lazy val objectMetadata = client.getObjectMetadata(bucket, keyName)
+  override def length(): Long = objectMetadata.getContentLength
+  override def readByteStream(offset: Long, length: Int): InputStream = {
+    val getObjectRequest = new GetObjectRequest(bucket, keyName).withRange(offset, offset + length)
+    client.getObject(getObjectRequest).getObjectContent
+  }
 
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
-
+}

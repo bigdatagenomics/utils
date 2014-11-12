@@ -15,13 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.io
 
-import org.scalatest.Tag
+import java.io.{ ByteArrayInputStream, InputStream }
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+class ByteArrayByteAccess(val bytes: Array[Byte]) extends ByteAccess with Serializable {
 
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+  private val inputStream = new ByteArrayInputStream(bytes)
+  assert(inputStream.markSupported(), "ByteArrayInputStream doesn't support marks")
 
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
+  inputStream.mark(bytes.length)
 
+  override def length(): Long = bytes.length
+  override def readByteStream(offset: Long, length: Int): InputStream = {
+    inputStream.reset()
+    inputStream.skip(offset)
+    inputStream
+  }
+}

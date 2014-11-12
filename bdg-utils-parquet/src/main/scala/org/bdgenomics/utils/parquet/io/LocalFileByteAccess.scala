@@ -15,13 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.io
 
-import org.scalatest.Tag
+import java.io.{ File, FileInputStream, InputStream }
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+/**
+ * This is somewhat poorly named, it probably should be LocalFileByteAccess
+ *
+ * @param f the file to read bytes from
+ */
+class LocalFileByteAccess(f: File) extends ByteAccess {
 
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+  assert(f.isFile, "\"%s\" isn't a file".format(f.getAbsolutePath))
+  assert(f.exists(), "File \"%s\" doesn't exist".format(f.getAbsolutePath))
+  assert(f.canRead, "File \"%s\" can't be read".format(f.getAbsolutePath))
 
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
+  override def length(): Long = f.length()
 
+  override def readByteStream(offset: Long, length: Int): InputStream = {
+    val fileIo = new FileInputStream(f)
+    fileIo.skip(offset)
+    fileIo
+  }
+
+}

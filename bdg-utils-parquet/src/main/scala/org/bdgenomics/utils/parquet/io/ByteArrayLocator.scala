@@ -15,13 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.io
 
-import org.scalatest.Tag
-
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
-
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
-
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
-
+class ByteArrayLocator(val byteData: Array[Byte]) extends FileLocator {
+  override def relativeLocator(relativePath: String): FileLocator = this
+  override def parentLocator(): Option[FileLocator] = None
+  override def bytes: ByteAccess = new ByteArrayByteAccess(byteData)
+}

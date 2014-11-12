@@ -15,13 +15,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.index
 
-import org.scalatest.Tag
+import org.bdgenomics.utils.parquet.rdd.{ ParquetRowGroup, Footer }
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+/**
+ * Any class which represents an entry (line?) in an index file should extend this class.
+ *
+ * @param path The location of the indexed row group's parquet file.
+ * @param index The index of the row group in the parquet file.
+ */
+class RowGroupIndexEntry(path: String, index: Int) {
 
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+  assert(index >= 0, "Negative row-group indices are not allowed.")
 
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
+  def parquetFilePath(): String = path
+  def getRowGroup(footer: Footer): ParquetRowGroup = footer.rowGroups(index)
+}
 

@@ -15,13 +15,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.misc
+package org.bdgenomics.utils.parquet.io
 
-import org.scalatest.Tag
+import com.amazonaws.auth.AWSCredentials
+import com.amazonaws.services.s3.AmazonS3Client
 
-object SparkTest extends Tag("org.bdgenomics.utils.misc.SparkFunSuite")
+class S3FileLocator(val credentials: AWSCredentials, val bucket: String, val key: String) extends FileLocator {
 
-object NetworkConnected extends Tag("org.bdgenomics.adam.util.NetworkConnected")
+  override def parentLocator(): Option[FileLocator] = FileLocator.parseSlash(key) match {
+    case Some((parent, child)) => Some(new S3FileLocator(credentials, bucket, parent))
+    case None                  => None
+  }
 
-object S3Test extends Tag("org.bdgenomics.adam.util.S3Test")
+  override def relativeLocator(relativePath: String): FileLocator =
+    new S3FileLocator(credentials, bucket, "%s/%s".format(key.stripSuffix("/"), relativePath))
 
+  override def bytes: ByteAccess = new S3ByteAccess(new AmazonS3Client(credentials), bucket, key)
+}
