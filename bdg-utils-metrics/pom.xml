@@ -7,7 +7,7 @@
     <version>0.0.2-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>bdg-utils-metrics</artifactId>
+  <artifactId>bdg-utils-metrics_${scala.artifact.suffix}</artifactId>
   <packaging>jar</packaging>
   <name>bdg-utils-metrics: tools for collecting metrics on top of RDDs</name>
   <build>
