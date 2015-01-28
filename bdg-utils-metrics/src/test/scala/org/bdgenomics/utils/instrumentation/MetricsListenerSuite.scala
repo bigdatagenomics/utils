@@ -17,16 +17,15 @@
  */
 package org.bdgenomics.utils.instrumentation
 
-import org.bdgenomics.utils.misc.SparkFunSuite
-
 import org.apache.spark.SparkContext.IntAccumulatorParam
-import org.scalatest.concurrent.{ IntegrationPatience, Eventually }
+import org.bdgenomics.utils.misc.SparkFunSuite
+import org.scalatest.concurrent.{ Eventually, IntegrationPatience }
 
 class MetricsListenerSuite extends SparkFunSuite with Eventually with IntegrationPatience {
 
   sparkTest("Listener accumulates metrics when registered with Spark") {
 
-    val metrics = new Metrics()
+    val metrics = new RecordedMetrics()
     val listener = new MetricsListener(metrics)
     sc.addSparkListener(listener)
 

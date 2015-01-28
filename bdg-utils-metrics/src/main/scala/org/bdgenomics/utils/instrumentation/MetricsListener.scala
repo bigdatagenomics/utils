@@ -17,16 +17,21 @@
  */
 package org.bdgenomics.utils.instrumentation
 
-import org.apache.spark.scheduler.{ StageInfo, SparkListenerStageCompleted, SparkListenerTaskEnd, SparkListener }
+import org.apache.spark.scheduler.{
+  SparkListener,
+  SparkListenerStageCompleted,
+  SparkListenerTaskEnd,
+  StageInfo
+}
 import scala.concurrent.duration._
 
 /**
- * Spark listener that accumulates metrics in the passed-in [[Metrics]] object
+ * Spark listener that accumulates metrics in the passed-in [[RecordedMetrics]] object
  * at stage completion time.
  * @note This class relies on being run in the same process as the driver. However,
  * this is the way that Spark seems to work.
  */
-class MetricsListener(val metrics: Metrics) extends SparkListener {
+class MetricsListener(val metrics: RecordedMetrics) extends SparkListener {
 
   private val sparkMetrics = metrics.sparkMetrics
 
@@ -41,7 +46,7 @@ class MetricsListener(val metrics: Metrics) extends SparkListener {
     val taskMetrics = Option(taskEnd.taskMetrics)
     val taskInfo = Option(taskEnd.taskInfo)
 
-    implicit val taskContext = TaskContext(
+    implicit val taskContext = SparkTaskContext(
       if (taskMetrics.isDefined && taskMetrics.get.hostname != null) taskMetrics.get.hostname else "unknown",
       taskEnd.stageId)
 
