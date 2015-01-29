@@ -19,7 +19,6 @@ package org.bdgenomics.utils.misc
 
 import org.scalatest.{ Tag, BeforeAndAfter, FunSuite }
 import org.apache.spark.{ SparkConf, SparkContext }
-import java.net.ServerSocket
 import org.apache.log4j.Level
 
 trait SparkFunSuite extends FunSuite with BeforeAndAfter {
@@ -29,22 +28,35 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
   val master: String = "local[4]"
   val properties: Map[String, String] = Map()
 
+  final val testPortRange: Range = 50000 until 60000
+  final val rnd: scala.util.Random = new scala.util.Random
+
+  private def nextTestPort = {
+    testPortRange.start + rnd.nextInt(testPortRange.length)
+  }
+
   def setupSparkContext(sparkName: String) {
-    // Silence the Spark logs if requested
-    synchronized {
-      // Find an unused port
-      val s = new ServerSocket(0)
-      val driverPort = s.getLocalPort
-      s.close()
+    var maybeSc: Option[SparkContext] = None
+
+    while (maybeSc.isEmpty) {
       val conf = new SparkConf(false)
         .setAppName(appName + ": " + sparkName)
         .setMaster(master)
-        .set("spark.driver.port", driverPort.toString)
+        .set("spark.driver.port", nextTestPort.toString)
+        .set("spark.ui.enabled", "false")
+        .set("spark.driver.allowMultipleContexts", "true")
 
       properties.foreach(kv => conf.set(kv._1, kv._2))
-
-      sc = new SparkContext(conf)
+      try {
+        maybeSc = Some(new SparkContext(conf))
+      } catch {
+        // Retry in the case of a bind exception
+        case bindException: java.net.BindException =>
+        // Throw all other exceptions
+        case e: Exception                          => throw e
+      }
     }
+    sc = maybeSc.get
   }
 
   def teardownSparkContext() {
