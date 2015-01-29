@@ -7,7 +7,7 @@
     <version>0.1.1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>bdg-utils-minhash</artifactId>
+  <artifactId>bdg-utils-minhash_${scala.artifact.suffix}</artifactId>
   <packaging>jar</packaging>
   <name>bdg-utils-minhash: MinHash-based Jaccard similarity estimator</name>
   <build>
