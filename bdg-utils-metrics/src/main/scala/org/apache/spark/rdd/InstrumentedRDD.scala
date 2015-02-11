@@ -415,7 +415,7 @@ object InstrumentedRDD {
   private def rddOperationTimer(): Timer = {
     // We can only do this because we are in an org.apache.spark package (Utils is private to Spark). When we fix that
     // we'll have to implement our own getCallSite function
-    val callSite = Utils.getCallSite.shortForm
+    val callSite = Utils.getCallSite().shortForm
     new Timer(callSite, clock = clock, recorder = None,
       sequenceId = Some(Metrics.generateNewSequenceId()), isRDDOperation = true)
   }
