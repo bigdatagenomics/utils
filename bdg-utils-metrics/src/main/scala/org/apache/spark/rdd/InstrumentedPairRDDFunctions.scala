@@ -246,6 +246,13 @@ class InstrumentedPairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTa
     case _ => self.rightOuterJoin(other, partitioner)
   }
 
+  def fullOuterJoin[W](other: RDD[(K, W)], partitioner: Partitioner): RDD[(K, (Option[V], Option[W]))] = self match {
+    case instrumented: InstrumentedRDD[_] => recordOperation {
+      instrument(self.fullOuterJoin(other, partitioner))
+    }
+    case _ => self.fullOuterJoin(other, partitioner)
+  }
+
   def combineByKey[C](createCombiner: (V) => C, mergeValue: (C, V) => C, mergeCombiners: (C, C) => C): RDD[(K, C)] = self match {
     case instrumented: InstrumentedRDD[_] => recordOperation {
       implicit val recorder = functionRecorder()
@@ -301,6 +308,20 @@ class InstrumentedPairRDDFunctions[K, V](self: RDD[(K, V)])(implicit kt: ClassTa
       instrument(self.rightOuterJoin(other, numPartitions))
     }
     case _ => self.rightOuterJoin(other, numPartitions)
+  }
+
+  def fullOuterJoin[W](other: RDD[(K, W)]): RDD[(K, (Option[V], Option[W]))] = self match {
+    case instrumented: InstrumentedRDD[_] => recordOperation {
+      instrument(self.fullOuterJoin(other))
+    }
+    case _ => self.fullOuterJoin(other)
+  }
+
+  def fullOuterJoin[W](other: RDD[(K, W)], numPartitions: Int): RDD[(K, (Option[V], Option[W]))] = self match {
+    case instrumented: InstrumentedRDD[_] => recordOperation {
+      instrument(self.fullOuterJoin(other, numPartitions))
+    }
+    case _ => self.fullOuterJoin(other, numPartitions)
   }
 
   def collectAsMap(): Map[K, V] = self match {

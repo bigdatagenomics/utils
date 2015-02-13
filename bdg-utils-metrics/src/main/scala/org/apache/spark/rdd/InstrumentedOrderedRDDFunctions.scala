@@ -17,6 +17,7 @@
  */
 package org.apache.spark.rdd
 
+import org.apache.spark.Partitioner
 import org.apache.spark.SparkContext.rddToOrderedRDDFunctions
 import org.apache.spark.rdd.InstrumentedRDD._
 import scala.reflect.ClassTag
@@ -32,6 +33,13 @@ class InstrumentedOrderedRDDFunctions[K: Ordering: ClassTag, V: ClassTag](self: 
       instrument(self.sortByKey(ascending, numPartitions))
     }
     case _ => self.sortByKey(ascending, numPartitions)
+  }
+
+  def repartitionAndSortWithinPartitions(partitioner: Partitioner): RDD[(K, V)] = self match {
+    case instrumented: InstrumentedRDD[_] => recordOperation {
+      instrument(self.repartitionAndSortWithinPartitions(partitioner))
+    }
+    case _ => self.repartitionAndSortWithinPartitions(partitioner)
   }
 
 }
