@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.bdg-utils</groupId>
   <artifactId>bdg-utils-parent</artifactId>
-  <version>0.1.2-SNAPSHOT</version>
+  <version>0.1.2</version>
   <packaging>pom</packaging>
   <name>bdg-utils</name>
   <description>General utility code used across BDG projects</description>
@@ -45,7 +45,7 @@
     <connection>scm:git:git@github.com:bigdatagenomics/bdg-utils.git</connection>
     <developerConnection>scm:git:git@github.com:bigdatagenomics/bdg-utils.git</developerConnection>
     <url>scm:git:git@github.com:bigdatagenomics/bdg-utils.git</url>
-    <tag>master</tag>
+    <tag>bdg-utils-parent-0.1.2</tag>
   </scm>
   <developers>
     <developer>
