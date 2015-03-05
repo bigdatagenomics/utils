@@ -33,6 +33,7 @@
     <module>bdg-utils-metrics</module>
     <module>bdg-utils-parquet</module>
     <module>bdg-utils-statistics</module>
+    <module>bdg-utils-cli</module>
   </modules>
   
   <licenses>
