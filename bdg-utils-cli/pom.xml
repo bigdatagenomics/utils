@@ -57,6 +57,10 @@
 
   <dependencies>
     <dependency>
+      <groupId>com.twitter</groupId>
+      <artifactId>parquet-avro</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.hadoop</groupId>
       <artifactId>hadoop-client</artifactId>
     </dependency>
@@ -67,10 +71,6 @@
     <dependency>
       <groupId>org.bdgenomics.bdg-utils</groupId>
       <artifactId>bdg-utils-misc</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.bdgenomics.bdg-utils</groupId>
-      <artifactId>bdg-utils-parquet</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.bdg-utils</groupId>

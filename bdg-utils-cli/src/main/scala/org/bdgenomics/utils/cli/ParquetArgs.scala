@@ -17,9 +17,19 @@
  */
 package org.bdgenomics.utils.cli
 
-import org.bdgenomics.utils.parquet.rdd.{ SaveArgs, ParquetRDDArgs }
 import org.kohsuke.args4j.{ Argument, Option }
 import parquet.hadoop.metadata.CompressionCodecName
+
+trait ParquetRDDArgs {
+  var blockSize: Int
+  var pageSize: Int
+  var compressionCodec: CompressionCodecName
+  var disableDictionaryEncoding: Boolean
+}
+
+trait SaveArgs extends ParquetRDDArgs {
+  var outputPath: String
+}
 
 trait ParquetArgs extends Args4jBase with ParquetRDDArgs {
   @Option(required = false, name = "-parquet_block_size", usage = "Parquet block size (default = 128mb)")
