@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.bdgenomics.bdg-utils</groupId>
-    <artifactId>bdg-utils-parent</artifactId>
+    <groupId>org.bdgenomics.utils</groupId>
+    <artifactId>utils-parent</artifactId>
     <version>0.1.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>bdg-utils-statistics</artifactId>
+  <artifactId>utils-statistics</artifactId>
   <packaging>jar</packaging>
-  <name>bdg-utils-statistics: Spark code for fitting statistical models</name>
+  <name>utils-statistics: Spark code for fitting statistical models</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -120,14 +120,14 @@
       <artifactId>hadoop-client</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.bdgenomics.bdg-utils</groupId>
-      <artifactId>bdg-utils-misc</artifactId>
+      <groupId>org.bdgenomics.utils</groupId>
+      <artifactId>utils-misc</artifactId>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
     <dependency>
-      <groupId>org.bdgenomics.bdg-utils</groupId>
-      <artifactId>bdg-utils-misc</artifactId>
+      <groupId>org.bdgenomics.utils</groupId>
+      <artifactId>utils-misc</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
