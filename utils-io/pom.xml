@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
-    <artifactId>utils-parent</artifactId>
+    <artifactId>utils-parent_${scala.artifact.suffix}</artifactId>
     <version>0.1.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-io</artifactId>
+  <artifactId>utils-io_${scala.artifact.suffix}</artifactId>
   <packaging>jar</packaging>
   <name>utils-io: I/O utils</name>
   <build>
@@ -113,17 +113,17 @@
   <dependencies>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc</artifactId>
+      <artifactId>utils-misc_${scala.artifact.suffix}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc</artifactId>
+      <artifactId>utils-misc_${scala.artifact.suffix}</artifactId>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-metrics</artifactId>
+      <artifactId>utils-metrics_${scala.artifact.suffix}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.scala-lang</groupId>
