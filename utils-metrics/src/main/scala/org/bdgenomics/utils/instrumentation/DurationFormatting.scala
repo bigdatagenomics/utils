@@ -51,10 +51,13 @@ object DurationFormatting {
 
   def formatDuration(duration: Duration): String = {
 
+    val builder = new StringBuilder()
+
     var nanoDuration = duration.toNanos
 
     if (nanoDuration < 0) {
-      throw new IllegalArgumentException("Duration must be greater or equal to zero!")
+      builder.append("-")
+      nanoDuration = Math.abs(nanoDuration)
     }
 
     val hours = TimeUnit.NANOSECONDS.toHours(nanoDuration)
@@ -74,7 +77,6 @@ object DurationFormatting {
 
     val nanos = nanoDuration
 
-    val builder = new StringBuilder()
     if (hours > 0) {
       builder.append(hours)
       builder.append(" hour").append(if (hours != 1) "s" else "")

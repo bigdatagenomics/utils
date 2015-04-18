@@ -18,14 +18,16 @@
 package org.bdgenomics.utils.instrumentation
 
 import java.io.File
+
 import org.apache.commons.io.FileUtils
 import org.apache.hadoop.conf.Configuration
 import org.apache.hadoop.mapreduce.OutputFormat
 import org.apache.hadoop.mapreduce.lib.output.TextOutputFormat
-import org.apache.spark.rdd.{ InstrumentedOutputFormat, InstrumentedRDD }
-import org.bdgenomics.utils.misc.SparkFunSuite
-import org.apache.spark.rdd.InstrumentedRDD._
 import org.apache.spark.rdd.MetricsContext._
+import org.apache.spark.rdd.{ InstrumentedOutputFormat, InstrumentedRDD }
+import org.bdgenomics.utils.instrumentation.DummyTimers.dummyTimer
+import org.bdgenomics.utils.misc.SparkFunSuite
+
 import scala.collection.JavaConversions._
 
 class InstrumentedPairRDDFunctionsSuite extends SparkFunSuite {
@@ -46,14 +48,15 @@ class InstrumentedPairRDDFunctionsSuite extends SparkFunSuite {
     if (tempDir.exists()) {
       FileUtils.deleteDirectory(tempDir)
     }
-    // We need to call recordOperation here or the timing stat ends up as a top-level stat, which has a unique
+    // We need to record a timing here or the timing stat ends up as a top-level stat, which has a unique
     // sequence Id
     implicit val implicitSc = sc
-    recordOperation {
+    dummyTimer.time {
       rdd.saveAsNewAPIHadoopFile(tempDir.getAbsolutePath, classOf[java.lang.Long],
         classOf[java.lang.Long], classOf[MyInstrumentedOutputFormat], new Configuration())
     }
-    val timers = Metrics.Recorder.value.get.accumulable.value.timerMap.filter(!_._1.isRDDOperation).toSeq
+    val timers = Metrics.Recorder.value.get.accumulable.value.timerMap.filter(entry =>
+      { !entry._1.isRDDOperation && !entry._1.timerName.equals("Dummy") }).toSeq
     assert(timers.size === 1)
     assert(timers.iterator.next()._2.getName === "Write Record Timer")
     assert(timers.iterator.next()._2.getCount === 5)
@@ -65,4 +68,8 @@ class InstrumentedPairRDDFunctionsSuite extends SparkFunSuite {
 class MyInstrumentedOutputFormat extends InstrumentedOutputFormat[Long, Long] {
   override def timerName(): String = "Write Record Timer"
   override def outputFormatClass(): Class[_ <: OutputFormat[Long, Long]] = classOf[TextOutputFormat[Long, Long]]
+}
+
+object DummyTimers extends Metrics {
+  val dummyTimer = timer("Dummy")
 }
