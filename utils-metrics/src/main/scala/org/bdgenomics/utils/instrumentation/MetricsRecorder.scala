@@ -44,7 +44,8 @@ class MetricsRecorder(val accumulable: Accumulable[ServoTimers, RecordedTiming],
 
   def startPhase(timerName: String, sequenceId: Option[Int] = None, isRDDOperation: Boolean = false) {
     val newSequenceId = generateSequenceId(sequenceId, timerName)
-    val key = new TimingPathKey(timerName, newSequenceId, isRDDOperation)
+    val shouldRecord = if (timingsStack.isEmpty) true else shouldRecordOperation(isRDDOperation, timingsStack.top)
+    val key = new TimingPathKey(timerName, newSequenceId, isRDDOperation, shouldRecord)
     val newPath = if (timingsStack.isEmpty) root(key) else timingsStack.top.child(key)
     timingsStack.push(newPath)
   }
@@ -53,7 +54,9 @@ class MetricsRecorder(val accumulable: Accumulable[ServoTimers, RecordedTiming],
     val top = timingsStack.pop()
     assert(top.timerName == timerName, "Timer name from on top of stack [" + top +
       "] did not match passed-in timer name [" + timerName + "]")
-    accumulable += new RecordedTiming(timingNanos, top)
+    if (top.shouldRecord) {
+      accumulable += new RecordedTiming(timingNanos, top)
+    }
   }
 
   def deleteCurrentPhase() {
@@ -64,6 +67,15 @@ class MetricsRecorder(val accumulable: Accumulable[ServoTimers, RecordedTiming],
     // Calling toList on a stack returns elements in LIFO order so we need to reverse
     // this to get them in FIFO order, which is what the constructor expects
     new MetricsRecorder(accumulable, Some(this.timingsStack.toList.reverse))
+  }
+
+  private def shouldRecordOperation(rddOperation: Boolean, parent: TimingPath) = {
+    // We don't want to record the timing in the following cases:
+    // 1. If the parent is not being recorded
+    // 2. If this is an RDD operation and the parent is also an RDD operation.
+    // This is because some Spark RDD operations (for example sortByKey) call other RDD operations.
+    // We don't want to record the nested RDD operations as it messes up our timing stats.
+    parent.shouldRecord && (!rddOperation || (rddOperation && !parent.isRDDOperation))
   }
 
   private def root(key: TimingPathKey) = {

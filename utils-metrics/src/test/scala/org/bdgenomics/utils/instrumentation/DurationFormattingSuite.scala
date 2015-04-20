@@ -95,6 +95,12 @@ class DurationFormattingSuite extends FunSuite {
     assert(format(NANOSECONDS.toNanos(1)) === "1 ns")
   }
 
+  test("Negative duration does not throw an error") {
+    // If we get a negative duration we prefer to render it (even though it doesn't make sense)
+    // rather than throwing an error
+    assert(format(SECONDS.toNanos(-25)) === "-25 secs")
+  }
+
   def format(durationNanos: Long): String = {
     formatDuration(Duration.fromNanos(durationNanos))
   }

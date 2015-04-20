@@ -79,7 +79,7 @@ case class RecordedTiming(timingNanos: Long, pathToRoot: TimingPath) extends Ser
  * Specifies a timer name, along with all of its ancestors.
  */
 class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val sequenceId: Int = 0,
-                 val isRDDOperation: Boolean = false) extends Serializable {
+                 val isRDDOperation: Boolean = false, val shouldRecord: Boolean = true) extends Serializable {
 
   val depth = computeDepth()
 
@@ -120,11 +120,12 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
    * directly, as it re-uses objects, thus making equality comparisons faster (objects can be compared by reference)
    */
   def child(key: TimingPathKey): TimingPath = {
-    children.getOrElseUpdate(key, { new TimingPath(key.timerName, Some(this), key.sequenceId, key.isRDDOperation) })
+    children.getOrElseUpdate(key, { new TimingPath(key.timerName, Some(this), key.sequenceId,
+        key.isRDDOperation, key.shouldRecord) })
   }
 
   private def otherFieldsEqual(that: TimingPath): Boolean = {
-    sequenceId == that.sequenceId && isRDDOperation == that.isRDDOperation
+    sequenceId == that.sequenceId && isRDDOperation == that.isRDDOperation && shouldRecord == that.shouldRecord
   }
 
   private def computeDepth(): Int = {
@@ -136,6 +137,7 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
     result = 37 * result + timerName.hashCode()
     result = 37 * result + sequenceId
     result = 37 * result + (if (isRDDOperation) 1 else 0)
+    result = 37 * result + (if (shouldRecord) 1 else 0)
     result = 37 * result + (if (parentPath.isDefined) parentPath.hashCode() else 0)
     result
   }
@@ -148,11 +150,13 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
 
 }
 
-class TimingPathKey(val timerName: String, val sequenceId: Int, val isRDDOperation: Boolean) {
+class TimingPathKey(val timerName: String, val sequenceId: Int,
+    val isRDDOperation: Boolean, val shouldRecord: Boolean = true) {
   private val cachedHashCode = computeHashCode()
   override def equals(other: Any): Boolean = other match {
     case that: TimingPathKey =>
-      timerName == that.timerName && sequenceId == that.sequenceId && isRDDOperation == that.isRDDOperation
+      timerName == that.timerName && sequenceId == that.sequenceId &&
+      isRDDOperation == that.isRDDOperation && shouldRecord == that.shouldRecord
     case _ => false
   }
   private def computeHashCode(): Int = {
@@ -160,6 +164,7 @@ class TimingPathKey(val timerName: String, val sequenceId: Int, val isRDDOperati
     result = 37 * result + timerName.hashCode()
     result = 37 * result + sequenceId
     result = 37 * result + (if (isRDDOperation) 1 else 0)
+    result = 37 * result + (if (shouldRecord) 1 else 0)
     result
   }
   override def hashCode(): Int = {

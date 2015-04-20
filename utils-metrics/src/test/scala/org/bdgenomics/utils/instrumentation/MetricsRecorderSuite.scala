@@ -19,6 +19,7 @@ package org.bdgenomics.utils.instrumentation
 
 import org.apache.spark.Accumulable
 import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.any
 import org.mockito.Mockito.{ times, verify }
 import org.scalatest.FunSuite
 import org.scalatest.mock.MockitoSugar._
@@ -86,6 +87,32 @@ class MetricsRecorderSuite extends FunSuite {
       recorder.startPhase("Timer 2", sequenceId = Some(1))
       recorder.finishPhase("Timer 3", 200000)
     }
+  }
+
+  test("Nested RDD operations are not recorded") {
+    // Checks that nested RDD operations, as well as anything nested within them are not recorded.
+    // This is this to avoid miscalculation of timings when Spark calls an RDD operation within another RDD operation.
+    val accumulable = mock[Accumulable[ServoTimers, RecordedTiming]]
+    val recorder = new MetricsRecorder(accumulable)
+    recorder.startPhase("Timer 1", sequenceId = Some(1), isRDDOperation = false)
+    recorder.startPhase("Timer 2", sequenceId = Some(1), isRDDOperation = true)
+    recorder.startPhase("Timer 3", sequenceId = Some(1), isRDDOperation = true)
+    recorder.startPhase("Timer 4", sequenceId = Some(1), isRDDOperation = false)
+    recorder.finishPhase("Timer 4", 400000)
+    recorder.finishPhase("Timer 3", 300000)
+    recorder.startPhase("Timer 5", sequenceId = Some(1), isRDDOperation = false)
+    recorder.finishPhase("Timer 5", 500000)
+    recorder.finishPhase("Timer 2", 200000)
+    recorder.finishPhase("Timer 1", 100000)
+    val timingPath1 = new TimingPath("Timer 1", None, sequenceId = 1)
+    val timingPath2 = new TimingPath("Timer 2", Some(timingPath1), sequenceId = 1, isRDDOperation = true)
+    val timingPath5 = new TimingPath("Timer 5", Some(timingPath2), sequenceId = 1)
+    // Timer 3 should not have been recorded as it is an RDD operation nested within
+    // another RDD operation. Timer 4 should not have been recorded as it is within the nested RDD operation.
+    verify(accumulable, times(3)).+=(any())
+    verify(accumulable).+=(new RecordedTiming(100000, timingPath1))
+    verify(accumulable).+=(new RecordedTiming(500000, timingPath5))
+    verify(accumulable).+=(new RecordedTiming(200000, timingPath2))
   }
 
 }
