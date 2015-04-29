@@ -1,4 +1,4 @@
- <?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <groupId>org.sonatype.oss</groupId>
@@ -6,150 +6,10 @@
     <version>7</version>
     <relativePath />
   </parent>
-
-  <profiles>
-    <profile>
-      <id>scala-2.10</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <properties>
-        <scala.version>2.10.4</scala.version>
-        <scala.artifact.suffix>2.10</scala.artifact.suffix>
-      </properties>
-    </profile>
-    <profile>
-      <id>scala-2.11</id>
-      <properties>
-        <scala.version>2.11.5</scala.version>
-        <scala.artifact.suffix>2.11</scala.artifact.suffix>
-      </properties>
-    </profile>
-    <!-- Only build coverage in when we want to run coverage -->
-    <profile>
-      <id>coverage</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>net.alchim31.maven</groupId>
-            <artifactId>scala-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>scala-compile-first</id>
-                <phase>process-resources</phase>
-                <goals>
-                  <goal>add-source</goal>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <args>
-                    <arg>-g:vars</arg>
-                    <arg>-Yrangepos</arg>
-                    <arg>-P:scoverage:dataDir:${project.build.directory}</arg>
-                  </args>
-                </configuration>
-              </execution>
-              <execution>
-                <id>scala-test-compile-first</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>testCompile</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>attach-scaladocs</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>doc-jar</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <scalaVersion>${scala.version}</scalaVersion>
-              <recompileMode>incremental</recompileMode>
-              <useZincServer>true</useZincServer>
-              <args>
-                <arg>-unchecked</arg>
-                <arg>-optimise</arg>
-                <arg>-deprecation</arg>
-                <arg>-Xlog-implicits</arg>
-              </args>
-              <jvmArgs>
-                <jvmArg>-Xms64m</jvmArg>
-                <jvmArg>-Xms1024m</jvmArg>
-                <jvmArg>-Xmx1024m</jvmArg>
-              </jvmArgs>
-              <javacArgs>
-                <javacArg>-source</javacArg>
-                <javacArg>${java.version}</javacArg>
-                <javacArg>-target</javacArg>
-                <javacArg>${java.version}</javacArg>
-              </javacArgs>
-              <compilerPlugins>
-                <compilerPlugin>
-                  <groupId>org.scoverage</groupId>
-                  <artifactId>scalac-scoverage-plugin_${scala.artifact.suffix}</artifactId>
-                  <version>${scoverage.version}</version>
-                </compilerPlugin>
-              </compilerPlugins>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <!-- Only sign artifacts when we are performing a release, not snapshots -->
-    <profile>
-      <id>sonatype-oss-release</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-source-plugin</artifactId>
-            <version>2.2.1</version>
-            <executions>
-              <execution>
-                <id>attach-sources</id>
-                <goals>
-                  <goal>jar-no-fork</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.9.1</version>
-            <executions>
-              <execution>
-                <id>attach-javadocs</id>
-                <goals>
-                  <goal>jar</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-gpg-plugin</artifactId>
-            <version>1.5</version>
-            <executions>
-              <execution>
-                <id>sign-artifacts</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
-  <artifactId>utils-parent_${scala.artifact.suffix}</artifactId>
+  <artifactId>utils-parent_2.10</artifactId>
   <version>0.1.3-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
@@ -204,8 +64,8 @@
   </issueManagement>
 
   <build>
-    <outputDirectory>target/scala-${scala.version}/classes</outputDirectory>
-    <testOutputDirectory>target/scala-${scala.version}/test-classes</testOutputDirectory>
+    <outputDirectory>target/scala-2.10.4/classes</outputDirectory>
+    <testOutputDirectory>target/scala-2.10.4/test-classes</testOutputDirectory>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -221,6 +81,7 @@
             <mavenExecutorId>forked-path</mavenExecutorId>
             <useReleaseProfile>false</useReleaseProfile>
             <arguments>-Psonatype-oss-release</arguments>
+            <tagNameFormat>utils-parent-${project.version}_2.10</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
@@ -230,7 +91,7 @@
         </plugin>
         <plugin>
           <groupId>net.alchim31.maven</groupId>
-          <artifactId>scala-maven-plugin_${scala.artifact.suffix}</artifactId>
+          <artifactId>scala-maven-plugin</artifactId>
           <version>3.1.5</version>
         </plugin>
         <plugin>
@@ -373,8 +234,7 @@
           </execution>
         </executions>
         <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-          <recompileMode>incremental</recompileMode>
+          <scalaVersion>2.10.4</scalaVersion>
           <useZincServer>true</useZincServer>
           <args>
             <arg>-unchecked</arg>
@@ -418,32 +278,31 @@
   <dependencyManagement>
     <dependencies>
       <dependency>
+        <groupId>com.esotericsoftware.kryo</groupId>
+        <artifactId>kryo</artifactId>
+        <version>2.21</version>
+      </dependency>
+      <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_${scala.artifact.suffix}</artifactId>
+        <artifactId>utils-misc_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_${scala.artifact.suffix}</artifactId>
+        <artifactId>utils-misc_2.10</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-metrics_${scala.artifact.suffix}</artifactId>
+        <artifactId>utils-io_2.10</artifactId>
         <version>${project.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.bdgenomics.utils</groupId>
-            <artifactId>*</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
-        <groupId>com.esotericsoftware.kryo</groupId>
-        <artifactId>kryo</artifactId>
-        <version>2.21</version>
+        <groupId>org.bdgenomics.utils</groupId>
+        <artifactId>utils-metrics_2.10</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.netflix.servo</groupId>
@@ -452,19 +311,19 @@
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_${scala.artifact.suffix}</artifactId>
+        <artifactId>scalatest_2.10</artifactId>
         <version>2.2.2</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.scoverage</groupId>
-        <artifactId>scalac-scoverage-plugin_${scala.artifact.suffix}</artifactId>
+        <artifactId>scalac-scoverage-plugin_2.10</artifactId>
         <version>${scoverage.version}</version>
       </dependency>
       <dependency>
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
-        <version>${scala.version}</version>
+        <version>2.10.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
@@ -500,7 +359,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_${scala.artifact.suffix}</artifactId>
+        <artifactId>spark-core_2.10</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
         <exclusions>
@@ -510,7 +369,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.twitter</groupId>
-            <artifactId>chill_${scala.artifact.suffix}</artifactId>
+            <artifactId>chill_2.10</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.apache.hadoop</groupId>
@@ -546,7 +405,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-mllib_${scala.artifact.suffix}</artifactId>
+        <artifactId>spark-mllib_2.10</artifactId>
         <version>${spark.version}</version>
       </dependency>
       <dependency>
@@ -562,4 +421,125 @@
     </dependencies>
   </dependencyManagement>
 
+  <profiles>
+    <!-- Only build coverage in when we want to run coverage -->
+    <profile>
+      <id>coverage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>net.alchim31.maven</groupId>
+            <artifactId>scala-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>scala-compile-first</id>
+                <phase>process-resources</phase>
+                <goals>
+                  <goal>add-source</goal>
+                  <goal>compile</goal>
+                </goals>
+                <configuration>
+                  <args>
+                    <arg>-g:vars</arg>
+                    <arg>-Yrangepos</arg>
+                    <arg>-P:scoverage:dataDir:${project.build.directory}</arg>
+                  </args>
+                </configuration>
+              </execution>
+              <execution>
+                <id>scala-test-compile-first</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>testCompile</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>attach-scaladocs</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>doc-jar</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <scalaVersion>2.10.4</scalaVersion>
+              <useZincServer>true</useZincServer>
+              <args>
+                <arg>-unchecked</arg>
+                <arg>-optimise</arg>
+                <arg>-deprecation</arg>
+                <arg>-Xlog-implicits</arg>
+              </args>
+              <jvmArgs>
+                <jvmArg>-Xms64m</jvmArg>
+                <jvmArg>-Xms1024m</jvmArg>
+                <jvmArg>-Xmx1024m</jvmArg>
+              </jvmArgs>
+              <javacArgs>
+                <javacArg>-source</javacArg>
+                <javacArg>${java.version}</javacArg>
+                <javacArg>-target</javacArg>
+                <javacArg>${java.version}</javacArg>
+              </javacArgs>
+              <compilerPlugins>
+                <compilerPlugin>
+                  <groupId>org.scoverage</groupId>
+                  <artifactId>scalac-scoverage-plugin_2.10</artifactId>
+                  <version>${scoverage.version}</version>
+                </compilerPlugin>
+              </compilerPlugins>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <!-- Only sign artifacts when we are performing a release, not snapshots -->
+    <profile>
+      <id>sonatype-oss-release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.2.1</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.9.1</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
