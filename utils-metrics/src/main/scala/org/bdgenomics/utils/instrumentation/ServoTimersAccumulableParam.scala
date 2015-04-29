@@ -120,8 +120,10 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
    * directly, as it re-uses objects, thus making equality comparisons faster (objects can be compared by reference)
    */
   def child(key: TimingPathKey): TimingPath = {
-    children.getOrElseUpdate(key, { new TimingPath(key.timerName, Some(this), key.sequenceId,
-        key.isRDDOperation, key.shouldRecord) })
+    children.getOrElseUpdate(key, {
+      new TimingPath(key.timerName, Some(this), key.sequenceId,
+        key.isRDDOperation, key.shouldRecord)
+    })
   }
 
   private def otherFieldsEqual(that: TimingPath): Boolean = {
@@ -151,12 +153,12 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
 }
 
 class TimingPathKey(val timerName: String, val sequenceId: Int,
-    val isRDDOperation: Boolean, val shouldRecord: Boolean = true) {
+                    val isRDDOperation: Boolean, val shouldRecord: Boolean = true) {
   private val cachedHashCode = computeHashCode()
   override def equals(other: Any): Boolean = other match {
     case that: TimingPathKey =>
       timerName == that.timerName && sequenceId == that.sequenceId &&
-      isRDDOperation == that.isRDDOperation && shouldRecord == that.shouldRecord
+        isRDDOperation == that.isRDDOperation && shouldRecord == that.shouldRecord
     case _ => false
   }
   private def computeHashCode(): Int = {
