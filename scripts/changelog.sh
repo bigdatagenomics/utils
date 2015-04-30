@@ -15,11 +15,11 @@ else
   exit 1
 fi
 
-echo "# BDG-UTILS #"
+echo "# UTILS #"
 
 git log | grep -E "Merge pull request|prepare release" | grep -vi "Revert" | uniq | while read l
 do 
-  release=`echo $l | grep "\[maven-release-plugin\] prepare release" | cut -d "-" -f 5`
+  release=`echo $l | grep "prepare release" | grep -v 2.11 | awk -F'-' '{print $NF}' | awk -F'_' '{ print $1 }'`
   PR=`echo $l| grep -E -o "Merge pull request #[^ ]*" | cut -d "#" -f 2`
 #  echo $l
   if [ -n "$release" ] 
@@ -29,7 +29,7 @@ do
   fi
   if [ -n "$PR" ]
   then
-    JSON=`curl -u $username:$password -s https://api.github.com/repos/bigdatagenomics/bdg-utils/pulls/$PR | tr "\n" " "`
+    JSON=`curl -u $username:$password -s https://api.github.com/repos/bigdatagenomics/utils/pulls/$PR | tr "\n" " "`
     DESC_RAW=$(echo $JSON | egrep -o '"title":.*?[^\\]",' | cut -d "\"" -f 4- | head -n 1 | sed -e "s/\\\\//g")
     DESC=$(echo ${DESC_RAW%\",})
     echo "* ISSUE [$PR](https://github.com/bigdatagenomics/bdg-utils/pull/$PR): ${DESC}"

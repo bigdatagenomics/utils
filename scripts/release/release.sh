@@ -10,4 +10,5 @@ mvn -Dresume=false release:clean release:prepare release:perform
 
 # move back to 2.10 for development
 ./scripts/move_to_scala_2.10.sh
+./scripts/changelog.sh | tee CHANGES.md
 git commit -a -m "Modifying pom.xml files to move back to Scala 2.10 for development."
