@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
     <artifactId>utils-parent_2.11</artifactId>
-    <version>0.2.0-SNAPSHOT</version>
+    <version>0.2.0</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>utils-statistics_2.11</artifactId>
