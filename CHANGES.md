@@ -1,5 +1,8 @@
 # UTILS #
 
+### Version 0.2.1 ###
+* ISSUE [38](https://github.com/bigdatagenomics/bdg-utils/pull/38): kill `job` argument to BDGSparkCommand
+
 ### Version 0.2.0 ###
 * ISSUE [36](https://github.com/bigdatagenomics/bdg-utils/pull/36): Clean up for release
 * ISSUE [35](https://github.com/bigdatagenomics/bdg-utils/pull/35): Fix problem with nested RDD operations that causes negative durations
