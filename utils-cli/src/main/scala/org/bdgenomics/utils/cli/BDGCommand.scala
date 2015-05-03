@@ -18,10 +18,8 @@
 package org.bdgenomics.utils.cli
 
 import java.io.{ StringWriter, PrintWriter }
-import org.apache.hadoop.mapreduce.Job
 import org.apache.spark.{ SparkConf, Logging, SparkContext }
 import org.bdgenomics.utils.instrumentation._
-import org.bdgenomics.utils.misc.HadoopUtil
 
 trait BDGCommandCompanion {
   val commandName: String
@@ -42,7 +40,7 @@ trait BDGCommand extends Runnable {
 trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
   protected val args: A
 
-  def run(sc: SparkContext, job: Job)
+  def run(sc: SparkContext)
 
   def run() {
     val start = System.nanoTime()
@@ -51,9 +49,8 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
       conf.setMaster("local[%d]".format(Runtime.getRuntime.availableProcessors()))
     }
     val sc = new SparkContext(conf)
-    val job = HadoopUtil.newJob()
     val metricsListener = initializeMetrics(sc)
-    run(sc, job)
+    run(sc)
     val totalTime = System.nanoTime() - start
     printMetrics(totalTime, metricsListener)
   }
