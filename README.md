@@ -87,7 +87,7 @@ the `unInstrument` method is called on an RDD. For example, consider the followi
 ```scala
 val array = instrumentedRDD.map(_+1).keyBy(_%2).groupByKey().collect()
 val writer = new PrintWriter(new OutputStreamWriter(System.out))
-Metrics.print(writer, None)
+Metrics.print(writer, Some(metricsListener.metrics.sparkMetrics.stageTimes))
 writer.close()
 ```
 
