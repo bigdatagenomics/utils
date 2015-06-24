@@ -1,5 +1,9 @@
 # UTILS #
 
+### Version 0.2.2 ###
+* ISSUE [42](https://github.com/bigdatagenomics/bdg-utils/pull/42): [utils-42] Upgrading to the org.apache.parquet release of Parquet.
+* ISSUE [39](https://github.com/bigdatagenomics/bdg-utils/pull/39): Updated docs to add correct parameter for printing metrics
+
 ### Version 0.2.1 ###
 * ISSUE [38](https://github.com/bigdatagenomics/bdg-utils/pull/38): kill `job` argument to BDGSparkCommand
 

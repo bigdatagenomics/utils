@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
-    <artifactId>utils-parent_2.11</artifactId>
+    <artifactId>utils-parent_2.10</artifactId>
     <version>0.2.3-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-statistics_2.11</artifactId>
+  <artifactId>utils-statistics_2.10</artifactId>
   <packaging>jar</packaging>
-  <name>utils-statistics_2.11: Spark code for fitting statistical models</name>
+  <name>utils-statistics_2.10: Spark code for fitting statistical models</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -121,21 +121,21 @@
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc_2.11</artifactId>
+      <artifactId>utils-misc_2.10</artifactId>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc_2.11</artifactId>
+      <artifactId>utils-misc_2.10</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.11</artifactId>
+      <artifactId>spark-core_2.10</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib_2.11</artifactId>
+      <artifactId>spark-mllib_2.10</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -143,12 +143,12 @@
     </dependency>
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.11</artifactId>
+      <artifactId>scalatest_2.10</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.scalanlp</groupId>
-      <artifactId>breeze_2.11</artifactId>
+      <artifactId>breeze_2.10</artifactId>
     </dependency>
   </dependencies>
 
