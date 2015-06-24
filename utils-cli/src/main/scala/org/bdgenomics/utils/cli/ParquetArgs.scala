@@ -18,7 +18,7 @@
 package org.bdgenomics.utils.cli
 
 import org.kohsuke.args4j.{ Argument, Option }
-import parquet.hadoop.metadata.CompressionCodecName
+import org.apache.parquet.hadoop.metadata.CompressionCodecName
 
 trait ParquetRDDArgs {
   var blockSize: Int
