@@ -27,7 +27,7 @@
         <configuration>
           <reportsDirectory>${project.build.directory}/surefire-reports</reportsDirectory>
           <junitxml>.</junitxml>
-          <filereports>BDGUtilsParquetTestSuite.txt</filereports>
+          <filereports>BDGUtilsIOTestSuite.txt</filereports>
           <!--
               As explained here: http://stackoverflow.com/questions/1660441/java-flag-to-enable-extended-serialization-debugging-info
               The second option allows us better debugging for serialization-based errors.
@@ -141,10 +141,6 @@
       <groupId>org.scalatest</groupId>
       <artifactId>scalatest_2.10</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.twitter</groupId>
-      <artifactId>parquet-avro</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
