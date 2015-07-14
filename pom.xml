@@ -81,7 +81,7 @@
             <mavenExecutorId>forked-path</mavenExecutorId>
             <useReleaseProfile>false</useReleaseProfile>
             <arguments>-Psonatype-oss-release</arguments>
-            <tagNameFormat>utils-parent-${project.version}_2.10</tagNameFormat>
+            <tagNameFormat>utils-parent_2.10-${project.version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
