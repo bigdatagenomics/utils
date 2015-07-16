@@ -50,8 +50,8 @@ object HadoopUtil {
 
   /**
    * In Hadoop 2.x, isDir is deprecated in favor of isDirectory
-   * @param fs
-   * @return
+   * @param fs The file or directory
+   * @return True if the specified file is a directory
    */
   def isDirectory(fs: FileStatus): Boolean = {
     val fsClass: Class[_] = fs.getClass

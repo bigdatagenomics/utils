@@ -120,6 +120,7 @@
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
       <artifactId>utils-misc_2.10</artifactId>
+      <scope>compile</scope>
     </dependency>
     <dependency>
       <groupId>com.netflix.servo</groupId>

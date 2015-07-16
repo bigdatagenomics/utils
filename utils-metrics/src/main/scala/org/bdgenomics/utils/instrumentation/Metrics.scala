@@ -249,7 +249,7 @@ object Metrics {
       val sortedChildren = children.sortWith((a, b) => { childLessThan(a, b) })
       val name = timer.name
       addToRows(rows, prefix + (if (isTail) "└─ " else "├─ ") + name, timer, isInSparkWorker = isInSparkWorker)
-      for (i <- 0 until sortedChildren.size) {
+      for (i <- sortedChildren.indices) {
         if (i < sortedChildren.size - 1) {
           sortedChildren.get(i).addToTable(rows, prefix + (if (isTail) "    " else "│   "),
             isInSparkWorker = isInSparkWorker || timingPath.isRDDOperation, isTail = false)

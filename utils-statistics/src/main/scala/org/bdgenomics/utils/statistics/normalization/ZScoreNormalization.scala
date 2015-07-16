@@ -30,7 +30,7 @@ object ZScoreNormalization extends Serializable with Logging {
    * by the standard deviation across all points.
    *
    * @param rdd RDD of (Double, Value) pairs to be normalized.
-   * @returns Returns an RDD where the original double value has been replaced
+   * @return Returns an RDD where the original double value has been replaced
    * by the Z score for that point.
    *
    * @tparam T Type of data passed along.

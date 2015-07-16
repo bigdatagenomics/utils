@@ -73,10 +73,8 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
    * Runs an EM loop to fit a mixture model.
    *
    * @param rdd An RDD of doubles to fit the mixture model to.
-   * @param initialDistributions The intial distributions to start running EM from.
+   * @param initialDistributions The initial distributions to start running EM from.
    * @param maxIterations The maximum number of iterations to run.
-   * @param ecllThreshold We stop running the EM loop once the expected complete log
-   *                      likelihood increases by less than this threshold.
    * @return Returns an array of fit distributions.
    */
   protected def em(rdd: RDD[Int],
@@ -110,9 +108,9 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
 
         // print logging info
         log.info("After iteration " + iteration + ":")
-        (0 until distributions.length).foreach(i => {
+        distributions.indices.foreach(i => {
           log.info("Distribution " + i + " has weight " + weighting(i) +
-            " and distribuion: " + distributions(i))
+            " and distribution: " + distributions(i))
         })
 
         // recursively call next iteration
@@ -185,7 +183,7 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
                                   maxIterations: Int)(implicit dTag: ClassTag[D]): (Array[D], Array[Double]) = {
 
     // initialize distributions by running k-means
-    val clusters = KMeans.train(rdd.map(p => Vectors.dense(p.toInt)), k, maxIterations)
+    val clusters = KMeans.train(rdd.map(p => Vectors.dense(p)), k, maxIterations)
 
     // get cluster centroids
     val centroids = clusters.clusterCenters

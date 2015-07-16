@@ -68,7 +68,7 @@ object MathUtils extends Serializable {
    * @return Overwrites a1 with the aggregated value, and returns a1.
    */
   def aggregateArray(a1: Array[Double], a2: Array[Double]): Array[Double] = {
-    (0 until a1.length).foreach(i => a1(i) += a2(i))
+    a1.indices.foreach(i => a1(i) += a2(i))
     a1
   }
 
@@ -96,7 +96,7 @@ object MathUtils extends Serializable {
   def softmax(a: Array[Double]) {
     val norm = a.sum
 
-    (0 until a.length).foreach(i => a(i) /= norm)
+    a.indices.foreach(i => a(i) /= norm)
   }
 
   /**
@@ -106,6 +106,6 @@ object MathUtils extends Serializable {
    * @param a Array to multiply. Multiplies array in place.
    */
   def scalarArrayMultiply(s: Double, a: Array[Double]) {
-    (0 until a.length).foreach(i => a(i) *= s)
+    a.indices.foreach(i => a(i) *= s)
   }
 }

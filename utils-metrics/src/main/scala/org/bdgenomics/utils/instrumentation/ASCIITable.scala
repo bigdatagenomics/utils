@@ -90,7 +90,7 @@ class ASCIITable(header: Array[ASCIITableHeader], rows: Array[Array[String]]) {
   }
 
   private def updateColumnWidths(columnWidths: Array[Int], row: Array[String]) = {
-    for (i <- 0 to columnWidths.length - 1) {
+    for (i <- columnWidths.indices) {
       if (row(i).length > columnWidths(i)) {
         columnWidths(i) = row(i).length
       }
