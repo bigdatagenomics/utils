@@ -59,9 +59,9 @@ class AggregatedCollection[T, U <: Aggregated[T]](val values: Seq[U])
     extends Aggregated[Collection[Seq[T]]]
     with Serializable {
 
-  def count(): Long = values.map(_.count()).reduce(_ + _)
+  def count(): Long = values.map(_.count()).sum
   def countIdentical(): Long =
-    values.map(_.countIdentical()).reduce(_ + _)
+    values.map(_.countIdentical()).sum
 
   def write(stream: Writer) {
     values.foreach(value => value.write(stream))

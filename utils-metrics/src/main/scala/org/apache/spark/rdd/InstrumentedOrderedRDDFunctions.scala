@@ -28,7 +28,7 @@ import scala.reflect.ClassTag
  */
 class InstrumentedOrderedRDDFunctions[K: Ordering: ClassTag, V: ClassTag](self: RDD[(K, V)]) extends Serializable {
 
-  def sortByKey(ascending: Boolean = true, numPartitions: Int = self.partitions.size): RDD[(K, V)] = self match {
+  def sortByKey(ascending: Boolean = true, numPartitions: Int = self.partitions.length): RDD[(K, V)] = self match {
     case instrumented: InstrumentedRDD[_] => recordOperation {
       instrument(self.sortByKey(ascending, numPartitions))
     }

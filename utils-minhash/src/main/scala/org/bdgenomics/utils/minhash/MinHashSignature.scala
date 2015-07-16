@@ -55,7 +55,7 @@ private[minhash] case class MinHashSignature(hashArray: Array[Int]) {
    *       roundly into the size of the signature; we delegate this check
    *       to the function caller.
    *
-   * @param The number of signature rows to use per band.
+   * @param bandSize The number of signature rows to use per band.
    * @return Returns this signature sliced into multiple band keys.
    */
   def bucket(bandSize: Int): Iterable[MinHashBucketKey] = {
@@ -79,7 +79,7 @@ private[minhash] case class MinHashSignature(hashArray: Array[Int]) {
    *       comparing to. We do not perform this check; we delegate this check
    *       to the function caller.
    *
-   * @param Another signature to similarity against.
+   * @param other Another signature to similarity against.
    * @return Returns the estimated Jaccard similarity of two signatures, which
    *         is defined as the number of elements in the signature that agree
    *         over the total length of the signature.
@@ -88,7 +88,7 @@ private[minhash] case class MinHashSignature(hashArray: Array[Int]) {
     var overlap = 0
 
     // loop over elements - increment overlap count if signatures match
-    (0 until hashArray.length).foreach(i => {
+    hashArray.indices.foreach(i => {
       if (hashArray(i) == other.hashArray(i)) {
         overlap += 1
       }

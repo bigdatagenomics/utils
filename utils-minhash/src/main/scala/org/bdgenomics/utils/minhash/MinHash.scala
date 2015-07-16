@@ -49,7 +49,7 @@ object MinHash extends Serializable {
    * @param rdd The RDD of data points to compute similarity on.
    * @param signatureLength The length of MinHash signature to use.
    * @param randomSeed An optional seed for random number generation.
-   * @returns Returns an RDD containing all pairs of elements, with their
+   * @return Returns an RDD containing all pairs of elements, with their
    *          similarity, as a tuple of (similarity, (elem1, elem2)).
    */
   def exactMinHash[T <: MinHashable](rdd: RDD[T],
@@ -92,7 +92,7 @@ object MinHash extends Serializable {
    * @param signatureLength The length of MinHash signature to use.
    * @param bands The number of bands to use for LSHing.
    * @param randomSeed An optional seed for random number generation.
-   * @returns Returns an RDD containing all pairs of elements, with their
+   * @return Returns an RDD containing all pairs of elements, with their
    *          similarity, as a tuple of (similarity, (elem1, elem2)).
    */
   def approximateMinHash[T <: MinHashable](rdd: RDD[T],

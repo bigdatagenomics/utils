@@ -26,7 +26,7 @@ class Histogram[T](val valueToCount: Map[T, Int]) extends Aggregated[T] with Ser
    * Counts the total number of elements that went into the histogram
    * @return
    */
-  def count(): Long = valueToCount.values.map(_.toLong).reduce(_ + _)
+  def count(): Long = valueToCount.values.map(_.toLong).sum
 
   def countIdentical(): Long = countSubset(defaultFilter)
 
@@ -37,7 +37,7 @@ class Histogram[T](val valueToCount: Map[T, Int]) extends Aggregated[T] with Ser
    */
   def countSubset(f: Any => Boolean): Long = valueToCount.filter {
     case (k, v: Int) => f(k)
-  }.values.map(_.toLong).reduce(_ + _)
+  }.values.map(_.toLong).sum
 
   private def defaultFilter(x: Any): Boolean = {
     x match {

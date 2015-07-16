@@ -34,7 +34,7 @@ object InstrumentationTestingUtil extends FunSuite {
           fail("Read past the end of the reader")
         }
         if (line.startsWith("|")) {
-          // Remove the intial pipe symbol or we will get an extra empty cell at the start
+          // Remove the initial pipe symbol or we will get an extra empty cell at the start
           val splitLine = line.substring(1).split('|')
           compareLines(splitLine, expectedValues(index), prefixString)
           index += 1
