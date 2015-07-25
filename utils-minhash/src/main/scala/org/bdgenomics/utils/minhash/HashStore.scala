@@ -50,4 +50,9 @@ private[minhash] class HashStore private (hashes: Array[Int]) extends Serializab
    * @return Returns the number of hashes in the store.
    */
   def size: Int = hashes.length
+
+  /**
+   * @regurn Returns the indices for all hash elements.
+   */
+  def indices: scala.collection.immutable.Range = hashes.indices
 }
