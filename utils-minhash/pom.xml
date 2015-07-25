@@ -138,6 +138,10 @@
       <artifactId>scalatest_2.10</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-mllib_2.10</artifactId>
+    </dependency>
   </dependencies>
 
   <profiles>

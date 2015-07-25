@@ -17,7 +17,9 @@
  */
 package org.bdgenomics.utils.minhash
 
-private[minhash] object MinHashSignature {
+import org.apache.spark.mllib.linalg.{ Vector, Vectors }
+
+object MinHashSignature {
 
   /**
    * For two signatures, finds the key for the first bucket that both signatures
@@ -33,9 +35,9 @@ private[minhash] object MinHashSignature {
    * @return Returns an option containing the first overlapping bucket key, if
    *         one exists.
    */
-  def firstBucket(sig1: MinHashSignature,
-                  sig2: MinHashSignature,
-                  bandSize: Int): Option[MinHashBucketKey] = {
+  private[minhash] def firstBucket(sig1: MinHashSignature,
+                                   sig2: MinHashSignature,
+                                   bandSize: Int): Option[MinHashBucketKey] = {
     // get and zip buckets
     val keys = sig1.bucket(bandSize).zip(sig2.bucket(bandSize))
 
@@ -45,7 +47,7 @@ private[minhash] object MinHashSignature {
   }
 }
 
-private[minhash] case class MinHashSignature(hashArray: Array[Int]) {
+case class MinHashSignature private[minhash] (hashArray: Array[Int]) {
 
   /**
    * Splits this signature into multiple bands, which can then be used to
@@ -58,7 +60,7 @@ private[minhash] case class MinHashSignature(hashArray: Array[Int]) {
    * @param bandSize The number of signature rows to use per band.
    * @return Returns this signature sliced into multiple band keys.
    */
-  def bucket(bandSize: Int): Iterable[MinHashBucketKey] = {
+  private[minhash] def bucket(bandSize: Int): Iterable[MinHashBucketKey] = {
     // split into groups
     val groups = hashArray.grouped(bandSize)
 
@@ -97,4 +99,11 @@ private[minhash] case class MinHashSignature(hashArray: Array[Int]) {
     // similarity is the number of matching elements over the signature length
     overlap.toDouble / hashArray.length.toDouble
   }
+
+  /**
+   * Goes from hash array to an MLLib vector.
+   *
+   * @return A dense vector that can be used in MLLib.
+   */
+  def toVector: Vector = Vectors.dense(hashArray.map(_.toDouble))
 }
