@@ -40,20 +40,20 @@ object Args4j {
       System.exit(exitCode)
     }
 
-    // Work around for help processing in Args4j
-    if (args.exists(helpOptions.contains(_))) {
-      displayHelp()
-    }
-
     try {
       parser.parseArgument(args.toList)
-      if (args4j.doPrintUsage)
+      if (!ignoreCmdLineExceptions && args4j.doPrintUsage) {
         displayHelp()
+      }
     } catch {
       case e: CmdLineException =>
         if (!ignoreCmdLineExceptions) {
-          println(e.getMessage)
-          displayHelp(1)
+          if (args4j.doPrintUsage) {
+            displayHelp()
+          } else {
+            println(e.getMessage)
+            displayHelp(1)
+          }
         }
     }
 
