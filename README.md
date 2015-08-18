@@ -15,45 +15,46 @@ The following is an example of some instrumentation output from the
 
 ```
 Timings
-+------------------------------------------------------------+-------------+-------------+---------+-----------+--------+-----------+
-|                           Metric                           | Worker Time | Driver Time |  Count  |   Mean    |  Min   |    Max    |
-+------------------------------------------------------------+-------------+-------------+---------+-----------+--------+-----------+
-| └─ Base Quality Recalibration                              |           - |   1.41 secs |       1 | 1.41 secs |      - |         - |
-|     ├─ map at DecadentRead.scala:50                        |           - |           - |       1 |         - |      - |         - |
-|     │   └─ function call                                   |   9.14 secs |           - |  185804 |  49.18 µs |      0 | 1.72 secs |
-|     ├─ filter at BaseQualityRecalibration.scala:71         |           - |           - |       1 |         - |      - |         - |
-|     │   └─ function call                                   |    95.09 ms |           - |   92902 |   1.02 µs |      0 |    782 µs |
-|     ├─ flatMap at BaseQualityRecalibration.scala:71        |           - |           - |       1 |         - |      - |         - |
-|     │   └─ function call                                   |  20.18 secs |           - |   90385 | 223.29 µs |  73 µs | 1.38 secs |
-|     ├─ map at BaseQualityRecalibration.scala:82            |           - |           - |       1 |         - |      - |         - |
-|     │   └─ function call                                   |   3.91 secs |           - | 8446035 |    463 ns |      0 | 1.35 secs |
-|     ├─ aggregate at BaseQualityRecalibration.scala:83      |           - |           - |       1 |         - |      - |         - |
-|     │   └─ function call                                   |  17.23 secs |           - | 8446036 |   2.04 µs |      0 | 1.23 secs |
-|     │       └─ Observation Accumulator: seq                |  14.25 secs |           - | 8446035 |   1.69 µs |      0 | 1.23 secs |
-|     └─ map at BaseQualityRecalibration.scala:95            |           - |           - |       1 |         - |      - |         - |
-|         └─ function call                                   |  31.98 secs |           - |   92902 | 344.23 µs | 195 µs | 1.26 secs |
-|             └─ Recalibrate Read                            |   31.9 secs |           - |   92902 | 343.41 µs | 194 µs | 1.26 secs |
-|                 └─ Compute Quality Score                   |  29.93 secs |           - |   92902 | 322.15 µs | 181 µs | 1.26 secs |
-| └─ Save File In ADAM Format                                |           - |    83.61 ms |       1 |  83.61 ms |      - |         - |
-|     ├─ map at ADAMRDDFunctions.scala:80                    |           - |           - |       1 |         - |      - |         - |
-|     │   └─ function call                                   |    41.84 ms |           - |   92902 |    450 ns |      0 |     51 µs |
-|     └─ saveAsNewAPIHadoopFile at ADAMRDDFunctions.scala:82 |           - |           - |       1 |         - |      - |         - |
-|         └─ Write ADAM Record                               |    2.4 secs |           - |   92902 |  25.86 µs |      0 |   9.01 ms |
-+------------------------------------------------------------+-------------+-------------+---------+-----------+--------+-----------+
++------------------------------------------------------------+--------------+----------------+-------------+----------+----------------+----------------+----------------+
+|                           Metric                           | Worker Total |  Driver Total  | Driver Only |  Count   |      Mean      |      Min       |      Max       |
++------------------------------------------------------------+--------------+----------------+-------------+----------+----------------+----------------+----------------+
+| └─ Base Quality Recalibration                              |            - | 2 mins 36 secs |   644.45 ms |        1 | 2 mins 36 secs | 2 mins 36 secs | 2 mins 36 secs |
+|     ├─ map at DecadentRead.scala:50                        |            - |        6.72 ms |           - |        1 |        6.72 ms |        6.72 ms |        6.72 ms |
+|     │   └─ function call                                   |   21.45 secs |              - |           - |   747308 |       28.71 µs |              0 |      183.24 ms |
+|     ├─ filter at BaseQualityRecalibration.scala:71         |            - |       20.09 ms |           - |        1 |       20.09 ms |       20.09 ms |       20.09 ms |
+|     │   └─ function call                                   |    170.74 ms |              - |           - |   373654 |         456 ns |              0 |        1.37 ms |
+|     ├─ flatMap at BaseQualityRecalibration.scala:71        |            - |        9.88 ms |           - |        1 |        9.88 ms |        9.88 ms |        9.88 ms |
+|     │   └─ function call                                   |   46.17 secs |              - |           - |   363277 |      127.08 µs |          69 µs |       54.42 ms |
+|     ├─ map at BaseQualityRecalibration.scala:82            |            - |        5.37 ms |           - |        1 |        5.37 ms |        5.37 ms |        5.37 ms |
+|     │   └─ function call                                   |    6.58 secs |              - |           - | 33940138 |         193 ns |              0 |       44.63 ms |
+|     ├─ aggregate at BaseQualityRecalibration.scala:83      |            - | 2 mins 35 secs |           - |        1 | 2 mins 35 secs | 2 mins 35 secs | 2 mins 35 secs |
+|     │   └─ function call                                   |   34.49 secs |              - |           - | 33940139 |        1.02 µs |              0 |      510.07 ms |
+|     │       └─ Observation Accumulator: seq                |   26.91 secs |              - |           - | 33940138 |         792 ns |              0 |      510.07 ms |
+|     └─ map at BaseQualityRecalibration.scala:95            |            - |       71.76 ms |           - |        1 |       71.76 ms |       71.76 ms |       71.76 ms |
+|         └─ function call                                   |   57.08 secs |              - |           - |   373654 |      152.76 µs |          89 µs |       39.02 ms |
+|             └─ Recalibrate Read                            |   56.85 secs |              - |           - |   373654 |      152.14 µs |          88 µs |       39.01 ms |
+|                 └─ Compute Quality Score                   |   51.48 secs |              - |           - |   373654 |      137.76 µs |          75 µs |        34.4 ms |
+|                     └─ Get Extra Values                    |   19.01 secs |              - |           - |   373654 |       50.88 µs |          22 µs |       33.31 ms |
+| └─ Save File In ADAM Format                                |            - | 2 mins 33 secs |     89.8 ms |        1 | 2 mins 33 secs | 2 mins 33 secs | 2 mins 33 secs |
+|     ├─ map at ADAMRDDFunctions.scala:73                    |            - |       30.45 ms |           - |        1 |       30.45 ms |       30.45 ms |       30.45 ms |
+|     │   └─ function call                                   |     126.9 ms |              - |           - |   373654 |         339 ns |              0 |          65 µs |
+|     └─ saveAsNewAPIHadoopFile at ADAMRDDFunctions.scala:75 |            - | 2 mins 33 secs |           - |        1 | 2 mins 33 secs | 2 mins 33 secs | 2 mins 33 secs |
+|         └─ Write ADAM Record                               |   12.22 secs |              - |           - |   373654 |       32.71 µs |              0 |      359.63 ms |
++------------------------------------------------------------+--------------+----------------+-------------+----------+----------------+----------------+----------------+
 
 Spark Operations
-+-----------------------------------------------------+--------------+--------------+----------+
-|                      Operation                      | Is Blocking? |   Duration   | Stage ID |
-+-----------------------------------------------------+--------------+--------------+----------+
-| map at DecadentRead.scala:50                        | false        |            - | -        |
-| filter at BaseQualityRecalibration.scala:71         | false        |            - | -        |
-| flatMap at BaseQualityRecalibration.scala:71        | false        |            - | -        |
-| map at BaseQualityRecalibration.scala:82            | false        |            - | -        |
-| aggregate at BaseQualityRecalibration.scala:83      | true         | 1 min 0 secs | 2        |
-| map at BaseQualityRecalibration.scala:95            | false        |            - | -        |
-| map at ADAMRDDFunctions.scala:80                    | false        |            - | -        |
-| saveAsNewAPIHadoopFile at ADAMRDDFunctions.scala:82 | true         |   47.09 secs | 3        |
-+-----------------------------------------------------+--------------+--------------+----------+
++----------+-----------------------------------------------------+---------------+----------------+----------------+----------+
+| Sequence |                      Operation                      | Is New Stage? | Stage Duration |  Driver Total  | Stage ID |
++----------+-----------------------------------------------------+---------------+----------------+----------------+----------+
+| 1        | map at DecadentRead.scala:50                        | false         |              - |        6.72 ms | -        |
+| 2        | filter at BaseQualityRecalibration.scala:71         | false         |              - |       20.09 ms | -        |
+| 3        | flatMap at BaseQualityRecalibration.scala:71        | false         |              - |        9.88 ms | -        |
+| 4        | map at BaseQualityRecalibration.scala:82            | false         |              - |        5.37 ms | -        |
+| 5        | aggregate at BaseQualityRecalibration.scala:83      | true          | 2 mins 35 secs | 2 mins 35 secs | 1        |
+| 6        | map at BaseQualityRecalibration.scala:95            | false         |              - |       71.76 ms | -        |
+| 7        | map at ADAMRDDFunctions.scala:73                    | false         |              - |       30.45 ms | -        |
+| 8        | saveAsNewAPIHadoopFile at ADAMRDDFunctions.scala:75 | true          | 2 mins 32 secs | 2 mins 33 secs | 2        |
++----------+-----------------------------------------------------+---------------+----------------+----------------+----------+
 ```
 
 ### Basic Usage
@@ -95,37 +96,63 @@ This will result in output like the following:
 
 ```
 Timings
-+-------------------------------+-------------+-------------+-------+---------+------+--------+
-|            Metric             | Worker Time | Driver Time | Count |  Mean   | Min  |  Max   |
-+-------------------------------+-------------+-------------+-------+---------+------+--------+
-| └─ map at Ins.scala:30        |           - |           - |     1 |       - |    - |      - |
-|     └─ function call          |      642 µs |           - |    10 | 64.2 µs | 6 µs | 550 µs |
-| └─ keyBy at Ins.scala:30      |           - |           - |     1 |       - |    - |      - |
-|     └─ function call          |      140 µs |           - |    10 |   14 µs | 5 µs |  64 µs |
-| └─ groupByKey at Ins.scala:30 |           - |           - |     1 |       - |    - |      - |
-| └─ collect at Ins.scala:30    |           - |           - |     1 |       - |    - |      - |
-+-------------------------------+-------------+-------------+-------+---------+------+--------+
++------------------------------------------+--------------+--------------+-------------+-------+----------+----------+----------+
+|                  Metric                  | Worker Total | Driver Total | Driver Only | Count |   Mean   |   Min    |   Max    |
++------------------------------------------+--------------+--------------+-------------+-------+----------+----------+----------+
+| └─ map at BdgUtilsTester.scala:26        |            - |     82.84 ms |           - |     1 | 82.84 ms | 82.84 ms | 82.84 ms |
+|     └─ function call                     |       321 µs |            - |           - |     5 |  64.2 µs |     8 µs |   284 µs |
+| └─ keyBy at BdgUtilsTester.scala:26      |            - |     11.52 ms |           - |     1 | 11.52 ms | 11.52 ms | 11.52 ms |
+|     └─ function call                     |        63 µs |            - |           - |     5 |  12.6 µs |     7 µs |    34 µs |
+| └─ groupByKey at BdgUtilsTester.scala:26 |            - |     41.63 ms |           - |     1 | 41.63 ms | 41.63 ms | 41.63 ms |
+| └─ collect at BdgUtilsTester.scala:26    |            - |     354.3 ms |           - |     1 | 354.3 ms | 354.3 ms | 354.3 ms |
++------------------------------------------+--------------+--------------+-------------+-------+----------+----------+----------+
 
 Spark Operations
-+----------------------------+--------------+----------+----------+
-|         Operation          | Is Blocking? | Duration | Stage ID |
-+----------------------------+--------------+----------+----------+
-| map at Ins.scala:30        | false        |        - | -        |
-| keyBy at Ins.scala:30      | true         |    91 ms | 1        |
-| groupByKey at Ins.scala:30 | false        |        - | -        |
-| collect at Ins.scala:30    | true         |    40 ms | 0        |
-+----------------------------+--------------+----------+----------+
++----------+---------------------------------------+---------------+----------------+--------------+----------+
+| Sequence |               Operation               | Is New Stage? | Stage Duration | Driver Total | Stage ID |
++----------+---------------------------------------+---------------+----------------+--------------+----------+
+| 1        | map at BdgUtilsTester.scala:26        | false         |              - |     82.84 ms | -        |
+| 2        | keyBy at BdgUtilsTester.scala:26      | true          |         124 ms |     11.52 ms | 0        |
+| 3        | groupByKey at BdgUtilsTester.scala:26 | false         |              - |     41.63 ms | -        |
+| 4        | collect at BdgUtilsTester.scala:26    | true          |          53 ms |     354.3 ms | 1        |
++----------+---------------------------------------+---------------+----------------+--------------+----------+
 ```
 
-The first table contains each Spark operation, as well as timings for each of the functions that the Spark
-operations use. The "Worker Time" column is the total time spent executing a particular function in the Spark Workers,
-and the "Count" column is the number of times that the function was called.
+#### Timings Table
 
-The second table contains more details about the Spark operations. The "Is Blocking?" column specifies whether a
-particular operation was blocking (it must complete before subsequent operations on the same RDD can proceed). For
-blocking operations the "Duration" column contains the duration of the Spark stage that corresponds to this operation.
-That is, this is *the duration of this operation plus all of the preceding operations on the same RDD, up until the
-previous blocking operation*.
+The "Timings" table contains each Spark operation, as well as timings for each of the functions that the Spark
+operations use. This table has 3 columns representing the total time for a particular entry, as follows:
+
+ * The "Worker Total" column is the total time spent in the Spark worker nodes (in other words, within an RDD operation).
+ * The "Driver Total" column is the total time spent in the Spark driver program (in other words, outside of any RDD
+ operations), including time spent waiting for Spark operations to complete. Since Spark executes operations lazily,
+ this column can be misleading. Typically the driver program will only wait for operations that return data back to
+ the driver program. Therefore, to investigate the performance of the driver program itself, it is typically better
+ to use the "Driver Only" column.
+ * The "Driver Only" column is the total time spent in the driver program, _excluding_ any time spent waiting for
+ Spark operations to complete. Note that in the above example the "Driver Only" column is always empty, as nothing in
+ the driver program has been instrumented. See "Instrumenting Function Calls" for details of how to instrument the
+ driver program.
+
+For an explanation of the difference between the Spark driver program and worker nodes see the
+[Spark Cluster Mode Overview](http://spark.apache.org/docs/latest/cluster-overview.html).
+
+#### Spark Operations Table
+
+The "Spark Operations" table contains more details about the Spark operations. The operations are displayed in the order in which
+they were executed, and are labelled with the location in the driver program from which they are called.
+In addition, the following columns are shown:
+
+ * The "Is New Stage?" column specifies whether a particular operation required the creation of a new "stage" in Spark.
+ A stage is a group of operations that must be completed before subsequent operations on the same data set can proceed.
+ (for example, a [shuffle operation](http://spark.apache.org/docs/latest/programming-guide.html#shuffle-operations)).
+ * The "Stage Duration" column specifies the total duration of a particular stage. That is, is represents the
+ duration of a particular entry, plus *all of the preceeding entries until the end of the previous stage*, for a particular
+ data set. It is not possible to obtain the time for individual operations within a stage - however it is possible to obtain
+ timings for functions that are executed by these operations. See the description of the "Timings" table (above) for more information.
+ * The "Driver Total" column is the total time spent waiting for an operation to complete in the Spark driver program. This
+ matches the corresponding column in the "Timings" table. See the description of that table (above) for further details.
+ * The "Stage ID" column is Spark's internal stage ID.
 
 **IMPORTANT**: When using bdg-utils instrumentation it is not a good idea to import `SparkContext._`, as the implicit
 conversions in there may conflict with those required for instrumentation. Instead it is better to import
@@ -169,28 +196,24 @@ This will result in output like the following:
 
 ```
 Timings
-+-----------------------------------------------+-------------+-------------+-------+----------+-------+---------+
-|                    Metric                     | Worker Time | Driver Time | Count |   Mean   |  Min  |   Max   |
-+-----------------------------------------------+-------------+-------------+-------+----------+-------+---------+
-| └─ Driver Function Top Level                  |           - |     8.93 ms |     1 |  8.93 ms |     - |       - |
-|     └─ Driver Function Nested                 |           - |     7.01 ms |     1 |  7.01 ms |     - |       - |
-|         ├─ map at Ins.scala:50                |           - |           - |     1 |        - |     - |       - |
-|         │   └─ function call                  |     1.75 ms |           - |    10 | 175.3 µs | 27 µs | 1.36 ms |
-|         │       └─ Worker Function Top Level  |      916 µs |           - |    10 |  91.6 µs | 15 µs |  717 µs |
-|         │           └─ Worker Function Nested |       77 µs |           - |    10 |   7.7 µs |  4 µs |   38 µs |
-|         └─ collect at Ins.scala:56            |           - |           - |     1 |        - |     - |       - |
-+-----------------------------------------------+-------------+-------------+-------+----------+-------+---------+
++-----------------------------------------------+--------------+--------------+-------------+-------+-----------+-----------+-----------+
+|                    Metric                     | Worker Total | Driver Total | Driver Only | Count |   Mean    |    Min    |    Max    |
++-----------------------------------------------+--------------+--------------+-------------+-------+-----------+-----------+-----------+
+| └─ Driver Function Top Level                  |            - |    604.27 ms |   168.11 ms |     1 | 604.27 ms | 604.27 ms | 604.27 ms |
+|     └─ Driver Function Nested                 |            - |    497.71 ms |    61.55 ms |     1 | 497.71 ms | 497.71 ms | 497.71 ms |
+|         ├─ map at NestedTester.scala:40       |            - |     75.39 ms |           - |     1 |  75.39 ms |  75.39 ms |  75.39 ms |
+|         │   └─ function call                  |    173.29 ms |            - |           - |     5 |  34.66 ms |  30.84 ms |  35.71 ms |
+|         │       └─ Worker Function Top Level  |     166.5 ms |            - |           - |     5 |   33.3 ms |  30.79 ms |  33.99 ms |
+|         │           └─ Worker Function Nested |    103.54 ms |            - |           - |     5 |  20.71 ms |  20.21 ms |  20.83 ms |
+|         └─ collect at NestedTester.scala:48   |            - |    360.78 ms |           - |     1 | 360.78 ms | 360.78 ms | 360.78 ms |
++-----------------------------------------------+--------------+--------------+-------------+-------+-----------+-----------+-----------+
 ```
 
-Note that there are two columns in the output to represent the total time spent on a particular function call:
-"Driver Time" and "Worker Time". A particular function call will be in one or the other.
-Driver Time is the total time spent on the function call in the Spark Driver (in other words, outside of any RDD
-operations). Worker Time is the total time spent in a Spark Worker (in other words, within an RDD operation).
+We can see that a tree structure representing the nested function calls, along with their timings, is displayed.
 
-Note that the Driver Time does not include the time taken to execute Spark operations. This is because, in Spark,
-operations are performed lazily: that is, for a particular RDD most operations take hardly any time at all, and a few
-take a long time. Therefore it would be misleading to include the time taken to execute Spark operations in the Driver
-time.
+Note that the "Worker Total" column is populated only for function calls within RDD operations, and the "Driver Total" column is populated
+for RDD operations themselves, and any operations outside them. The "Driver Only" column is populated just for function calls outside
+RDD operations. See the description of the "Timings" table above for further details on these columns.
 
 ### Instrumenting File Saving Operations
 

@@ -17,6 +17,7 @@
  */
 package org.bdgenomics.utils.instrumentation
 
+import com.netflix.servo.monitor.MonitorConfig.builder
 import com.netflix.servo.monitor.{ BasicCompositeMonitor, LongGauge, Monitor, MonitorConfig }
 import com.netflix.servo.tag.{ Tag, Tags }
 import java.io.PrintWriter
@@ -76,9 +77,11 @@ object Metrics {
   private implicit val accumulableParam = new ServoTimersAccumulableParam()
 
   private final val TreePathTagKey = "TreePath"
-  private final val BlockingTagKey = "IsBlocking"
+  private final val NewStageTagKey = "IsNewStage"
+  private final val SequenceTagKey = "Sequence"
   private final val StageIdTagKey = "StageId"
-  private final val DriverTimeTag = Tags.newTag("statistic", "DriverTime")
+  private final val DriverTotalTimeTag = Tags.newTag("statistic", "DriverTotalTime")
+  private final val DriverOnlyTimeTag = Tags.newTag("statistic", "DriverOnlyTime")
   private final val WorkerTimeTag = Tags.newTag("statistic", "WorkerTime")
   private final val StageDurationTag = Tags.newTag("statistic", "StageDuration")
 
@@ -150,41 +153,58 @@ object Metrics {
     // Now, create a map from the Spark stages so that we can look them up
     val stageMap = sparkStageTimings.map(t => t.stageName -> t).toMap
 
+    var sequence = 0
     val rddMonitors = sortedRddOperations.map(rddOperation => {
+      sequence += 1
       val name = rddOperation._2.getName
       val stageOption = stageMap.get(Some(name))
-      val durationMonitors = new mutable.ArrayBuffer[Monitor[_]]()
-      val monitorConfig = MonitorConfig.builder(name).withTag(NameTagKey, name)
-        .withTag(BlockingTagKey, stageOption.isDefined.toString)
+      val subMonitors = new mutable.ArrayBuffer[Monitor[_]]()
+      val monitorConfig = builder(name).withTag(NameTagKey, name)
+        .withTag(NewStageTagKey, stageOption.isDefined.toString)
+        .withTag(SequenceTagKey, sequence.toString)
       stageOption.foreach(stage => {
-        val durationGauge = new LongGauge(MonitorConfig.builder(name).withTag(StageDurationTag).build())
+        val durationGauge = new LongGauge(builder(name).withTag(StageDurationTag).build())
         durationGauge.set(stage.duration.toNanos)
-        durationMonitors += durationGauge
+        subMonitors += durationGauge
         monitorConfig.withTag(StageIdTagKey, stage.stageId.toString)
       })
-      new BasicCompositeMonitor(monitorConfig.build(), durationMonitors)
+      subMonitors += findMonitor(rddOperation._2.getMonitors, DriverTotalTimeTag)
+      new BasicCompositeMonitor(monitorConfig.build(), subMonitors)
     })
-
     renderTable(out, "Spark Operations", rddMonitors, createRDDOperationsHeader())
   }
 
   private def createRDDOperationsHeader(): ArrayBuffer[TableHeader] = {
     ArrayBuffer(
+      TableHeader(name = "Sequence", valueExtractor = forTagValueWithKey(SequenceTagKey), alignment = Alignment.Left),
       TableHeader(name = "Operation", valueExtractor = forTagValueWithKey(NameTagKey), alignment = Alignment.Left),
-      TableHeader(name = "Is Blocking?", valueExtractor = forTagValueWithKey(BlockingTagKey), alignment = Alignment.Left),
-      TableHeader(name = "Duration", valueExtractor = forMonitorMatchingTag(StageDurationTag), formatFunction = Some(formatNanos)),
+      TableHeader(name = "Is New Stage?", valueExtractor = forTagValueWithKey(NewStageTagKey), alignment = Alignment.Left),
+      TableHeader(name = "Stage Duration", valueExtractor = forMonitorMatchingTag(StageDurationTag), formatFunction = Some(formatNanos)),
+      TableHeader(name = "Driver Total", valueExtractor = forMonitorMatchingTag(DriverTotalTimeTag), formatFunction = Some(formatNanos)),
       TableHeader(name = "Stage ID", valueExtractor = forTagValueWithKey(StageIdTagKey), alignment = Alignment.Left))
   }
 
   private def createTreeViewHeader(): ArrayBuffer[TableHeader] = {
     ArrayBuffer(
       TableHeader(name = "Metric", valueExtractor = forTagValueWithKey(TreePathTagKey), alignment = Alignment.Left),
-      TableHeader(name = "Worker Time", valueExtractor = forMonitorMatchingTag(WorkerTimeTag), formatFunction = Some(formatNanos)),
-      TableHeader(name = "Driver Time", valueExtractor = forMonitorMatchingTag(DriverTimeTag), formatFunction = Some(formatNanos)),
+      TableHeader(name = "Worker Total", valueExtractor = forMonitorMatchingTag(WorkerTimeTag), formatFunction = Some(formatNanos)),
+      TableHeader(name = "Driver Total", valueExtractor = forMonitorMatchingTag(DriverTotalTimeTag), formatFunction = Some(formatNanos)),
+      TableHeader(name = "Driver Only", valueExtractor = forMonitorMatchingTag(DriverOnlyTimeTag), formatFunction = Some(formatNanos)),
       TableHeader(name = "Count", valueExtractor = forMonitorMatchingTag(CountTag)),
       TableHeader(name = "Mean", valueExtractor = forMonitorMatchingTag(MeanTag), formatFunction = Some(formatNanos)),
       TableHeader(name = "Min", valueExtractor = forMonitorMatchingTag(MinTag), formatFunction = Some(formatNanos)),
       TableHeader(name = "Max", valueExtractor = forMonitorMatchingTag(MaxTag), formatFunction = Some(formatNanos)))
+  }
+
+  private def findMonitor(monitors: Seq[Monitor[_]], tagToFind: Tag): Monitor[_] = {
+    monitors.foreach(monitor => {
+      monitor.getConfig.getTags.iterator().foreach(tag => {
+        if (tag.equals(tagToFind)) {
+          return monitor
+        }
+      })
+    })
+    throw new IllegalStateException("Could not find monitor with tag [" + tagToFind + "]")
   }
 
   private def buildTree(accumulable: Accumulable[ServoTimers, RecordedTiming]): Iterable[TreeNode] = {
@@ -227,12 +247,12 @@ object Metrics {
 
     val timingPath = nodeData._1
     val timer = nodeData._2
+    var adjustedDriverTime = nodeData._2.getTotalTime
 
     val children = new mutable.ArrayBuffer[TreeNode]()
 
     // Since Spark executes RDD operations lazily (some take no time at all, and some take all the time)
-    // it would be confusing to include the time taken to execute a method on an RDD in its parent timings.
-    // Therefore we subtract the time taken for RDD operations from all of its ancestors.
+    // we subtract the time taken for an RDD operations from the driver time for all of its ancestors
     adjustTimingsForRddOperations()
 
     def addChild(node: TreeNode) = {
@@ -267,7 +287,7 @@ object Metrics {
     }
 
     private def subtractTimingFromAncestors(totalTime: Long) {
-      timer.adjustTotalTime(-totalTime)
+      adjustedDriverTime = adjustedDriverTime - totalTime
       parent.foreach(_.subtractTimingFromAncestors(totalTime))
     }
 
@@ -281,27 +301,25 @@ object Metrics {
 
     private def addToRows(rows: mutable.Buffer[Monitor[_]], treePath: String,
                           servoTimer: ServoTimer, isInSparkWorker: Boolean) = {
-      // For RDD operations we create a new monitor that just contains the count, since Since Spark executes
-      // RDD operations lazily and so the time taken isn't very useful.
-      if (timingPath.isRDDOperation) {
-        val newConfig = servoTimer.getConfig.withAdditionalTag(Tags.newTag(TreePathTagKey, treePath))
-        val count = new LongGauge(newConfig.withAdditionalTag(ServoTimer.CountTag))
-        count.set(servoTimer.getCount)
-        rows += new BasicCompositeMonitor(newConfig, List(count))
-      } else {
-        servoTimer.addTag(Tags.newTag(TreePathTagKey, treePath))
-        val tag = if (isInSparkWorker) WorkerTimeTag else DriverTimeTag
-        val gauge = new LongGauge(MonitorConfig.builder(tag.getKey).withTag(tag).build())
-        gauge.set(servoTimer.getTotalTime)
+      servoTimer.addTag(Tags.newTag(TreePathTagKey, treePath))
+      val tag = if (isInSparkWorker) WorkerTimeTag else DriverTotalTimeTag
+      val blockingGauge = new LongGauge(builder(tag.getKey).withTag(tag).build())
+      blockingGauge.set(servoTimer.getTotalTime)
+      servoTimer.addSubMonitor(blockingGauge)
+      // If this is a stage which is entirely in the driver program (not in a Spark RDD
+      // operation, or in a Spark worker) then we add an additional total for "driver-only" time.
+      if (!timingPath.isRDDOperation && !isInSparkWorker) {
+        val gauge = new LongGauge(builder(DriverOnlyTimeTag.getKey).withTag(DriverOnlyTimeTag).build())
+        gauge.set(adjustedDriverTime)
         servoTimer.addSubMonitor(gauge)
-        rows += servoTimer
       }
+      rows += servoTimer
     }
 
   }
 
   private class StringMonitor(name: String, value: String, tags: Tag*) extends Monitor[String] {
-    private val config = MonitorConfig.builder(name).withTags(tags).build()
+    private val config = builder(name).withTags(tags).build()
     override def getConfig: MonitorConfig = {
       config
     }

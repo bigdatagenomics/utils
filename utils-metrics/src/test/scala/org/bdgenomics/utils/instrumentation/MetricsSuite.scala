@@ -144,52 +144,53 @@ class MetricsSuite extends SparkFunSuite with Logging with BeforeAndAfterAll {
 
   private def getExpectedSparkOperations: Array[Array[String]] = {
     Array(
-      Array("Operation", "Is Blocking?", "Duration", "Stage ID"),
+      Array("Sequence", "Operation", "Is New Stage?", "Stage Duration", "Driver Total", "Stage ID"),
       // Operations occur in order of sequence ID. Two of them are matched to Spark stages --
-      // these are the ones that are marked as blocking, and have timings and stage IDs.
-      Array("RDD Map Operation 1", "true", "2 ms", "2"),
-      Array("RDD Group Operation 1", "false", "-", "-"),
-      Array("RDD Group Operation 1", "false", "-", "-"),
-      Array("RDD Group Operation 2", "true", "1 ms", "1"))
+      // these are the ones that are marked as blocking, and have durations and stage IDs.
+      Array("1", "RDD Map Operation 1", "true", "2 ms", "2 ms", "2"),
+      Array("2", "RDD Group Operation 1", "false", "-", "5 ms", "-"),
+      Array("3", "RDD Group Operation 1", "false", "-", "2 ms", "-"),
+      Array("4", "RDD Group Operation 2", "true", "1 ms", "2 ms", "1"))
   }
 
   private def getExpectedTimerValuesWithRDDOperations: Array[Array[String]] = {
     Array(
-      Array("Metric", "Worker Time", "Driver Time", "Count", "Mean", "Min", "Max"),
-      // Timer 4 and 1 have occurred in the driver (before the RDD operation). The time taken in the RDD
-      // operations has been subtracted from their time, which is recorded as "driver time".
-      Array("# └─ Timer 4", "-", "90 ms", "1", "90 ms", "-", "-"),
-      Array("#     ├─ Timer 1", "-", "60 ms", "2", "30 ms", "-", "-"),
-      // The three RDD operations are arranged in order of sequence ID. The RDD operations do not have a time
-      // recorded (only a count). The timings within the RDD operations are recorded as "worker time".
-      Array("#     │   ├─ RDD Map Operation 1", "-", "-", "1", "-", "-", "-"),
-      Array("#     │   │   └─ Timer 2", "1 ms", "-", "1", "1 ms", "1 ms", "1 ms"),
-      Array("#     │   ├─ RDD Group Operation 1", "-", "-", "1", "-", "-", "-"),
-      Array("#     │   │   └─ Timer 3", "4 ms", "-", "2", "2 ms", "2 ms", "2 ms"),
-      Array("#     │   └─ RDD Group Operation 1", "-", "-", "1", "-", "-", "-"),
+      Array("Metric", "Worker Total", "Driver Total", "Driver Only", "Count", "Mean", "Min", "Max"),
+      // Timer 4 and 1 have occurred in the driver (before the RDD operation).
+      // The time that the driver was blocked while executing RDD operations is recorded as the "driver time".
+      // The time that is purely in the driver (excluding RDD operations) is record as "driver only".
+      Array("# └─ Timer 4", "-", "101 ms", "90 ms", "1", "101 ms", "101 ms", "101 ms"),
+      Array("#     ├─ Timer 1", "-", "69 ms", "60 ms", "2", "34.5 ms", "32 ms", "37 ms"),
+      // The three RDD operations are arranged in order of sequence ID.
+      // The timings within the RDD operations are recorded as "worker time".
+      Array("#     │   ├─ RDD Map Operation 1", "-", "2 ms", "-", "1", "2 ms", "2 ms", "2 ms"),
+      Array("#     │   │   └─ Timer 2", "1 ms", "-", "-", "1", "1 ms", "1 ms", "1 ms"),
+      Array("#     │   ├─ RDD Group Operation 1", "-", "5 ms", "-", "1", "5 ms", "5 ms", "5 ms"),
+      Array("#     │   │   └─ Timer 3", "4 ms", "-", "-", "2", "2 ms", "2 ms", "2 ms"),
+      Array("#     │   └─ RDD Group Operation 1", "-", "2 ms", "-", "1", "2 ms", "2 ms", "2 ms"),
       // Another RDD operation has occurred, as a direct child of the root (Timer 4)
-      Array("#     └─ RDD Group Operation 2", "-", "-", "1", "-", "-", "-"))
+      Array("#     └─ RDD Group Operation 2", "-", "2 ms", "-", "1", "2 ms", "2 ms", "2 ms"))
   }
 
   private def getExpectedTimerValues: Array[Array[String]] = {
     Array(
-      Array("Metric", "Worker Time", "Driver Time", "Count", "Mean", "Min", "Max"),
+      Array("Metric", "Worker Total", "Driver Total", "Driver Only", "Count", "Mean", "Min", "Max"),
       // The two consecutive top-level instances of Timer 1 should have been combined
-      Array("# └─ Timer 1", "-", "71.5 ms", "2", "35.75 ms", "31.5 ms", "40 ms"),
+      Array("# └─ Timer 1", "-", "71.5 ms", "71.5 ms", "2", "35.75 ms", "31.5 ms", "40 ms"),
       // Timer 2 has occurred twice as a child of Timer 1, once taking 200 µs, and once taking 500 µs (including children)
-      Array("#     ├─ Timer 2", "-", "700 µs", "2", "350 µs", "200 µs", "500 µs"),
+      Array("#     ├─ Timer 2", "-", "700 µs", "700 µs", "2", "350 µs", "200 µs", "500 µs"),
       // Timer 4 has occurred once as a child of Timer 2 -- it comes before Timer 3, as its total time is greater
-      Array("#     │   ├─ Timer 4", "-", "200 µs", "1", "200 µs", "200 µs", "200 µs"),
+      Array("#     │   ├─ Timer 4", "-", "200 µs", "200 µs", "1", "200 µs", "200 µs", "200 µs"),
       // Timer 3 has occurred once as a child of Timer 2 -- it comes after Timer 4, as its total time is smaller
-      Array("#     │   └─ Timer 3", "-", "100 µs", "1", "100 µs", "100 µs", "100 µs"),
+      Array("#     │   └─ Timer 3", "-", "100 µs", "100 µs", "1", "100 µs", "100 µs", "100 µs"),
       // Timer 1 has occurred once as a child of Timer 1 -- it comes before Timer 3, as its total timer is greater
-      Array("#     ├─ Timer 1", "-", "600 µs", "1", "600 µs", "600 µs", "600 µs"),
+      Array("#     ├─ Timer 1", "-", "600 µs", "600 µs", "1", "600 µs", "600 µs", "600 µs"),
       // Timer 3 has occurred once as a child of Timer 1 -- it comes after Timer 1, as its total timer is smaller
-      Array("#     └─ Timer 3", "-", "200 µs", "1", "200 µs", "200 µs", "200 µs"),
+      Array("#     └─ Timer 3", "-", "200 µs", "200 µs", "1", "200 µs", "200 µs", "200 µs"),
       // Timer 2 has occurred once at the top level, after the two instances of Timer 1
-      Array("# └─ Timer 2", "-", "20 ms", "1", "20 ms", "20 ms", "20 ms"),
+      Array("# └─ Timer 2", "-", "20 ms", "20 ms", "1", "20 ms", "20 ms", "20 ms"),
       // Timer 2 has occurred again at the top level but is not consecutive with the first instance
-      Array("# └─ Timer 1", "-", "10 ms", "1", "10 ms", "10 ms", "10 ms"))
+      Array("# └─ Timer 1", "-", "10 ms", "10 ms", "1", "10 ms", "10 ms", "10 ms"))
   }
 
   private def getRenderedTable(sparkStageTimings: Option[Seq[StageTiming]]): String = {

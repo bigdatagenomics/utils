@@ -18,6 +18,7 @@
 package org.bdgenomics.utils.instrumentation
 
 import java.io.{ PrintWriter, StringWriter, BufferedReader, StringReader }
+import java.util
 import org.scalatest.FunSuite
 import scala.util.control.Breaks._
 
@@ -62,8 +63,8 @@ object InstrumentationTestingUtil extends FunSuite {
   def assertOnNameAndCountInTimingsTable(row: String, name: String, count: Int) = {
     assert(row contains name)
     val cells = row.trim().split('|')
-    // The count is in the 4th column and we have empty value at the start
-    assert(cells(4).trim() === String.valueOf(count))
+    // The count is in the 5th column and we have empty value at the start
+    assert(cells(5).trim() === String.valueOf(count))
   }
 
   private def advanceReaderToName(name: String, reader: BufferedReader) = {
@@ -87,7 +88,8 @@ object InstrumentationTestingUtil extends FunSuite {
       if (prefixString.isDefined && expected(expectedIndex).startsWith(prefixString.get)) {
         assert((prefixString.get + actualCell).trim === expected(expectedIndex))
       } else {
-        assert(actualCell.trim === expected(expectedIndex))
+        assert(actualCell.trim === expected(expectedIndex), "for actual [" + actual.mkString(" ") +
+          "] and expected [" + expected.mkString(" ") + "]")
       }
       expectedIndex += 1
     })
