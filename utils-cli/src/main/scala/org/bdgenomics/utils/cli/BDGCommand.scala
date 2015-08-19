@@ -50,9 +50,18 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
     }
     val sc = new SparkContext(conf)
     val metricsListener = initializeMetrics(sc)
-    run(sc)
+    val e = try {
+      run(sc)
+      None
+    } catch {
+      case e: Throwable => {
+        System.err.println("Command body threw exception:\n%s".format(e))
+        Some(e)
+      }
+    }
     val totalTime = System.nanoTime() - start
     printMetrics(totalTime, metricsListener)
+    e.foreach(throw _)
   }
 
   def initializeMetrics(sc: SparkContext): Option[MetricsListener] = {
