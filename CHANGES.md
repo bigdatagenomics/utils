@@ -1,5 +1,12 @@
 # UTILS #
 
+### Version 0.2.3 ###
+* ISSUE [51](https://github.com/bigdatagenomics/bdg-utils/pull/51): Added "Driver Time" column to represent the total time in the driver
+* ISSUE [49](https://github.com/bigdatagenomics/bdg-utils/pull/49): Adding method for hashing down a whole RDD.
+* ISSUE [48](https://github.com/bigdatagenomics/bdg-utils/pull/48): Fix minor code style and doc errors and warnings
+* ISSUE [47](https://github.com/bigdatagenomics/bdg-utils/pull/47): [utils-46] removing duplicate declaration of spark-core dependency
+* ISSUE [45](https://github.com/bigdatagenomics/bdg-utils/pull/45): [utils-44] updating release tag name format to more closely match artifact name
+
 ### Version 0.2.2 ###
 * ISSUE [42](https://github.com/bigdatagenomics/bdg-utils/pull/42): [utils-42] Upgrading to the org.apache.parquet release of Parquet.
 * ISSUE [39](https://github.com/bigdatagenomics/bdg-utils/pull/39): Updated docs to add correct parameter for printing metrics
