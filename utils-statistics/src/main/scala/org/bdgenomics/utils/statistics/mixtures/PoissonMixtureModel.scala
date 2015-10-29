@@ -47,8 +47,15 @@ object PoissonMixtureModel extends DiscreteKMeansMixtureModel[Poisson] {
     rdd.cache()
 
     // aggregate the distribution weights
-    val weights = rdd.map(p => p._1)
-      .aggregate(Array.fill(distributions.length) { 0.0 })(MathUtils.aggregateArray, MathUtils.aggregateArray)
+    val weights = rdd.map(p => {
+      val a = p._1
+
+      if (a.forall(v => !v.isNaN && !v.isInfinite)) {
+        a
+      } else {
+        Array.fill(a.length) { 0.0 }
+      }
+    }).aggregate(Array.fill(distributions.length) { 0.0 })(MathUtils.aggregateArray, MathUtils.aggregateArray)
 
     // map to acquire the distribution means and aggregate
     val means = rdd.map(p => {
@@ -57,7 +64,11 @@ object PoissonMixtureModel extends DiscreteKMeansMixtureModel[Poisson] {
       // calculate mean contributions for this element
       MathUtils.scalarArrayMultiply(v, a)
 
-      a
+      if (a.forall(v => !v.isNaN && !v.isInfinite)) {
+        a
+      } else {
+        Array.fill(a.length) { 0.0 }
+      }
     }).aggregate(Array.fill(distributions.length) { 0.0 })(MathUtils.aggregateArray, MathUtils.aggregateArray)
 
     // unpersist the rdd, as we're done using it

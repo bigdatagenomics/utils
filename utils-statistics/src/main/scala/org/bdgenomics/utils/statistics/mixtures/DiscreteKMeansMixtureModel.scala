@@ -57,6 +57,9 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
       .reduce(_ + _)
 
     // return soft assignment and ECLL contribution
+    if (weight <= 0.0) {
+      log.warn("Value %d had zero probabilities under all distributions and was dropped.".format(value))
+    }
     (membership, pointEcll)
   }
 
