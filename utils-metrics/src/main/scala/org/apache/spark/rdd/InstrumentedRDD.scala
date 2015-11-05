@@ -36,6 +36,8 @@ import scala.reflect.ClassTag
 class InstrumentedRDD[T: ClassTag](private[rdd] val decoratedRDD: RDD[T])
     extends RDD[T](decoratedRDD.sparkContext, decoratedRDD.dependencies) {
 
+  override val partitioner = decoratedRDD.partitioner
+
   @DeveloperApi
   override def compute(split: Partition, context: TaskContext): Iterator[T] = decoratedRDD.compute(split, context)
 
