@@ -28,7 +28,7 @@ import org.bdgenomics.utils.instrumentation.InstrumentationFunctions._
 import org.bdgenomics.utils.instrumentation.ServoTimer._
 import org.bdgenomics.utils.instrumentation.ValueExtractor._
 import scala.annotation.tailrec
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 import scala.collection.mutable.ArrayBuffer
 import scala.util.DynamicVariable
@@ -128,13 +128,15 @@ object Metrics {
       throw new IllegalStateException("Trying to print metrics for an uninitialized Metrics class! " +
         "Call the initialize method to initialize it.")
     }
-    val accumulable = Recorder.value.get.accumulable
-    val treeRoots = buildTree(accumulable).toSeq.sortWith((a, b) => { a.timingPath.sequenceId < b.timingPath.sequenceId })
-    val treeNodeRows = new mutable.ArrayBuffer[Monitor[_]]()
-    treeRoots.foreach(treeNode => { treeNode.addToTable(treeNodeRows) })
-    renderTable(out, "Timings", treeNodeRows, createTreeViewHeader())
-    out.println()
-    sparkStageTimings.foreach(printRddOperations(out, _, accumulable))
+    Recorder.value.foreach { (rec) =>
+      val accumulable = rec.accumulable
+      val treeRoots = buildTree(accumulable).toSeq.sortWith((a, b) => { a.timingPath.sequenceId < b.timingPath.sequenceId })
+      val treeNodeRows = new mutable.ArrayBuffer[Monitor[_]]()
+      treeRoots.foreach(treeNode => { treeNode.addToTable(treeNodeRows) })
+      renderTable(out, "Timings", treeNodeRows, createTreeViewHeader())
+      out.println()
+      sparkStageTimings.foreach(printRddOperations(out, _, accumulable))
+    }
   }
 
   /**
@@ -148,7 +150,7 @@ object Metrics {
                                  accumulable: Accumulable[ServoTimers, RecordedTiming]) {
 
     // First, extract a list of the RDD operations, sorted by sequence ID (the order in which they occurred)
-    val sortedRddOperations = accumulable.value.timerMap.filter(_._1.isRDDOperation).toList.sortBy(_._1.sequenceId)
+    val sortedRddOperations = accumulable.value.timerMap.asScala.filter(_._1.isRDDOperation).toList.sortBy(_._1.sequenceId)
 
     // Now, create a map from the Spark stages so that we can look them up
     val stageMap = sparkStageTimings.map(t => t.stageName -> t).toMap
@@ -168,8 +170,8 @@ object Metrics {
         subMonitors += durationGauge
         monitorConfig.withTag(StageIdTagKey, stage.stageId.toString)
       })
-      subMonitors += findMonitor(rddOperation._2.getMonitors, DriverTotalTimeTag)
-      new BasicCompositeMonitor(monitorConfig.build(), subMonitors)
+      subMonitors += findMonitor(rddOperation._2.getMonitors.asScala, DriverTotalTimeTag)
+      new BasicCompositeMonitor(monitorConfig.build(), subMonitors.asJava)
     })
     renderTable(out, "Spark Operations", rddMonitors, createRDDOperationsHeader())
   }
@@ -198,7 +200,7 @@ object Metrics {
 
   private def findMonitor(monitors: Seq[Monitor[_]], tagToFind: Tag): Monitor[_] = {
     monitors.foreach(monitor => {
-      monitor.getConfig.getTags.iterator().foreach(tag => {
+      monitor.getConfig.getTags.iterator().asScala.foreach(tag => {
         if (tag.equals(tagToFind)) {
           return monitor
         }
@@ -208,7 +210,7 @@ object Metrics {
   }
 
   private def buildTree(accumulable: Accumulable[ServoTimers, RecordedTiming]): Iterable[TreeNode] = {
-    val timerPaths: Seq[(TimingPath, ServoTimer)] = accumulable.value.timerMap.toSeq
+    val timerPaths: Seq[(TimingPath, ServoTimer)] = accumulable.value.timerMap.asScala.toSeq
     val rootNodes = new mutable.LinkedHashMap[TimingPath, TreeNode]
     buildTree(timerPaths, 0, rootNodes)
     rootNodes.values
@@ -230,16 +232,16 @@ object Metrics {
                         currentLevelNodes: mutable.Map[TimingPath, TreeNode]) = {
     // If this is a non-root node, add it to the parent node. Otherwise, just put it in the maps.
     val parentPath = timerPath._1.parentPath
-    if (parentPath.isDefined) {
-      parents.get(parentPath.get).foreach(parentNode => {
+    parentPath.fold {
+      val node = new TreeNode(timerPath, None)
+      parents.put(node.timingPath, node)
+      currentLevelNodes.put(timerPath._1, node)
+    } { (pPath) =>
+      parents.get(pPath).flatMap(parentNode => {
         val node = new TreeNode(timerPath, Some(parentNode))
         parentNode.addChild(node)
         currentLevelNodes.put(timerPath._1, node)
       })
-    } else {
-      val node = new TreeNode(timerPath, None)
-      parents.put(node.timingPath, node)
-      currentLevelNodes.put(timerPath._1, node)
     }
   }
 
@@ -271,10 +273,10 @@ object Metrics {
       addToRows(rows, prefix + (if (isTail) "└─ " else "├─ ") + name, timer, isInSparkWorker = isInSparkWorker)
       for (i <- sortedChildren.indices) {
         if (i < sortedChildren.size - 1) {
-          sortedChildren.get(i).addToTable(rows, prefix + (if (isTail) "    " else "│   "),
+          sortedChildren(i).addToTable(rows, prefix + (if (isTail) "    " else "│   "),
             isInSparkWorker = isInSparkWorker || timingPath.isRDDOperation, isTail = false)
         } else {
-          sortedChildren.get(sortedChildren.size - 1).addToTable(rows, prefix + (if (isTail) "    " else "│   "),
+          sortedChildren(sortedChildren.size - 1).addToTable(rows, prefix + (if (isTail) "    " else "│   "),
             isInSparkWorker = isInSparkWorker || timingPath.isRDDOperation, isTail = true)
         }
       }
@@ -319,7 +321,7 @@ object Metrics {
   }
 
   private class StringMonitor(name: String, value: String, tags: Tag*) extends Monitor[String] {
-    private val config = builder(name).withTags(tags).build()
+    private val config = builder(name).withTags(tags.asJava).build()
     override def getConfig: MonitorConfig = {
       config
     }

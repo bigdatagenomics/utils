@@ -79,10 +79,9 @@ abstract class SparkMetrics {
       def compare(a: ServoTimer, b: ServoTimer): Int = {
         val sortOrderA = sortOrderMap.get(a.getName)
         val sortOrderB = sortOrderMap.get(b.getName)
-        if (sortOrderA.isEmpty || sortOrderB.isEmpty || sortOrderA == sortOrderB) {
-          -(a.getTotalTime compare b.getTotalTime)
-        } else {
-          sortOrderA.get - sortOrderB.get
+        (sortOrderA, sortOrderB) match {
+          case (Some(oA), Some(oB)) if oA != oB => oA - oB
+          case _                                => -(a.getTotalTime compare b.getTotalTime)
         }
       }
     }

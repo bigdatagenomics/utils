@@ -47,6 +47,6 @@ object FileLocator {
   def parseSlash(path: String): Option[(String, String)] =
     slashDivided.findFirstMatchIn(path) match {
       case None    => None
-      case Some(m) => Some(m.group(1), m.group(2))
+      case Some(m) => Some((m.group(1), m.group(2)))
     }
 }

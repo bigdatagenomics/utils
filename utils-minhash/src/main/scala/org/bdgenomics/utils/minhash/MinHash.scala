@@ -137,7 +137,7 @@ object MinHash extends Serializable {
 
           // is this the first bucket these elements overlap in? if not, don't
           // process to limit the number of dupes emitted
-          if (MinHashSignature.firstBucket(sig1, sig2, bandLength).get.equals(bucket)) {
+          if (MinHashSignature.firstBucket(sig1, sig2, bandLength).exists(_.equals(bucket))) {
             // compute similarity and add to list
             l = (sig1.similarity(sig2), (item1, item2)) :: l
           }
