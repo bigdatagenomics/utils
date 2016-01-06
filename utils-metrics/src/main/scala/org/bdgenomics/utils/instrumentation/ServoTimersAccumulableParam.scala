@@ -19,7 +19,7 @@ package org.bdgenomics.utils.instrumentation
 
 import java.util.concurrent.ConcurrentHashMap
 import org.apache.spark.AccumulableParam
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
@@ -49,12 +49,12 @@ class ServoTimers extends Serializable {
   val timerMap = new ConcurrentHashMap[TimingPath, ServoTimer]()
 
   def recordTiming(timing: RecordedTiming) = {
-    val servoTimer = timerMap.getOrElseUpdate(timing.pathToRoot, createServoTimer(timing.pathToRoot.timerName))
+    val servoTimer = timerMap.asScala.getOrElseUpdate(timing.pathToRoot, createServoTimer(timing.pathToRoot.timerName))
     servoTimer.recordNanos(timing.timingNanos)
   }
 
   def merge(servoTimers: ServoTimers) {
-    servoTimers.timerMap.foreach(entry => {
+    servoTimers.timerMap.asScala.foreach(entry => {
       val existing = this.timerMap.get(entry._1)
       if (existing != null) {
         existing.merge(entry._2)
@@ -111,7 +111,7 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
   }
 
   override def toString: String = {
-    (if (parentPath.isDefined) parentPath.get.toString() else "") + "/" + timerName +
+    parentPath.map(_.toString()).getOrElse("") + "/" + timerName +
       "(" + sequenceId + "," + isRDDOperation + ")"
   }
 
@@ -131,7 +131,7 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
   }
 
   private def computeDepth(): Int = {
-    if (parentPath.isDefined) parentPath.get.depth + 1 else 0
+    parentPath.map(_.depth + 1).getOrElse(0)
   }
 
   private def computeHashCode(): Int = {

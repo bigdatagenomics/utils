@@ -47,7 +47,7 @@ class MetricsListener(val metrics: RecordedMetrics) extends SparkListener {
     val taskInfo = Option(taskEnd.taskInfo)
 
     implicit val taskContext = SparkTaskContext(
-      if (taskMetrics.isDefined && taskMetrics.get.hostname != null) taskMetrics.get.hostname else "unknown",
+      taskMetrics.flatMap((tM) => Option(tM.hostname)).getOrElse("unknown"),
       taskEnd.stageId)
 
     taskMetrics.foreach(e => {
@@ -65,10 +65,9 @@ class MetricsListener(val metrics: RecordedMetrics) extends SparkListener {
   private def getStageDuration(info: StageInfo): Option[Duration] = {
     // We calculate this in the same way as the Spark code calculates the task duration when it
     // logs it at completion time, so hopefully it is a good representation of the duration
-    if (info.submissionTime.isDefined && info.completionTime.isDefined) {
-      Some(Duration(info.completionTime.get - info.submissionTime.get, MILLISECONDS))
-    } else {
-      None
+    (info.submissionTime, info.completionTime) match {
+      case (Some(cTime), Some(sTime)) => Some(Duration(cTime - sTime, MILLISECONDS))
+      case _                          => None
     }
   }
 

@@ -20,7 +20,7 @@ package org.bdgenomics.utils.instrumentation
 import com.netflix.servo.monitor.{ CompositeMonitor, Monitor }
 import com.netflix.servo.tag.Tag
 import java.io.PrintWriter
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable.ArrayBuffer
 
 /**
@@ -55,13 +55,9 @@ class MonitorTable(headerRow: Array[TableHeader], rows: Array[Monitor[_]]) {
   }
 
   private def stringValue(headerCol: TableHeader, option: Option[Any]): String = {
-    option.foreach(value => {
-      if (headerCol.formatFunction.isDefined)
-        return headerCol.formatFunction.get.apply(value)
-      else
-        return value.toString
-    })
-    "-"
+    option.map(value => {
+      headerCol.formatFunction.map(_.apply(value)).getOrElse(value.toString)
+    }).getOrElse("-")
   }
 
 }
@@ -117,13 +113,13 @@ private class CompositeMonitorValueExtractor(tag: Tag) extends ValueExtractor {
 
   override def extractValue(monitor: Monitor[_]): Option[Any] = {
     val matching = findMatchingMonitor(monitor)
-    if (matching.isDefined) Option(matching.get.getValue) else None
+    matching.flatMap((mc) => Option(mc.getValue))
   }
 
   private def findMatchingMonitor(monitor: Monitor[_]): Option[Monitor[_]] = {
     monitor match {
       case monitor: CompositeMonitor[_] =>
-        monitor.getMonitors.foreach(subMonitor => {
+        monitor.getMonitors.asScala.foreach(subMonitor => {
           val matching = returnMonitorIfMatching(subMonitor)
           if (matching.isDefined) {
             return matching

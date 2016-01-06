@@ -43,9 +43,9 @@ class Timer(name: String, clock: Clock = new Clock(), recorder: Option[MetricsRe
    */
   def time[A](f: => A): A = {
     val recorderOption = if (recorder.isDefined) recorder else Metrics.Recorder.value
-    // If we were not initialized this will not be set, and nothing will be recorded (which is what we want)
-    if (recorderOption.isDefined) {
-      val recorder = recorderOption.get
+    // If we were not initialized this will not be set, and nothing will
+    // be recorded (which is what we want)
+    recorderOption.fold { f } { (recorder) =>
       val startTime = clock.nanoTime()
       recorder.startPhase(timerName, sequenceId, isRDDOperation)
       try {
@@ -53,8 +53,6 @@ class Timer(name: String, clock: Clock = new Clock(), recorder: Option[MetricsRe
       } finally {
         recorder.finishPhase(timerName, clock.nanoTime() - startTime)
       }
-    } else {
-      f
     }
   }
 }

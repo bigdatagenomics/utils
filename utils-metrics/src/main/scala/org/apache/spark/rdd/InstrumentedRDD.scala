@@ -390,7 +390,7 @@ object InstrumentedRDD {
     val existingRegistryOption = Metrics.Recorder.value
     // Make a copy of the existing registry, as otherwise the stack will be unwound without having measured
     // the timings within the RDD operation
-    val metricsRecorder = if (existingRegistryOption.isDefined) Some(existingRegistryOption.get.copy()) else None
+    val metricsRecorder = existingRegistryOption.map(_.copy())
     new FunctionRecorder(metricsRecorder, functionTimer)
   }
 

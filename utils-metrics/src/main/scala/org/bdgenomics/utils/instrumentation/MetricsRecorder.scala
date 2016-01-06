@@ -92,9 +92,7 @@ class MetricsRecorder(val accumulable: Accumulable[ServoTimers, RecordedTiming],
     // Always generate a new sequence ID for top-level operations, as we want to display them in sequence.
     // The exception to this is consecutive operations for the same timer, as these are most likely a loop.
     // For non top-level operations, just return a constant sequence ID.
-    if (sequenceId.isDefined) {
-      sequenceId.get
-    } else {
+    sequenceId.getOrElse {
       val topLevel = timingsStack.isEmpty
       if (topLevel) {
         val newSequenceId = if (timerName != previousTopLevelTimerName) Metrics.generateNewSequenceId() else previousTopLevelSequenceId

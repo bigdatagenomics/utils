@@ -85,9 +85,9 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
       val out = new PrintWriter(stringWriter)
       out.println("Metrics:")
       out.println()
-      Metrics.print(out, Some(metricsListener.get.metrics.sparkMetrics.stageTimes))
+      Metrics.print(out, metricsListener.map(_.metrics.sparkMetrics.stageTimes))
       out.println()
-      metricsListener.get.metrics.sparkMetrics.print(out)
+      metricsListener.foreach(_.metrics.sparkMetrics.print(out))
       out.flush()
       logInfo(stringWriter.getBuffer.toString)
     }

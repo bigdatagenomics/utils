@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit._
 import java.util.concurrent.atomic.AtomicLong
 import org.bdgenomics.utils.instrumentation.ServoTimer._
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 import scala.collection.mutable
 
 /**
@@ -144,7 +144,7 @@ class ServoTimer(name: String, @transient tags: Tag*) extends ConfigurableMonito
   }
 
   override def getMonitors: util.List[Monitor[_]] = {
-    subMonitors
+    subMonitors.asJava
   }
 
   /**
