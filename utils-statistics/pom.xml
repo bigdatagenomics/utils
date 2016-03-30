@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
-    <artifactId>utils-parent_2.10</artifactId>
+    <artifactId>utils-parent_${scala.main.version}</artifactId>
     <version>0.2.5-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-statistics_2.10</artifactId>
+  <artifactId>utils-statistics_${scala.main.version}</artifactId>
   <packaging>jar</packaging>
-  <name>utils-statistics_2.10: Spark code for fitting statistical models</name>
+  <name>utils-statistics_${scala.main.version}: Spark code for fitting statistical models</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -98,21 +98,21 @@
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc_2.10</artifactId>
+      <artifactId>utils-misc_${scala.main.version}</artifactId>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc_2.10</artifactId>
+      <artifactId>utils-misc_${scala.main.version}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.10</artifactId>
+      <artifactId>spark-core_${scala.main.version}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-mllib_2.10</artifactId>
+      <artifactId>spark-mllib_${scala.main.version}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -120,12 +120,12 @@
     </dependency>
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.10</artifactId>
+      <artifactId>scalatest_${scala.main.version}</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.scalanlp</groupId>
-      <artifactId>breeze_2.10</artifactId>
+      <artifactId>breeze_${scala.main.version}</artifactId>
     </dependency>
   </dependencies>
 
