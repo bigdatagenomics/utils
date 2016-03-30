@@ -9,7 +9,7 @@
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
-  <artifactId>utils-parent_2.10</artifactId>
+  <artifactId>utils-parent_${scala.main.version}</artifactId>
   <version>0.2.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
@@ -18,6 +18,8 @@
 
   <properties>
     <java.version>1.7</java.version>
+    <scala.version>2.10.4</scala.version>
+    <scala.main.version>2.10</scala.main.version>
     <spark.version>1.5.2</spark.version>
     <parquet.version>1.8.1</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
@@ -64,14 +66,14 @@
   </issueManagement>
 
   <build>
-    <outputDirectory>target/scala-2.10.4/classes</outputDirectory>
-    <testOutputDirectory>target/scala-2.10.4/test-classes</testOutputDirectory>
+    <outputDirectory>target/scala-${scala.version}/classes</outputDirectory>
+    <testOutputDirectory>target/scala-${scala.version}/test-classes</testOutputDirectory>
     <pluginManagement>
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.3</version>
+          <version>${scala.main.version}.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -81,7 +83,7 @@
             <mavenExecutorId>forked-path</mavenExecutorId>
             <useReleaseProfile>false</useReleaseProfile>
             <arguments>-Psonatype-oss-release</arguments>
-            <tagNameFormat>utils-parent_2.10-${project.version}</tagNameFormat>
+            <tagNameFormat>utils-parent_${scala.main.version}-${project.version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
@@ -229,7 +231,7 @@
           </execution>
         </executions>
         <configuration>
-          <scalaVersion>2.10.4</scalaVersion>
+          <scalaVersion>${scala.version}</scalaVersion>
           <useZincServer>true</useZincServer>
           <args>
             <arg>-unchecked</arg>
@@ -279,24 +281,24 @@
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_2.10</artifactId>
+        <artifactId>utils-misc_${scala.main.version}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_2.10</artifactId>
+        <artifactId>utils-misc_${scala.main.version}</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-io_2.10</artifactId>
+        <artifactId>utils-io_${scala.main.version}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-metrics_2.10</artifactId>
+        <artifactId>utils-metrics_${scala.main.version}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -306,19 +308,19 @@
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_2.10</artifactId>
+        <artifactId>scalatest_${scala.main.version}</artifactId>
         <version>2.2.5</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.scoverage</groupId>
-        <artifactId>scalac-scoverage-plugin_2.10</artifactId>
+        <artifactId>scalac-scoverage-plugin_${scala.main.version}</artifactId>
         <version>${scoverage.version}</version>
       </dependency>
       <dependency>
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
-        <version>2.10.4</version>
+        <version>${scala.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
@@ -354,7 +356,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_2.10</artifactId>
+        <artifactId>spark-core_${scala.main.version}</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
         <exclusions>
@@ -364,7 +366,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.twitter</groupId>
-            <artifactId>chill_2.10</artifactId>
+            <artifactId>chill_${scala.main.version}</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.apache.hadoop</groupId>
@@ -374,7 +376,7 @@
       </dependency>
       <dependency>
         <groupId>org.scalanlp</groupId>
-        <artifactId>breeze_2.10</artifactId>
+        <artifactId>breeze_${scala.main.version}</artifactId>
         <version>0.10</version>
       </dependency>
       <dependency>
@@ -395,7 +397,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-mllib_2.10</artifactId>
+        <artifactId>spark-mllib_${scala.main.version}</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
       </dependency>
@@ -453,7 +455,7 @@
               </execution>
             </executions>
             <configuration>
-              <scalaVersion>2.10.4</scalaVersion>
+              <scalaVersion>${scala.version}</scalaVersion>
               <useZincServer>true</useZincServer>
               <args>
                 <arg>-unchecked</arg>
@@ -475,7 +477,7 @@
               <compilerPlugins>
                 <compilerPlugin>
                   <groupId>org.scoverage</groupId>
-                  <artifactId>scalac-scoverage-plugin_2.10</artifactId>
+                  <artifactId>scalac-scoverage-plugin_${scala.main.version}</artifactId>
                   <version>${scoverage.version}</version>
                 </compilerPlugin>
               </compilerPlugins>
@@ -505,7 +507,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
-            <version>2.10.3</version>
+            <version>${scala.main.version}.3</version>
             <executions>
               <execution>
                 <id>attach-javadocs</id>

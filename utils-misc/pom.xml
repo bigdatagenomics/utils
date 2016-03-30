@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
-    <artifactId>utils-parent_2.10</artifactId>
+    <artifactId>utils-parent_${scala.main.version}</artifactId>
     <version>0.2.5-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-misc_2.10</artifactId>
+  <artifactId>utils-misc_${scala.main.version}</artifactId>
   <packaging>jar</packaging>
-  <name>utils-misc_2.10: Miscellaneous Spark helper code</name>
+  <name>utils-misc_${scala.main.version}: Miscellaneous Spark helper code</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -98,11 +98,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.10</artifactId>
+      <artifactId>spark-core_${scala.main.version}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.10</artifactId>
+      <artifactId>scalatest_${scala.main.version}</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
