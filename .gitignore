@@ -22,8 +22,10 @@ target
 *.jar
 build
 *~
-#*
+*#*
 *.log
 .*.swp
 
 git.properties
+release.properties
+*.releaseBackup
