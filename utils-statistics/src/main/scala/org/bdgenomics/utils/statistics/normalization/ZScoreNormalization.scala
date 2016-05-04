@@ -17,7 +17,7 @@
  */
 package org.bdgenomics.utils.statistics.normalization
 
-import org.apache.spark.Logging
+import org.bdgenomics.utils.misc.Logging
 import org.apache.spark.rdd.RDD
 import scala.math.sqrt
 

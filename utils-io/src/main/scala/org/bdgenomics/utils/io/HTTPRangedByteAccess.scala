@@ -23,7 +23,7 @@ import java.net.URI
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.{ HttpGet, HttpHead }
 import org.apache.http.impl.client.{ HttpClients, StandardHttpRequestRetryHandler }
-import org.apache.spark.Logging
+import org.bdgenomics.utils.misc.Logging
 
 /**
  * HTTPRangedByteAccess supports Ranged GET queries against HTTP resources.
