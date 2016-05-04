@@ -1,5 +1,14 @@
 # UTILS #
 
+### Version 0.2.5 ###
+* ISSUE [67](https://github.com/bigdatagenomics/bdg-utils/pull/67): Modifying pom.xml files to move back to Scala 2.10 for development.
+
+### Version SNAPSHOT ###
+* ISSUE [64](https://github.com/bigdatagenomics/bdg-utils/pull/64): Add exception for maven-javadoc-plugin in move_to_scala_2.11.sh
+* ISSUE [63](https://github.com/bigdatagenomics/bdg-utils/pull/63): Remove extraneous git-commit-id-plugin configuration
+* ISSUE [62](https://github.com/bigdatagenomics/bdg-utils/pull/62): Update spark, hadoop, and parquet dependency versions
+* ISSUE [60](https://github.com/bigdatagenomics/bdg-utils/pull/60): Various small util fixes :
+
 ### Version 0.2.3 ###
 * ISSUE [51](https://github.com/bigdatagenomics/bdg-utils/pull/51): Added "Driver Time" column to represent the total time in the driver
 * ISSUE [49](https://github.com/bigdatagenomics/bdg-utils/pull/49): Adding method for hashing down a whole RDD.

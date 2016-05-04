@@ -9,7 +9,7 @@
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
-  <artifactId>utils-parent_2.11</artifactId>
+  <artifactId>utils-parent_2.10</artifactId>
   <version>0.2.5-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
@@ -64,8 +64,8 @@
   </issueManagement>
 
   <build>
-    <outputDirectory>target/scala-2.11.4/classes</outputDirectory>
-    <testOutputDirectory>target/scala-2.11.4/test-classes</testOutputDirectory>
+    <outputDirectory>target/scala-2.10.4/classes</outputDirectory>
+    <testOutputDirectory>target/scala-2.10.4/test-classes</testOutputDirectory>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -81,7 +81,7 @@
             <mavenExecutorId>forked-path</mavenExecutorId>
             <useReleaseProfile>false</useReleaseProfile>
             <arguments>-Psonatype-oss-release</arguments>
-            <tagNameFormat>utils-parent_2.11-${project.version}</tagNameFormat>
+            <tagNameFormat>utils-parent_2.10-${project.version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
@@ -229,7 +229,7 @@
           </execution>
         </executions>
         <configuration>
-          <scalaVersion>2.11.4</scalaVersion>
+          <scalaVersion>2.10.4</scalaVersion>
           <useZincServer>true</useZincServer>
           <args>
             <arg>-unchecked</arg>
@@ -279,24 +279,24 @@
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_2.11</artifactId>
+        <artifactId>utils-misc_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_2.11</artifactId>
+        <artifactId>utils-misc_2.10</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-io_2.11</artifactId>
+        <artifactId>utils-io_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-metrics_2.11</artifactId>
+        <artifactId>utils-metrics_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -306,19 +306,19 @@
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_2.11</artifactId>
+        <artifactId>scalatest_2.10</artifactId>
         <version>2.2.5</version>
         <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.scoverage</groupId>
-        <artifactId>scalac-scoverage-plugin_2.11</artifactId>
+        <artifactId>scalac-scoverage-plugin_2.10</artifactId>
         <version>${scoverage.version}</version>
       </dependency>
       <dependency>
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
-        <version>2.11.4</version>
+        <version>2.10.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
@@ -354,7 +354,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_2.11</artifactId>
+        <artifactId>spark-core_2.10</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
         <exclusions>
@@ -364,7 +364,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.twitter</groupId>
-            <artifactId>chill_2.11</artifactId>
+            <artifactId>chill_2.10</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.apache.hadoop</groupId>
@@ -374,7 +374,7 @@
       </dependency>
       <dependency>
         <groupId>org.scalanlp</groupId>
-        <artifactId>breeze_2.11</artifactId>
+        <artifactId>breeze_2.10</artifactId>
         <version>0.10</version>
       </dependency>
       <dependency>
@@ -395,7 +395,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-mllib_2.11</artifactId>
+        <artifactId>spark-mllib_2.10</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
       </dependency>
@@ -453,7 +453,7 @@
               </execution>
             </executions>
             <configuration>
-              <scalaVersion>2.11.4</scalaVersion>
+              <scalaVersion>2.10.4</scalaVersion>
               <useZincServer>true</useZincServer>
               <args>
                 <arg>-unchecked</arg>
@@ -475,7 +475,7 @@
               <compilerPlugins>
                 <compilerPlugin>
                   <groupId>org.scoverage</groupId>
-                  <artifactId>scalac-scoverage-plugin_2.11</artifactId>
+                  <artifactId>scalac-scoverage-plugin_2.10</artifactId>
                   <version>${scoverage.version}</version>
                 </compilerPlugin>
               </compilerPlugins>
