@@ -18,7 +18,8 @@
 package org.bdgenomics.utils.cli
 
 import java.io.{ StringWriter, PrintWriter }
-import org.apache.spark.{ SparkConf, Logging, SparkContext }
+import org.apache.spark.{ SparkConf, SparkContext }
+import org.bdgenomics.utils.misc.Logging
 import org.bdgenomics.utils.instrumentation._
 
 trait BDGCommandCompanion {

@@ -18,7 +18,7 @@
 package org.bdgenomics.utils.instrumentation
 
 import java.io.{ PrintWriter, StringWriter, BufferedReader, StringReader }
-import org.apache.spark.Logging
+import org.bdgenomics.utils.misc.Logging
 import org.apache.spark.rdd.Timer
 import org.bdgenomics.utils.instrumentation.InstrumentationTestingUtil._
 import org.bdgenomics.utils.misc.SparkFunSuite

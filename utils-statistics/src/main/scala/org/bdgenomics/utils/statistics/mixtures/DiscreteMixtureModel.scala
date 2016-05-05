@@ -18,7 +18,7 @@
 package org.bdgenomics.utils.statistics.mixtures
 
 import breeze.stats.distributions.DiscreteDistr
-import org.apache.spark.Logging
+import org.bdgenomics.utils.misc.Logging
 import org.apache.spark.rdd.RDD
 import scala.reflect.ClassTag
 

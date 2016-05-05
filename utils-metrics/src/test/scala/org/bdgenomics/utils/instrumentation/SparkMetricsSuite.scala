@@ -19,7 +19,7 @@ package org.bdgenomics.utils.instrumentation
 
 import java.io._
 import java.util.concurrent.TimeUnit
-import org.apache.spark.Logging
+import org.bdgenomics.utils.misc.Logging
 import org.bdgenomics.utils.instrumentation.InstrumentationTestingUtil._
 import org.scalatest.FunSuite
 import scala.concurrent.duration._
