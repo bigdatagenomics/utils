@@ -1,5 +1,10 @@
 # UTILS #
 
+### Version plugin] prepare release 0.2.6 ###
+
+### Version 0.2.6 ###
+* ISSUE [72](https://github.com/bigdatagenomics/bdg-utils/pull/72): Remove dependency on Spark internal Logging
+
 ### Version 0.2.5 ###
 * ISSUE [67](https://github.com/bigdatagenomics/bdg-utils/pull/67): Modifying pom.xml files to move back to Scala 2.10 for development.
 
