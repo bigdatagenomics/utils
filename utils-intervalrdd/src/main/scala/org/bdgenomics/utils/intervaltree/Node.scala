@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.intervaltree
+package org.bdgenomics.utils.intervaltree
 
 import java.io.Serializable
 import scala.reflect.ClassTag
 
-class Node[K <: Interval, T: ClassTag](interval: K) extends Serializable {
+protected class Node[K <: Interval, T: ClassTag](interval: K) extends Serializable {
 
   /* left and right children of this node */
   var leftChild: Node[K, T] = null

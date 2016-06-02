@@ -16,15 +16,31 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.intervaltree
+package org.bdgenomics.utils.intervaltree
 
 import scala.reflect.ClassTag
 import scala.collection.mutable.ListBuffer
 
 /*
- * Interval tree that supports two dimensional range searches over keyed nodes
- * in tree
+ * Interval tree supports two dimensional range searches over keyed nodes
+ * in tree. Interval trees support fast lookups for all intervals that overlap
+ * the interval being queried.
+ *
+ * Each node in an interval tree is keyed by an Interval, consisting of a start and
+ * end value. Each node stores all values corresponding to that node's key. Each
+ * node in the tree has the ability to store values that correspond to its key.
+ *
+ * Actions supported in interval tree include:
+ * - searching for elements overlapping a queried interval
+ * - inserting new values
+ * - inserting new nodes
+ * - mapping values in tree
+ * - filtering values in tree
+ *
+ * Interval tree supports rebalancing after either the left or right subtree depth
+ * surpasses the other subtree depth past a given threshold.
  */
+
 class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
   var root: Node[K, T] = null
   var leftDepth: Long = 0
@@ -89,7 +105,7 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
   /**
    * Prints all nodes in tree in ascending order of key start value
    */
-  def printNodes(): Unit = {
+  def printNodes() = {
     println("Printing all nodes in interval tree")
     val nodes: List[Node[K, T]] = inOrder().
       sortWith(_.getInterval.start < _.getInterval.start)
@@ -114,7 +130,19 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
    * @param vs values to insert associated with key r
    */
   def insert(k: K, vs: Iterator[T]): Unit = {
-    insertRegion(k, vs)
+    insertInterval(k, vs)
+    if (Math.abs(leftDepth - rightDepth) > threshold) {
+      rebalance()
+    }
+  }
+
+  /**
+   * Inserts values grouped by keys
+   * @param kvs key, value data to insert into tree
+   */
+  def insert(kvs: Iterator[(K, T)]) = {
+    val grouped = kvs.toList.groupBy(_._1)
+    grouped.map(kv => insertInterval(kv._1, kv._2.map(_._2).toIterator))
     if (Math.abs(leftDepth - rightDepth) > threshold) {
       rebalance()
     }
@@ -123,10 +151,23 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
   /*
   * Finds an existing node (keyed by Interval) to insert the data into,
   * or creates a new node to insert it into the tree
-  * @param interval interval to insert or to create new node from
+  *
+  * Traverses tree based on the left and right subtree maximum from the current node. Insert works
+  * similar to a binary serach tree. If the interval's start value is less than the current subtree max,
+  * we traverse to the left of the tree towards lower intervals. Otherwise, if the interval's start
+  * value is greater than the current node's subtree max, we traverse down the right subtree. When a node
+  * is found that equals the interval to be insert, we append all values to this node. If a node
+  * with the searched interval is not found, we create and insert a new node into the tree.
+  *
+  * Insertions occur in O(logN) time, where N is the number of nodes in the tree.
+  *
+  * is found in which the subtree maximum is greater than the
+  * @param interval to insert or to create new node from
   * @param vs: values associated with interval to insert into tree
+  *
+  *
   */
-  private def insertRegion(interval: K, vs: Iterator[T]) = {
+  private def insertInterval(interval: K, vs: Iterator[T]) = {
     if (root == null) {
       nodeCount += 1
       root = new Node[K, T](interval)
@@ -183,7 +224,15 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
   }
 
   /**
-   * Searches for all nodes that overlap key
+   * Searches for and returns the keys and values from all nodes that overlap the specified search key.
+   *
+   * Search occurs similar to insert, where the interval tree is traversed based on the left and right subtree maximum
+   * from the current node. Insert works similar to a binary serach tree. If the interval's start value is less than
+   * the current subtree max, we traverse to the left of the tree towards lower intervals. Otherwise, if the interval's start
+   * value is greater than the current node's subtree max, we traverse down the right subtree. When a node
+   * is found that equals the interval to be insert, we append all values to this node. If a node
+   * with the searched interval is not found, we create and insert a new node into the tree.
+   *
    * @param k key to search over tree
    */
   def search(k: K): Iterator[(K, T)] = {
@@ -211,12 +260,13 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
    * @param pred predicate function to filter vales
    * @return new interval tree of filtered values
    */
-  def filterTree(pred: T => Boolean): IntervalTree[K, T] = {
-    val orig: List[Node[K, T]] = inOrder()
-    val filteredNodes =
-      inOrder.map(elem => {
-        Node(elem.getInterval, elem.data.filter(pred))
-      })
+  def filter(pred: (K, T) => Boolean): IntervalTree[K, T] = {
+    val filteredNodes = inOrder
+      .map(node => {
+        val mapped: Array[T] = node.data.map(r => (node.getInterval, r))
+          .filter(r => pred(r._1, r._2)).map(_._2)
+        new Node(node.getInterval, mapped)
+      }).filter(!_.data.isEmpty)
     new IntervalTree[K, T](filteredNodes)
   }
 
@@ -245,14 +295,13 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
     return results.distinct.toIterator
   }
 
-  /*
-  * This method is used for bulk insertions of Nodes into a tree,
-  * specifically with regards to rebalancing
-  * Note: this method only appends data to existing nodes if a node with the
-  *   same exact Interval exists. In insertRegion, it will insert the data
-  *   if the Interval is a subregion of a particular Node.
-  *   @param n Node to insert into tree
-  */
+  /**
+   * This method is used for bulk insertions of Nodes into a tree,
+   * specifically with regards to rebalancing
+   * Node insertions use the same described algorithm as insertInterval
+   * @see insertInterval
+   * @param n Node to insert into tree
+   */
   def insertNode(n: Node[K, T]): Unit = {
     if (root == null) {
       root = n
@@ -325,7 +374,7 @@ class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
   }
 
   /**
-   * Gets an inorder list of nodes in tree and rebalances tree
+   * Gets an in-order list of nodes in tree and rebalances tree
    * @see insertRecursive
    */
   private def rebalance() = {

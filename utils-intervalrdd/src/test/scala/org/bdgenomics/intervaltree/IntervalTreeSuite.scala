@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.intervaltree
+package org.bdgenomics.utils.intervaltree
 
 import org.scalatest.FunSuite
 
@@ -151,7 +151,7 @@ class IntervalTreeSuite extends FunSuite {
 
   }
 
-  test("difference between insertRegion and insertNode: RefRegion is the same") {
+  test("assert items inserted using insertInterval and insertNode result in the same count") {
 
     val tree1 = new IntervalTree[Region, Long]()
     val tree2 = new IntervalTree[Region, Long]()
@@ -159,6 +159,7 @@ class IntervalTreeSuite extends FunSuite {
     val start = 0L
     val end = 1000L
     val region = Region(start, end)
+
     //all the data should go into just one node for regular insert
     //but we should be left with 6 nodes for insertNode
     for (i <- 1L to 6L) {
@@ -173,7 +174,7 @@ class IntervalTreeSuite extends FunSuite {
 
   }
 
-  test("difference between insertRegion and insertNode: RefRegion is the different") {
+  test("test consecutive puts into tree") {
 
     val tree1 = new IntervalTree[Region, Long]()
     val tree2 = new IntervalTree[Region, Long]()
@@ -183,7 +184,6 @@ class IntervalTreeSuite extends FunSuite {
     val reg2 = Region(100L, 900L)
     val reg3 = Region(300L, 700L)
 
-    //(region, (id, partitionNum))
     tree1.insert(reg1, 1L)
     val node1 = new Node[Region, Long](reg1)
     node1.put(1L)
@@ -214,8 +214,8 @@ class IntervalTreeSuite extends FunSuite {
       val region = Region(start, end)
       tree.insert(region, start)
     }
-    val filtTree = tree.filterTree(elem => elem < 3)
-    assert(filtTree.size == 2)
+    val filteredTree = tree.filter((k, v) => v < 3)
+    assert(filteredTree.size == 2)
 
   }
 
@@ -248,6 +248,22 @@ class IntervalTreeSuite extends FunSuite {
     val filtTree = tree.search(region)
     assert(filtTree.size == 2)
 
+  }
+
+  test("delete node") {
+
+    val tree = new IntervalTree[Region, Long]()
+
+    val id = 1L
+    val region1 = Region(0L, 10L)
+    val region2 = Region(20L, 30L)
+
+    tree.insert(region1, 4L)
+    tree.insert(region2, 2L)
+
+    assert(tree.size == 2)
+    val deleted = tree.filter((k, v) => k.start == 0L)
+    assert(deleted.size == 1)
   }
 
 }
