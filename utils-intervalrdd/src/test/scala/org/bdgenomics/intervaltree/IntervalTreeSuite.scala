@@ -20,6 +20,8 @@ package org.bdgenomics.utils.intervaltree
 
 import org.scalatest.FunSuite
 
+case class Region(start: Long, end: Long) extends Interval
+
 class IntervalTreeSuite extends FunSuite {
 
   test("insert regions to intervaltree") {

@@ -44,9 +44,3 @@ trait Interval {
   def width: Long = end - start
 
 }
-
-/*
- * Basic implementation of Interval
- */
-case class Region(start: Long, end: Long) extends Interval
-

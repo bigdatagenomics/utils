@@ -18,8 +18,10 @@
 
 package org.bdgenomics.utils.intervalrdd
 
-import org.bdgenomics.utils.intervaltree.Region
+import org.bdgenomics.utils.intervaltree.Interval
 import org.scalatest.FunSuite
+
+case class Region(start: Long, end: Long) extends Interval
 
 class IntervalPartitionSuite extends FunSuite {
 

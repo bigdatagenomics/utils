@@ -20,7 +20,7 @@ package org.bdgenomics.utils.intervalrdd
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.{ Logging, Partition, TaskContext, OneToOneDependency, HashPartitioner }
+import org.apache.spark.{ Partition, TaskContext, OneToOneDependency, HashPartitioner }
 import org.bdgenomics.utils.intervaltree._
 import scala.reflect.ClassTag
 
@@ -162,7 +162,7 @@ class PartitionMerger[K <: Interval, V: ClassTag]() extends Serializable {
   }
 }
 
-object IntervalRDD extends Logging {
+object IntervalRDD {
 
   /**
    * Constructs an IntervalRDD from a set of interval, V tuples

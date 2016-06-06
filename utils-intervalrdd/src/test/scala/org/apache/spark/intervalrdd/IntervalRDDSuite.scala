@@ -20,7 +20,6 @@ package org.bdgenomics.utils.intervalrdd
 
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD
-import org.bdgenomics.utils.intervaltree.Region
 import org.bdgenomics.utils.misc.SparkFunSuite
 
 class IntervalRDDSuite extends SparkFunSuite {
