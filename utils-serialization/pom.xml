@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
-    <artifactId>utils-parent_2.10</artifactId>
+    <artifactId>utils-parent_2.11</artifactId>
     <version>0.2.7-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-serialization_2.10</artifactId>
+  <artifactId>utils-serialization_2.11</artifactId>
   <packaging>jar</packaging>
-  <name>utils-serialization_2.10: tools for serializing data</name>
+  <name>utils-serialization_2.11: tools for serializing data</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -90,7 +90,7 @@
   <dependencies>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc_2.10</artifactId>
+      <artifactId>utils-misc_2.11</artifactId>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
@@ -105,7 +105,7 @@
     </dependency>
     <dependency>
       <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.10</artifactId>
+      <artifactId>scalatest_2.11</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -114,7 +114,7 @@
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
-      <artifactId>spark-core_2.10</artifactId>
+      <artifactId>spark-core_2.11</artifactId>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -123,7 +123,7 @@
         </exclusion>
         <exclusion>
           <groupId>org.twitter</groupId>
-          <artifactId>chill_2.10</artifactId>
+          <artifactId>chill_2.11</artifactId>
         </exclusion>
         <exclusion>
           <groupId>org.apache.hadoop</groupId>
