@@ -33,6 +33,7 @@
     <module>utils-statistics</module>
     <module>utils-cli</module>
     <module>utils-serialization</module>
+    <module>utils-intervalrdd</module>
   </modules>
   
   <licenses>
