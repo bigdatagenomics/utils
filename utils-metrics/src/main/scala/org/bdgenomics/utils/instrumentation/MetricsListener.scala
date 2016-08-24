@@ -47,7 +47,7 @@ class MetricsListener(val metrics: RecordedMetrics) extends SparkListener {
     val taskInfo = Option(taskEnd.taskInfo)
 
     implicit val taskContext = SparkTaskContext(
-      taskMetrics.flatMap((tM) => Option(tM.hostname)).getOrElse("unknown"),
+      taskInfo.map(tI => tI.executorId).getOrElse("unknown"),
       taskEnd.stageId)
 
     taskMetrics.foreach(e => {

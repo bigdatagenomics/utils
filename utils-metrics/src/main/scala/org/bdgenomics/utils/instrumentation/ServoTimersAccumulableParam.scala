@@ -30,9 +30,11 @@ class ServoTimersAccumulableParam extends AccumulableParam[ServoTimers, Recorded
     timers.recordTiming(newTiming)
     timers
   }
+
   override def zero(initialValue: ServoTimers): ServoTimers = {
     new ServoTimers()
   }
+
   override def addInPlace(timers1: ServoTimers, timers2: ServoTimers): ServoTimers = {
     timers1.merge(timers2)
     timers1
@@ -68,6 +70,16 @@ class ServoTimers extends Serializable {
     new ServoTimer(timerName)
   }
 
+  override def equals(obj: Any): Boolean = obj match {
+    case st: ServoTimers => {
+      st.timerMap.isEmpty && timerMap.isEmpty
+    }
+    case _ => false
+  }
+
+  override def hashCode: Int = {
+    timerMap.hashCode
+  }
 }
 
 /**
