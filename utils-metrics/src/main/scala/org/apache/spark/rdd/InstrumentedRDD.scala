@@ -72,10 +72,6 @@ class InstrumentedRDD[T: ClassTag](private[rdd] val decoratedRDD: RDD[T])
     instrument(decoratedRDD.repartition(numPartitions))
   }
 
-  override def coalesce(numPartitions: Int, shuffle: Boolean)(implicit ord: Ordering[T]): RDD[T] = recordOperation {
-    instrument(decoratedRDD.coalesce(numPartitions, shuffle))
-  }
-
   override def sample(withReplacement: Boolean, fraction: Double, seed: Long): RDD[T] = recordOperation {
     instrument(decoratedRDD.sample(withReplacement, fraction, seed))
   }
@@ -144,10 +140,6 @@ class InstrumentedRDD[T: ClassTag](private[rdd] val decoratedRDD: RDD[T])
     instrument(decoratedRDD.pipe(command, env))
   }
 
-  override def pipe(command: Seq[String], env: Map[String, String], printPipeContext: ((String) => Unit) => Unit, printRDDElement: (T, (String) => Unit) => Unit, separateWorkingDir: Boolean): RDD[String] = recordOperation {
-    instrument(decoratedRDD.pipe(command, env, printPipeContext, printRDDElement, separateWorkingDir))
-  }
-
   override def mapPartitions[U](f: (Iterator[T]) => Iterator[U], preservesPartitioning: Boolean)(implicit evidence$6: ClassTag[U]): RDD[U] = recordOperation {
     implicit val recorder = functionRecorder()
     instrument(decoratedRDD.mapPartitions((it) => recordFunction(f(it)), preservesPartitioning))
@@ -156,42 +148,6 @@ class InstrumentedRDD[T: ClassTag](private[rdd] val decoratedRDD: RDD[T])
   override def mapPartitionsWithIndex[U](f: (Int, Iterator[T]) => Iterator[U], preservesPartitioning: Boolean)(implicit evidence$7: ClassTag[U]): RDD[U] = recordOperation {
     implicit val recorder = functionRecorder()
     instrument(decoratedRDD.mapPartitionsWithIndex((i, it) => recordFunction(f(i, it)), preservesPartitioning))
-  }
-
-  @DeveloperApi
-  override def mapPartitionsWithContext[U](f: (TaskContext, Iterator[T]) => Iterator[U], preservesPartitioning: Boolean)(implicit evidence$8: ClassTag[U]): RDD[U] = recordOperation {
-    implicit val recorder = functionRecorder()
-    instrument(decoratedRDD.mapPartitionsWithContext((t, it) => recordFunction(f(t, it)), preservesPartitioning))
-  }
-
-  @deprecated("use mapPartitionsWithIndex")
-  override def mapPartitionsWithSplit[U](f: (Int, Iterator[T]) => Iterator[U], preservesPartitioning: Boolean)(implicit evidence$9: ClassTag[U]): RDD[U] = recordOperation {
-    implicit val recorder = functionRecorder()
-    instrument(decoratedRDD.mapPartitionsWithSplit((i, it) => recordFunction(f(i, it)), preservesPartitioning))
-  }
-
-  @deprecated("use mapPartitionsWithIndex")
-  override def mapWith[A, U](constructA: (Int) => A, preservesPartitioning: Boolean)(f: (T, A) => U)(implicit evidence$10: ClassTag[U]): RDD[U] = recordOperation {
-    implicit val recorder = functionRecorder()
-    instrument(decoratedRDD.mapWith((i: Int) => recordFunction(constructA(i)), preservesPartitioning)((t, a) => recordFunction(f(t, a))))
-  }
-
-  @deprecated("use mapPartitionsWithIndex and flatMap")
-  override def flatMapWith[A, U](constructA: (Int) => A, preservesPartitioning: Boolean)(f: (T, A) => Seq[U])(implicit evidence$11: ClassTag[U]): RDD[U] = recordOperation {
-    implicit val recorder = functionRecorder()
-    instrument(decoratedRDD.flatMapWith((i: Int) => recordFunction(constructA(i)), preservesPartitioning)((t, a) => recordFunction(f(t, a))))
-  }
-
-  @deprecated("use mapPartitionsWithIndex and foreach")
-  override def foreachWith[A](constructA: (Int) => A)(f: (T, A) => Unit): Unit = recordOperation {
-    implicit val recorder = functionRecorder()
-    decoratedRDD.foreachWith((i: Int) => recordFunction(constructA(i)))((t, a) => recordFunction(f(t, a)))
-  }
-
-  @deprecated("use mapPartitionsWithIndex and filter")
-  override def filterWith[A](constructA: (Int) => A)(p: (T, A) => Boolean): RDD[T] = recordOperation {
-    implicit val recorder = functionRecorder()
-    instrument(decoratedRDD.filterWith((i: Int) => recordFunction(constructA(i)))((t, a) => recordFunction(p(t, a))))
   }
 
   override def zip[U](other: RDD[U])(implicit evidence$12: ClassTag[U]): RDD[(T, U)] = recordOperation {
@@ -244,11 +200,6 @@ class InstrumentedRDD[T: ClassTag](private[rdd] val decoratedRDD: RDD[T])
 
   override def toLocalIterator: Iterator[T] = recordOperation {
     decoratedRDD.toLocalIterator
-  }
-
-  @deprecated("use collect")
-  override def toArray(): Array[T] = recordOperation {
-    decoratedRDD.toArray()
   }
 
   override def collect[U](f: PartialFunction[T, U])(implicit evidence$31: ClassTag[U]): RDD[U] = recordOperation {

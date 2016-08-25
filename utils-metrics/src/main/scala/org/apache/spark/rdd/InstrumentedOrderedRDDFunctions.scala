@@ -18,7 +18,6 @@
 package org.apache.spark.rdd
 
 import org.apache.spark.Partitioner
-import org.apache.spark.SparkContext.rddToOrderedRDDFunctions
 import org.apache.spark.rdd.InstrumentedRDD._
 import scala.reflect.ClassTag
 
