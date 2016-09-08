@@ -1,5 +1,10 @@
 # UTILS #
 
+### Version 0.2.8 ###
+
+### Version SNAPSHOT ###
+* ISSUE [75](https://github.com/bigdatagenomics/bdg-utils/pull/75): Added IntervalRDD submodule and its interval tree dependency.
+
 ### Version plugin] prepare release 0.2.6 ###
 
 ### Version 0.2.6 ###
