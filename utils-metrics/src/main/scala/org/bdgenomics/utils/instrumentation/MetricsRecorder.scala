@@ -44,16 +44,32 @@ class MetricsRecorder(val accumulable: Accumulable[ServoTimers, RecordedTiming],
 
   def startPhase(timerName: String, sequenceId: Option[Int] = None, isRDDOperation: Boolean = false) {
     val newSequenceId = generateSequenceId(sequenceId, timerName)
-    val shouldRecord = if (timingsStack.isEmpty) true else shouldRecordOperation(isRDDOperation, timingsStack.top)
-    val key = new TimingPathKey(timerName, newSequenceId, isRDDOperation, shouldRecord)
-    val newPath = if (timingsStack.isEmpty) root(key) else timingsStack.top.child(key)
-    timingsStack.push(newPath)
+    this.synchronized {
+      val shouldRecord = if (timingsStack.isEmpty) true else shouldRecordOperation(isRDDOperation, timingsStack.top)
+      val key = new TimingPathKey(timerName, newSequenceId, isRDDOperation, shouldRecord)
+      val newPath = if (timingsStack.isEmpty) root(key) else timingsStack.top.child(key)
+      timingsStack.push(newPath)
+    }
   }
 
   def finishPhase(timerName: String, timingNanos: Long) {
-    val top = timingsStack.pop()
-    assert(top.timerName == timerName, "Timer name from on top of stack [" + top +
-      "] did not match passed-in timer name [" + timerName + "]")
+    var top: TimingPath = null
+    this.synchronized {
+      top = timingsStack.pop()
+      // Stack is out of order. This should never happen for thread-local contexts.
+      if (top.timerName != timerName) {
+        val tmpStack = new mutable.Stack[TimingPath]()
+        while (top.timerName != timerName && !timingsStack.isEmpty) {
+          tmpStack.push(top)
+          top = timingsStack.pop()
+        }
+        assert(top.timerName == timerName, "Timer name from on top of stack [" + top +
+          "] did not match passed-in timer name [" + timerName + "]")
+        while (!tmpStack.isEmpty) {
+          timingsStack.push(tmpStack.pop())
+        }
+      }
+    }
     if (top.shouldRecord) {
       accumulable += new RecordedTiming(timingNanos, top)
     }
