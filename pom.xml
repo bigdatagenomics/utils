@@ -17,12 +17,12 @@
   <url>http://bdgenomics.org/</url>
 
   <properties>
-    <java.version>1.7</java.version>
+    <java.version>1.8</java.version>
     <spark.version>2.0.0</spark.version>
     <parquet.version>1.8.1</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
     <hadoop.version>2.6.0</hadoop.version>
-    <scoverage.version>0.99.2</scoverage.version>
+      <scoverage.plugin.version>1.1.1</scoverage.plugin.version>
   </properties>
   
   <modules>
@@ -314,7 +314,7 @@
       <dependency>
         <groupId>org.scoverage</groupId>
         <artifactId>scalac-scoverage-plugin_2.10</artifactId>
-        <version>${scoverage.version}</version>
+        <version>${scoverage.plugin.version}</version>
       </dependency>
       <dependency>
         <groupId>org.scala-lang</groupId>
@@ -477,7 +477,7 @@
                 <compilerPlugin>
                   <groupId>org.scoverage</groupId>
                   <artifactId>scalac-scoverage-plugin_2.10</artifactId>
-                  <version>${scoverage.version}</version>
+                  <version>${scoverage.plugin.version}</version>
                 </compilerPlugin>
               </compilerPlugins>
             </configuration>
