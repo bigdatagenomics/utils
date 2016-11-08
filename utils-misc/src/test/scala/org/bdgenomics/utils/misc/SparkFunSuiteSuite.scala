@@ -17,6 +17,8 @@
  */
 package org.bdgenomics.utils.misc
 
+import scala.io.Source
+
 class SparkFunSuiteSuite extends SparkFunSuite {
 
   sparkTest("a simple test using spark") {
@@ -24,5 +26,18 @@ class SparkFunSuiteSuite extends SparkFunSuite {
 
     assert(rdd.count === 5)
     assert(rdd.reduce(_ + _) === 10)
+  }
+
+  test("copying a resource should pass equivalence testing") {
+    val originalFile = testFile("test.txt")
+    val copiedFile = copyResource("test.txt")
+
+    checkFiles(originalFile, copiedFile)
+  }
+
+  test("load a resource file") {
+    assert(Source.fromFile(resourceUrl("test.txt").toURI)
+      .getLines
+      .mkString(" ") === "This is a test of the emergency resource copying system.")
   }
 }
