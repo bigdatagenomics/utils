@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+set -e -x -v
+
+# make a tempdir for writing maven cruft to
+UTILS_MVN_TMP_DIR=$(mktemp -d -t utilsTestMvnXXXXXXX)
+
+# add this tempdir to the poms...
+find . -name pom.xml \
+    -exec sed -i.bak \
+    -e "s:sun.io.serialization.extendedDebugInfo=true:sun.io.serialization.extendedDebugInfo=true -Djava.io.tmpdir=${UTILS_MVN_TMP_DIR}:g" \
+    {} \;
+find . -name "*.bak" -exec rm {} \;
+
+# variable declarations
+export PATH=${JAVA_HOME}/bin/:${PATH}
+export MAVEN_OPTS="-Xmx1536m -XX:MaxPermSize=1g -Dfile.encoding=utf-8"
+DIR=$( cd $( dirname ${BASH_SOURCE[0]} ) && pwd )
+PROJECT_ROOT=${DIR}/..
+VERSION=$(grep "<version>" ${PROJECT_ROOT}/pom.xml  | head -2 | tail -1 | sed 's/ *<version>//g' | sed 's/<\/version>//g')
+
+# is the hadoop version set?
+if ! [[ ${HADOOP_VERSION} ]];
+then
+    echo "HADOOP_VERSION environment variable is not set."
+    echo "Please set this variable before running."
+    
+    exit 1
+fi
+
+# is the spark version set?
+if ! [[ ${SPARK_VERSION} ]];
+then
+    echo "SPARK_VERSION environment variable is not set."
+    echo "Please set this variable before running."
+    
+    exit 1
+fi
+
+# are we testing for spark 2.0.0? if so, we need to rewrite our poms first
+if [ ${SPARK_VERSION} == 2.0.0 ];
+then
+        echo "Rewriting POM.xml files for Scala 2.10."
+        ./scripts/move_to_spark_2.sh
+fi
+
+# are we testing for scala 2.11? if so, we need to rewrite our poms to 2.11 first
+if [ ${SCALAVER} == 2.11 ];
+then
+        echo "Rewriting POM.xml files for Scala 2.10."
+        ./scripts/move_to_scala_2.11.sh
+fi
+
+# print versions
+echo "Testing UTILS version ${VERSION} on Spark ${SPARK_VERSION} and Hadoop ${HADOOP_VERSION}"
+
+# first, build the sources, run the unit tests
+mvn clean package \
+    -Dhadoop.version=${HADOOP_VERSION} \
+    -Dspark.version=${SPARK_VERSION} 
+    
+# we are done with maven, so clean up the maven temp dir
+find ${UTILS_MVN_TMP_DIR}
+rm -rf ${UTILS_MVN_TMP_DIR}
+
+# run integration tests on scala 2.10; prebuilt spark distributions are not available for 2.11
+if [ ${SCALAVER} == 2.10 ];
+then
+
+    # test that the source is formatted correctly
+    # we had modified the poms to add a temp dir, so check those out first
+    pushd ${PROJECT_ROOT}
+    find . -name pom.xml -exec git checkout {} \;
+    ./scripts/format-source
+    if test -n "$(git status --porcelain)"
+    then
+        echo "Please run './scripts/format-source'"
+        exit 1
+    fi
+    popd
+    
+fi
+
+echo
+echo "All the tests passed"
+echo
