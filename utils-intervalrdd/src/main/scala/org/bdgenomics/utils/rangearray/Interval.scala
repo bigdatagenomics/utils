@@ -16,14 +16,14 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.utils.intervaltree
+package org.bdgenomics.utils.rangearray
 
 /**
  * An interval is a 2-dimensional 0-based coordinate consisting of a closed start value and open end value.
  * Each 2-dimensional coordinate has a defined width.
  * This can be used to express a region of a genome, a transcript, a gene, etc.
  */
-trait Interval {
+trait Interval[T <: Interval[T]] extends Comparable[T] {
 
   /**
    * @return The start of this interval.
@@ -42,5 +42,17 @@ trait Interval {
    * @return The width of this interval.
    */
   def width: Long = end - start
+
+  /**
+   * Determines whether Interval overlaps with other Interval T
+   * @return Boolean whether or not Intervals overlap
+   */
+  def overlaps(interval: T): Boolean
+
+  /**
+   * Compares the distance between this Interval and other Interval T
+   * @return Distance between two Intervals
+   */
+  def compareTo(interval: T): Int
 
 }
