@@ -45,7 +45,7 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
 
   def run() {
     val start = System.nanoTime()
-    val conf = new SparkConf().setAppName("adam: " + companion.commandName)
+    val conf = new SparkConf().setAppName(companion.commandName)
     if (conf.getOption("spark.master").isEmpty) {
       conf.setMaster("local[%d]".format(Runtime.getRuntime.availableProcessors()))
     }
