@@ -67,7 +67,7 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
   }
 
   override def first: (K, V) = {
-    partitionsRDD.filter(_.getRangeArray.length > 0).first.getRangeArray.array(0)
+    partitionsRDD.filter(_.getRangeArray.length > 0).first.getRangeArray.collect()(0)
   }
 
   override def collect: Array[(K, V)] = partitionsRDD.flatMap(_.get).collect
@@ -83,7 +83,7 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
       context.runJob(partitionsRDD, (context: TaskContext, partIter: Iterator[IntervalPartition[K, V]]) => {
         if (partIter.hasNext) {
           val intPart = partIter.next()
-          intPart.filterByInterval(interval).getRangeArray.array.map(_._2)
+          intPart.filterByInterval(interval).getRangeArray.collect.map(_._2)
         } else {
           Array[V]()
         }

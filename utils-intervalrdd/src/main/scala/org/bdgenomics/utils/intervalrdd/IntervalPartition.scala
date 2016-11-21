@@ -48,7 +48,7 @@ protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val a
    * @return Iterator of searched interval and the corresponding (K,V) pairs
    */
   def get(): Iterable[(K, V)] = {
-    array.array.toIterable
+    array.collect.toIterable
   }
 
   private[utils] def filterByInterval(r: K): IntervalPartition[K, V] = {
@@ -94,7 +94,7 @@ protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val a
    * @return Iterator of searched interval and the corresponding (K,V) pairs
    */
   def mergePartitions(p: IntervalPartition[K, V]): IntervalPartition[K, V] = {
-    this.withMap(array.insert(p.getRangeArray().array.toIterator))
+    this.withMap(array.insert(p.getRangeArray().collect.toIterator))
   }
 
 }

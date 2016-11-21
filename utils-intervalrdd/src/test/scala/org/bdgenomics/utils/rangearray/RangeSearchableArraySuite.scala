@@ -23,7 +23,7 @@ import org.bdgenomics.utils.misc.SparkFunSuite
 class RangeSearchableArraySuite extends SparkFunSuite {
 
   test("succeeds in searching empty RangeSearchableArray") {
-    val array = RangeSearchableArray(Array[(Region, Long)]())
+    val array = new RangeSearchableArray(Array[(Region, Long)]())
 
     // retrieve a value wholly for nonexistant key
     val wholly = array.get(Region(11L, 12L))
@@ -32,7 +32,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
   }
 
   test("build a RangeSearchableArray with a single item and retrieve data") {
-    val array = RangeSearchableArray(Array((Region(10L, 15L), 1)))
+    val array = new RangeSearchableArray(Array((Region(10L, 15L), 1)))
 
     assert(array.length === 1)
     assert(array.midpoint === 1)
@@ -131,7 +131,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
   }
 
   test("inserts new elements into RangeSearchableArray") {
-    val array = RangeSearchableArray(Array((Region(10L, 15L), 1),
+    val array = new RangeSearchableArray(Array((Region(10L, 15L), 1),
       (Region(19L, 24L), 0),
       (Region(100L, 150L), 4),
       (Region(80L, 95L), 2),

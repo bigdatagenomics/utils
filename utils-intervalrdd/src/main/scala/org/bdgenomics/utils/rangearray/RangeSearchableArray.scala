@@ -52,10 +52,11 @@ object RangeSearchableArray extends Serializable {
  * @param arr An array of values for the left side of the join. We require
  *   this array to be sorted.
  */
-case class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], sorted: Boolean = false) {
+class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], sorted: Boolean = false)
+    extends Serializable {
 
   // ensure that array is sorted
-  val array =
+  private[rangearray] val array =
     if (sorted) arr
     else arr.sortBy(_._1)
 
@@ -106,7 +107,8 @@ case class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)
   }
 
   /**
-   * Insert Iterator of (K,V) items into existing RangeSearchableArray
+   * Insert an Iterator of (K,V) items into existing RangeSearchableArray.
+   *
    * @param kvs (K,V) tuples to insert into RangeSearchableArray
    * @return new RangeSearchableArray with inserted values
    */
@@ -117,53 +119,72 @@ case class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)
       if (sorted) kvs.toArray
       else kvs.toArray.sortBy(_._1)
 
-    // initialize empty array to merge two arrays into
-    val allSorted: Array[(K, T)] = new Array[(K, T)](array.length + sortedKvs.length)
-    var i = 0
-    var j = 0
-
-    // merge two sorted arrays
-    Array.range(0, allSorted.length).foreach(k => {
-      allSorted(k) = (
-        if (i >= length) {
-          j = j + 1
-          sortedKvs(j - 1)
-        } else if (j >= sortedKvs.length) {
-          i += 1
-          array(i - 1)
-        } else if (array(i)._1.compareTo(sortedKvs(j)._1) < 0) {
-          i += 1
-          array(i - 1)
-        } else {
-          j = j + 1
-          sortedKvs(j - 1)
-        })
-    })
-
-    RangeSearchableArray(allSorted)
+    val allSorted = merge(sortedKvs, new Array[(K, T)](array.length + sortedKvs.length))
+    new RangeSearchableArray(allSorted)
   }
 
   /**
-   * Filters items in RangeSearchableArray based on predicate on (K,V) tuples
+   * Merges the sorted array from this class with a new sorted array into a new array.
+   *
+   * @param arr Sorted array to merge into this sorted array
+   * @param allSorted Array to merge sorted arrays into
+   * @param k index of current position in allSorted array
+   * @param idx1 index of current position in this array
+   * @param idx2 index of current position in new array arr
+   * @return new sorted array with merged components from new array arr and base array
+   */
+  @tailrec private def merge(arr: Array[(K, T)],
+                             allSorted: Array[(K, T)],
+                             k: Int = 0,
+                             idx1: Int = 0,
+                             idx2: Int = 0): Array[(K, T)] = {
+
+    // if both arrays are out of bounds, return
+    if (idx1 >= length && idx2 >= arr.length) {
+      allSorted
+      // if array 1 is out of bounds, return element from array 2
+    } else if (idx1 >= length) {
+      allSorted(k) = arr(idx2)
+      merge(arr, allSorted, k + 1, idx1, idx2 + 1)
+      // if array 2 is out of bounds, return element from array 1
+    } else if (idx2 >= arr.length) {
+      allSorted(k) = array(idx1)
+      merge(arr, allSorted, k + 1, idx1 + 1, idx2)
+      // if array 1 has element before array 2, add element from array 1
+    } else if (array(idx1)._1.compareTo(arr(idx2)._1) < 0) {
+      allSorted(k) = array(idx1)
+      merge(arr, allSorted, k + 1, idx1 + 1, idx2)
+      // if array 2 has element before array 1, add element from array 2
+    } else {
+      allSorted(k) = arr(idx2)
+      merge(arr, allSorted, k + 1, idx1, idx2 + 1)
+    }
+  }
+
+  /**
+   * Filters items in RangeSearchableArray based on predicate on (K,V) tuples.
+   *
    * @param pred predicate to filter elements by
    * @return new RangeSearchableArray with filtered elements
    */
   def filter(pred: ((K, T)) => Boolean): RangeSearchableArray[K, T] = {
-    RangeSearchableArray(array.filter(r => pred(r._1, r._2)))
+    new RangeSearchableArray(array.filter(r => pred(r._1, r._2)))
   }
 
   /**
-   * Maps values from T to T2
+   * Maps values from T to T2.
+   *
    * @param f Function mapping T to T2
    * @tparam T2 new type to map values to
    * @return new RangeSearchableArray with mapped values
    */
   def mapValues[T2: ClassTag](f: T => T2): RangeSearchableArray[K, T2] = {
-    RangeSearchableArray(array.map(r => (r._1, f(r._2))))
+    new RangeSearchableArray(array.map(r => (r._1, f(r._2))))
   }
 
   /**
-   * Filters elements in array by overlapping Interval
+   * Filters elements in this array by an overlapping Interval.
+   *
    * @param rr Interval to filter by
    * @return Iterable of elements filtered by Interval rr
    */
@@ -176,6 +197,13 @@ case class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)
         expand(rr, idx, -1) ::: expand(rr, idx + 1, 1)
       })
   }
+
+  /**
+   * Collects and returns all elements in this array.
+   *
+   * @return array containing all elements
+   */
+  def collect(): Array[(K, T)] = array
 }
 
 class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS <: Serializer[T], KS <: Serializer[K]](
@@ -209,6 +237,6 @@ class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS
         tSerializer.read(kryo, input, tTag.runtimeClass.asInstanceOf[Class[T]]))
     })
 
-    RangeSearchableArray[K, T](array)
+    new RangeSearchableArray[K, T](array)
   }
 }
