@@ -270,14 +270,20 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](
   def collect(): Array[(K, T)] = array
 }
 
-class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS <: Serializer[T], KS <: Serializer[K]](
-    private val kSerializer: KS,
-    private val tSerializer: TS) extends Serializer[RangeSearchableArray[K, T]] {
+class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS <: Serializer[T], KS <: Serializer[K]]
+    extends Serializer[RangeSearchableArray[K, T]] {
 
-  def tTag: ClassTag[T] = implicitly[ClassTag[T]]
-  def kTag: ClassTag[K] = implicitly[ClassTag[K]]
+  private def tTag: ClassTag[T] = implicitly[ClassTag[T]]
+  private def kTag: ClassTag[K] = implicitly[ClassTag[K]]
 
   def write(kryo: Kryo, output: Output, obj: RangeSearchableArray[K, T]) {
+
+    val kSerializer = kryo
+      .getSerializer(kTag.runtimeClass.asInstanceOf[Class[K]])
+      .asInstanceOf[Serializer[K]]
+    val tSerializer = kryo
+      .getSerializer(tTag.runtimeClass.asInstanceOf[Class[T]])
+      .asInstanceOf[Serializer[T]]
 
     // write the max width
     output.writeLong(obj.maxIntervalWidth)
@@ -293,6 +299,13 @@ class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS
   }
 
   def read(kryo: Kryo, input: Input, klazz: Class[RangeSearchableArray[K, T]]): RangeSearchableArray[K, T] = {
+
+    val kSerializer = kryo
+      .getSerializer(kTag.runtimeClass.asInstanceOf[Class[K]])
+      .asInstanceOf[Serializer[K]]
+    val tSerializer = kryo
+      .getSerializer(tTag.runtimeClass.asInstanceOf[Class[T]])
+      .asInstanceOf[Serializer[T]]
 
     // read the max width
     val maxWidth = input.readInt()
