@@ -32,6 +32,17 @@ case class Region(start: Long, end: Long) extends Interval[Region] {
 
   def overlaps(other: Region): Boolean = end > other.start && start < other.end
 
+  def covers(other: Region): Boolean = overlaps(other)
+
+  def distance(other: Region): Option[Long] = {
+    if (overlaps(other)) {
+      Some(0L)
+    } else if (start > other.end) {
+      Some(start - other.end)
+    } else {
+      Some(other.start - end)
+    }
+  }
 }
 
 class IntervalPartitionSuite extends FunSuite {
@@ -50,7 +61,7 @@ class IntervalPartitionSuite extends FunSuite {
   val read6 = 250L
 
   def createEmptyPartition: IntervalPartition[Region, Long] = {
-    new IntervalPartition[Region, Long](new RangeSearchableArray(Array[(Region, Long)]()))
+    new IntervalPartition[Region, Long](new RangeSearchableArray(Array[(Region, Long)](), 0L))
   }
 
   test("create new partition") {

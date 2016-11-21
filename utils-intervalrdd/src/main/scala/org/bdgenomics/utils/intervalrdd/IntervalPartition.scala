@@ -20,6 +20,7 @@ package org.bdgenomics.utils.intervalrdd
 
 import org.bdgenomics.utils.rangearray._
 import org.bdgenomics.utils.misc.Logging
+import scala.math.max
 import scala.reflect.ClassTag
 
 protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val array: RangeSearchableArray[K, V])
@@ -102,8 +103,8 @@ protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val a
 private[intervalrdd] object IntervalPartition {
 
   def apply[K <: Interval[K], K2 <: Interval[K2], V: ClassTag](iter: Iterable[(K, V)]): IntervalPartition[K, V] = {
-    val map = new RangeSearchableArray[K, V](iter.toArray)
+    val array = iter.toArray
+    val map = new RangeSearchableArray[K, V](array, array.map(_._1.width).fold(0L)(max(_, _)))
     new IntervalPartition(map)
   }
-
 }

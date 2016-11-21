@@ -47,15 +47,51 @@ trait Interval[T <: Interval[T]] extends Comparable[T] {
   def width: Long = end - start
 
   /**
-   * Determines whether Interval overlaps with other Interval T
+   * Determines whether Interval intersects with another Interval T.
+   *
+   * @param interval Another interval to compare against.
    * @return Boolean whether or not Intervals overlap
+   *
+   * @see covers
    */
   def overlaps(interval: T): Boolean
 
   /**
-   * Compares the distance between this Interval and other Interval T
-   * @return Distance between two Intervals
+   * Determines whether the range of positions this interval intersects the
+   * range of positions another interval covers.
+   *
+   * In many cases, this function is identical to the overlaps function.
+   * However, some coordinate spaces may allow two intervals to cover the same
+   * start/end interval, while not truly overlapping. E.g., in a genomic
+   * coordinate space, two objects may cover the same range on a chromosome, but
+   * may have opposite strandedness.
+   *
+   * Essentially, this is relaxed variant of overlaps where we have projected
+   * a complex coordinate space down. If two intervals overlap, they must cover
+   * each other. However, if two interlaps cover each other, they may not
+   * overlap.
+   *
+   * @param interval Another interval to compare against.
+   * @return True if two intervals cover intersecting indices in a coordinate
+   *   space.
+   *
+   * @see overlaps
+   */
+  def covers(interval: T): Boolean
+
+  /**
+   * Compares the distance between this Interval and other Interval T.
+   *
+   * @param interval Another interval to compare against.
+   * @return Greater than/equal to/less than comparison.
    */
   def compareTo(interval: T): Int
 
+  /**
+   * Provides a distance, if defined, between two Intervals.
+   *
+   * @param interval Another interval to compare against.
+   * @return Absolute value istance between two Intervals, if defined.
+   */
+  def distance(interval: T): Option[Long]
 }
