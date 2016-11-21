@@ -23,7 +23,7 @@ import org.bdgenomics.utils.misc.SparkFunSuite
 class RangeSearchableArraySuite extends SparkFunSuite {
 
   test("succeeds in searching empty RangeSearchableArray") {
-    val array = new RangeSearchableArray(Array[(Region, Long)]())
+    val array = new RangeSearchableArray(Array[(Region, Long)](), 0L)
 
     // retrieve a value wholly for nonexistant key
     val wholly = array.get(Region(11L, 12L))
@@ -32,7 +32,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
   }
 
   test("build a RangeSearchableArray with a single item and retrieve data") {
-    val array = new RangeSearchableArray(Array((Region(10L, 15L), 1)))
+    val array = new RangeSearchableArray(Array((Region(10L, 15L), 1)), 5L)
 
     assert(array.length === 1)
     assert(array.midpoint === 1)
@@ -74,6 +74,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
       (Region(80L, 110L), 3)))
 
     val array = RangeSearchableArray(rdd)
+    assert(array.maxIntervalWidth === 50)
     assert(array.length === 5)
     assert(array.midpoint === 4)
     (0 until array.length).foreach(idx => {
@@ -112,7 +113,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
   }
 
   sparkTest("verify RangeSearchableArray fetches all valid ranges") {
-    val longRegion = Region(2L, 200L)
+    val longRegion = Region(1L, 200L)
     val rdd = sc.parallelize(Seq((longRegion, 0),
       (Region(1L, 10L), 1),
       (Region(18L, 24L), 2),
@@ -121,7 +122,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
       (Region(40L, 60L), 5)))
 
     val array = RangeSearchableArray(rdd)
-
+    assert(array.maxIntervalWidth === 199)
     // retrieve a value overlapping just the last key
     val query = array.get(Region(20L, 30L)).toArray
 
@@ -135,7 +136,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
       (Region(19L, 24L), 0),
       (Region(100L, 150L), 4),
       (Region(80L, 95L), 2),
-      (Region(80L, 110L), 3)))
+      (Region(80L, 110L), 3)), 50L)
 
     val newData = Iterator((Region(21L, 22L), 5))
 
@@ -145,5 +146,4 @@ class RangeSearchableArraySuite extends SparkFunSuite {
     val after = newForest.get(Region(20L, 30L))
     assert(after.size === 2)
   }
-
 }

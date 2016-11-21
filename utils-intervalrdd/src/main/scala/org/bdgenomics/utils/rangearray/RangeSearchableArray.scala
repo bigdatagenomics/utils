@@ -19,14 +19,27 @@ package org.bdgenomics.utils.rangearray
 
 import com.esotericsoftware.kryo.io.{ Input, Output }
 import com.esotericsoftware.kryo.{ Kryo, Serializer }
+import org.apache.spark.AccumulatorParam
 import org.apache.spark.rdd.RDD
 import scala.annotation.tailrec
+import scala.math.max
 import scala.reflect.ClassTag
 
 /**
  * Companion object for building a RangeSearchableArray from an RDD.
  */
 object RangeSearchableArray extends Serializable {
+
+  private class MaxAccumulatorParam extends AccumulatorParam[Long] {
+
+    def zero(initialValue: Long): Long = {
+      initialValue
+    }
+
+    def addInPlace(r1: Long, r2: Long): Long = {
+      max(r1, r2)
+    }
+  }
 
   /**
    * Sorts the RDD and collects it to build RangeSearchableArray, a sorted array that searches
@@ -36,11 +49,23 @@ object RangeSearchableArray extends Serializable {
    * @return The RangeSearchableArray built from this RDD.
    */
   def apply[K <: Interval[K]: ClassTag, T: ClassTag](rdd: RDD[(K, T)]): RangeSearchableArray[K, T] = {
+
+    val accum = {
+      implicit val accumParam = new MaxAccumulatorParam
+
+      rdd.context.accumulator(0L)
+    }
+
     val sortedArray =
-      rdd.sortByKey()
+      rdd.map(i => {
+        // we do this to get the width of the widest interval
+        accum += i._1.width
+
+        i
+      }).sortByKey()
         .collect
 
-    new RangeSearchableArray(sortedArray, sorted = true)
+    new RangeSearchableArray(sortedArray, accum.value, sorted = true)
   }
 }
 
@@ -49,11 +74,14 @@ object RangeSearchableArray extends Serializable {
  * Alas, we have no trees anymore.
  * I blame global warming.
  *
- * @param arr An array of values for the left side of the join. We require
- *   this array to be sorted.
+ * @param arr An array of values for the left side of the join.
+ * @param maxIntervalWidth The maximum width across all intervals in this array.
+ * @param sorted True if arr is sorted. If false, we sort arr.
  */
-class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], sorted: Boolean = false)
-    extends Serializable {
+class RangeSearchableArray[K <: Interval[K], T: ClassTag](
+    arr: Array[(K, T)],
+    private[rangearray] val maxIntervalWidth: Long,
+    sorted: Boolean = false) extends Serializable {
 
   // ensure that array is sorted
   private[rangearray] val array =
@@ -76,14 +104,14 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
                                     step: Int = midpoint): Option[Int] = {
     if (array.length == 0) {
       None
-    } else if (rr.overlaps(array(idx)._1)) {
+    } else if (rr.covers(array(idx)._1)) {
       Some(idx)
     } else if (step == 0) {
       None
     } else {
       val stepIdx = idx + step
       val nextIdx = if (stepIdx >= length ||
-        (!rr.overlaps(array(stepIdx)._1) &&
+        (!rr.covers(array(stepIdx)._1) &&
           rr.compareTo(array(stepIdx)._1) < 0)) {
         idx
       } else {
@@ -93,16 +121,51 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
     }
   }
 
-  @tailrec private def expand(rr: K,
-                              idx: Int,
-                              step: Int,
-                              list: List[(K, T)] = List.empty): List[(K, T)] = {
-    if (idx < 0 ||
-      idx >= length ||
-      !rr.overlaps(array(idx)._1)) {
+  @tailrec private def expandForward(rr: K,
+                                     idx: Int,
+                                     list: List[(K, T)] = List.empty): List[(K, T)] = {
+    if (idx >= length) {
       list
     } else {
-      expand(rr, idx + step, step, array(idx) :: list)
+      val arrayElem = array(idx)
+
+      if (!rr.covers(arrayElem._1) && rr.compareTo(arrayElem._1) > 0) {
+        list
+      } else {
+        val hits = if (rr.overlaps(arrayElem._1)) {
+          arrayElem :: list
+        } else {
+          list
+        }
+
+        expandForward(rr, idx + 1, hits)
+      }
+    }
+  }
+
+  @tailrec private def expandBackward(rr: K,
+                                      idx: Int,
+                                      list: List[(K, T)] = List.empty): List[(K, T)] = {
+    if (idx < 0) {
+      list
+    } else {
+      val arrayElem = array(idx)
+
+      // get the distance between the current and query regions
+      val distance = arrayElem._1.distance(rr)
+
+      // are we out of range?
+      if (distance.fold(true)(d => d > maxIntervalWidth)) {
+        list
+      } else {
+        val hits = if (rr.overlaps(arrayElem._1)) {
+          arrayElem :: list
+        } else {
+          list
+        }
+
+        expandBackward(rr, idx - 1, hits)
+      }
     }
   }
 
@@ -118,9 +181,10 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
     val sortedKvs =
       if (sorted) kvs.toArray
       else kvs.toArray.sortBy(_._1)
+    val maxWidth = sortedKvs.map(_._1.width).fold(0L)(max(_, _))
 
     val allSorted = merge(sortedKvs, new Array[(K, T)](array.length + sortedKvs.length))
-    new RangeSearchableArray(allSorted)
+    new RangeSearchableArray(allSorted, max(maxIntervalWidth, maxWidth), sorted = true)
   }
 
   /**
@@ -168,7 +232,7 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
    * @return new RangeSearchableArray with filtered elements
    */
   def filter(pred: ((K, T)) => Boolean): RangeSearchableArray[K, T] = {
-    new RangeSearchableArray(array.filter(r => pred(r._1, r._2)))
+    new RangeSearchableArray(array.filter(r => pred(r._1, r._2)), maxIntervalWidth)
   }
 
   /**
@@ -179,7 +243,7 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
    * @return new RangeSearchableArray with mapped values
    */
   def mapValues[T2: ClassTag](f: T => T2): RangeSearchableArray[K, T2] = {
-    new RangeSearchableArray(array.map(r => (r._1, f(r._2))))
+    new RangeSearchableArray(array.map(r => (r._1, f(r._2))), maxIntervalWidth)
   }
 
   /**
@@ -190,11 +254,87 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
    */
   def get(rr: K): Iterable[(K, T)] = {
 
+    // this function searches for all overlapping keys in a sorted array which
+    // is keyed by intervals. we can prove that this function is correct.
+    //
+    // we require that:
+    // - intervals exist in a coordinate space where a single interval is
+    //   contiguous and has:
+    //   - a width, which is always defined
+    //   - a distance function, which is defined for all other intervals that
+    //     are in the same coordinate plane
+    //   - overlaps and covers functions, where:
+    //      - covers is true if two intervals are in the same coordinate plane
+    //        and have overlapping start/end ranges
+    //      - overlaps is true if two intervals overlap, for whatever definition
+    //        of overlap is given in that coordinate space. the only invariant
+    //        here is that if overlaps returns true, covers must return true
+    // - intervals have a sorted order where:
+    //   - intervals that are on the same coordinate plane sort by start
+    //     position on that coordinate plane
+    //   - intervals that are in the same coordinate space but different planes
+    //     have a defined order that sort coordinate spaces
+    // 
+    // as arguments, we take:
+    // - a query region
+    // - a sorted array (again, sorted first by coordinate plane, and then by
+    //   start position on a given coordinate plane)
+    // - the width of the largest interval
+    //
+    // our algorithm runs two phases:
+    // 1. we run binary search to find a key that overlaps the query region
+    // 2. if we find a key that overlaps the query region, we "expand" from this
+    //    key to identify the range of all keys that overlap the query sequence
+    //
+    // we take as a given that binary search works. the only nuance of our
+    // approach is that we use the covers function instead of the overlaps
+    // function to determine when we have a query hit.
+    // 
+    // once we have gotten an index of a covering key/value pair in the sorted
+    // array from the binary search algorithm, we need to expand this index to
+    // find all overlapping key/value pairs. we need to expand the array both
+    // forward and backward. these two expansions have separate approaches:
+    // 1. expanding forward: we walk forward (increment the array index) until
+    //    we hit a region that sorts after the query region, and that does not
+    //    cover the query region. since the array is sorted by start position,
+    //    once we hit an array element that sorts after the query region, that
+    //    implies that:
+    //      * the start position of the array element is greater than the start
+    //        position of the query region, or
+    //      * the array element is on a different coordinate plane
+    //
+    //    if the array element is on a different coordinate plane, by definition
+    //    all intervals that are later in the array will also be on a different
+    //    coordinate plane from the query region, and intervals on different
+    //    coordinate planes cannot overlap.
+    //
+    //    if the array element is on the same coordinate plane as the query
+    //    region, the sort order implies that the two intervals will overlap
+    //    iff the end position of the query region is greater than/equal to the
+    //    start position of the array element, and the start position of the
+    //    array elements increases monotonically moving forward in the array.
+    //    thus, once we see an array element that is sorted after the query
+    //    interval and that does not cover the query interval, we know that
+    //    we will never see another element between the current array index
+    //    and the end of the array that is on the same coordinate plane as
+    //    the query interval and that has a start position less than/equal to
+    //    the end position, and thus we do not need to walk further.
+    // 2. expanding backwards: here, our sort invariant helps us, but only
+    //    slightly. we backtrack in the array until we find an interval whose
+    //    distance to the current interval is greater than the largest interval
+    //    in the dataset, or undefined. if the distance is undefined, that means
+    //    we have tracked back to a coordinate plane that sorts before our
+    //    coordinate plane. if the distance is defined and greater than the
+    //    longest interval length, this implies that the end of the array
+    //    element is more than the maximum interval length away from the start
+    //    of the query region, and thus, there cannot be any intervals earlier
+    //    in the array that overlap the query region.
+
     val optIdx = binarySearch(rr)
 
     optIdx.toIterable
       .flatMap(idx => {
-        expand(rr, idx, -1) ::: expand(rr, idx + 1, 1)
+        expandBackward(rr, idx) ::: expandForward(rr, idx + 1)
       })
   }
 
@@ -206,14 +346,23 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](arr: Array[(K, T)], so
   def collect(): Array[(K, T)] = array
 }
 
-class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS <: Serializer[T], KS <: Serializer[K]](
-    private val kSerializer: KS,
-    private val tSerializer: TS) extends Serializer[RangeSearchableArray[K, T]] {
+class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS <: Serializer[T], KS <: Serializer[K]]
+    extends Serializer[RangeSearchableArray[K, T]] {
 
-  def tTag: ClassTag[T] = implicitly[ClassTag[T]]
-  def kTag: ClassTag[K] = implicitly[ClassTag[K]]
+  private def tTag: ClassTag[T] = implicitly[ClassTag[T]]
+  private def kTag: ClassTag[K] = implicitly[ClassTag[K]]
 
   def write(kryo: Kryo, output: Output, obj: RangeSearchableArray[K, T]) {
+
+    val kSerializer = kryo
+      .getSerializer(kTag.runtimeClass.asInstanceOf[Class[K]])
+      .asInstanceOf[Serializer[K]]
+    val tSerializer = kryo
+      .getSerializer(tTag.runtimeClass.asInstanceOf[Class[T]])
+      .asInstanceOf[Serializer[T]]
+
+    // write the max width
+    output.writeLong(obj.maxIntervalWidth)
 
     // we will use the array length to allocate an array on read
     output.writeInt(obj.length)
@@ -227,6 +376,16 @@ class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS
 
   def read(kryo: Kryo, input: Input, klazz: Class[RangeSearchableArray[K, T]]): RangeSearchableArray[K, T] = {
 
+    val kSerializer = kryo
+      .getSerializer(kTag.runtimeClass.asInstanceOf[Class[K]])
+      .asInstanceOf[Serializer[K]]
+    val tSerializer = kryo
+      .getSerializer(tTag.runtimeClass.asInstanceOf[Class[T]])
+      .asInstanceOf[Serializer[T]]
+
+    // read the max width
+    val maxWidth = input.readInt()
+
     // read the array size and allocate
     val length = input.readInt()
     val array = new Array[(K, T)](length)
@@ -237,6 +396,6 @@ class RangeSearchableArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, TS
         tSerializer.read(kryo, input, tTag.runtimeClass.asInstanceOf[Class[T]]))
     })
 
-    new RangeSearchableArray[K, T](array)
+    new RangeSearchableArray[K, T](array, maxWidth)
   }
 }
