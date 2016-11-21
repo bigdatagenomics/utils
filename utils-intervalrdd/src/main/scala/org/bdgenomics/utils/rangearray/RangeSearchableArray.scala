@@ -129,7 +129,7 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](
     } else {
       val arrayElem = array(idx)
 
-      if (!rr.covers(arrayElem._1)) {
+      if (!rr.covers(arrayElem._1) && rr.compareTo(arrayElem._1) > 0) {
         list
       } else {
         val hits = if (rr.overlaps(arrayElem._1)) {
@@ -253,6 +253,82 @@ class RangeSearchableArray[K <: Interval[K], T: ClassTag](
    * @return Iterable of elements filtered by Interval rr
    */
   def get(rr: K): Iterable[(K, T)] = {
+
+    // this function searches for all overlapping keys in a sorted array which
+    // is keyed by intervals. we can prove that this function is correct.
+    //
+    // we require that:
+    // - intervals exist in a coordinate space where a single interval is
+    //   contiguous and has:
+    //   - a width, which is always defined
+    //   - a distance function, which is defined for all other intervals that
+    //     are in the same coordinate plane
+    //   - overlaps and covers functions, where:
+    //      - covers is true if two intervals are in the same coordinate plane
+    //        and have overlapping start/end ranges
+    //      - overlaps is true if two intervals overlap, for whatever definition
+    //        of overlap is given in that coordinate space. the only invariant
+    //        here is that if overlaps returns true, covers must return true
+    // - intervals have a sorted order where:
+    //   - intervals that are on the same coordinate plane sort by start
+    //     position on that coordinate plane
+    //   - intervals that are in the same coordinate space but different planes
+    //     have a defined order that sort coordinate spaces
+    // 
+    // as arguments, we take:
+    // - a query region
+    // - a sorted array (again, sorted first by coordinate plane, and then by
+    //   start position on a given coordinate plane)
+    // - the width of the largest interval
+    //
+    // our algorithm runs two phases:
+    // 1. we run binary search to find a key that overlaps the query region
+    // 2. if we find a key that overlaps the query region, we "expand" from this
+    //    key to identify the range of all keys that overlap the query sequence
+    //
+    // we take as a given that binary search works. the only nuance of our
+    // approach is that we use the covers function instead of the overlaps
+    // function to determine when we have a query hit.
+    // 
+    // once we have gotten an index of a covering key/value pair in the sorted
+    // array from the binary search algorithm, we need to expand this index to
+    // find all overlapping key/value pairs. we need to expand the array both
+    // forward and backward. these two expansions have separate approaches:
+    // 1. expanding forward: we walk forward (increment the array index) until
+    //    we hit a region that sorts after the query region, and that does not
+    //    cover the query region. since the array is sorted by start position,
+    //    once we hit an array element that sorts after the query region, that
+    //    implies that:
+    //      * the start position of the array element is greater than the start
+    //        position of the query region, or
+    //      * the array element is on a different coordinate plane
+    //
+    //    if the array element is on a different coordinate plane, by definition
+    //    all intervals that are later in the array will also be on a different
+    //    coordinate plane from the query region, and intervals on different
+    //    coordinate planes cannot overlap.
+    //
+    //    if the array element is on the same coordinate plane as the query
+    //    region, the sort order implies that the two intervals will overlap
+    //    iff the end position of the query region is greater than/equal to the
+    //    start position of the array element, and the start position of the
+    //    array elements increases monotonically moving forward in the array.
+    //    thus, once we see an array element that is sorted after the query
+    //    interval and that does not cover the query interval, we know that
+    //    we will never see another element between the current array index
+    //    and the end of the array that is on the same coordinate plane as
+    //    the query interval and that has a start position less than/equal to
+    //    the end position, and thus we do not need to walk further.
+    // 2. expanding backwards: here, our sort invariant helps us, but only
+    //    slightly. we backtrack in the array until we find an interval whose
+    //    distance to the current interval is greater than the largest interval
+    //    in the dataset, or undefined. if the distance is undefined, that means
+    //    we have tracked back to a coordinate plane that sorts before our
+    //    coordinate plane. if the distance is defined and greater than the
+    //    longest interval length, this implies that the end of the array
+    //    element is more than the maximum interval length away from the start
+    //    of the query region, and thus, there cannot be any intervals earlier
+    //    in the array that overlap the query region.
 
     val optIdx = binarySearch(rr)
 
