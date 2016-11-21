@@ -113,7 +113,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
   }
 
   sparkTest("verify RangeSearchableArray fetches all valid ranges") {
-    val longRegion = Region(2L, 200L)
+    val longRegion = Region(1L, 200L)
     val rdd = sc.parallelize(Seq((longRegion, 0),
       (Region(1L, 10L), 1),
       (Region(18L, 24L), 2),
@@ -122,7 +122,7 @@ class RangeSearchableArraySuite extends SparkFunSuite {
       (Region(40L, 60L), 5)))
 
     val array = RangeSearchableArray(rdd)
-    assert(array.maxIntervalWidth === 198)
+    assert(array.maxIntervalWidth === 199)
     // retrieve a value overlapping just the last key
     val query = array.get(Region(20L, 30L)).toArray
 
