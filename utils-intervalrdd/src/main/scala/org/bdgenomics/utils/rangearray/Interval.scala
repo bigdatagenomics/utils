@@ -50,15 +50,15 @@ trait Interval[T <: Interval[T]] extends Comparable[T] {
    * Determines whether Interval intersects with another Interval T.
    *
    * @param interval Another interval to compare against.
-   * @return Boolean whether or not Intervals overlap
+   * @return True if this interval overlaps with the specified interval.
    *
    * @see covers
    */
   def overlaps(interval: T): Boolean
 
   /**
-   * Determines whether the range of positions this interval intersects the
-   * range of positions another interval covers.
+   * Return true if the range of positions covered by this interval
+   * intersects the range of positions the specified interval covers.
    *
    * In many cases, this function is identical to the overlaps function.
    * However, some coordinate spaces may allow two intervals to cover the same
@@ -66,10 +66,10 @@ trait Interval[T <: Interval[T]] extends Comparable[T] {
    * coordinate space, two objects may cover the same range on a chromosome, but
    * may have opposite strandedness.
    *
-   * Essentially, this is relaxed variant of overlaps where we have projected
-   * a complex coordinate space down. If two intervals overlap, they must cover
-   * each other. However, if two interlaps cover each other, they may not
-   * overlap.
+   * Essentially, this is a relaxed variant of overlaps where we have projected
+   * a complex coordinate space down to a set of 1D ranges. Two intervals cover
+   * each other if they are on the same 1D range out of the sets, and if their
+   * start/end coordinates overlap.
    *
    * @param interval Another interval to compare against.
    * @return True if two intervals cover intersecting indices in a coordinate
@@ -80,7 +80,7 @@ trait Interval[T <: Interval[T]] extends Comparable[T] {
   def covers(interval: T): Boolean
 
   /**
-   * Compares the distance between this Interval and other Interval T.
+   * Compares the distance between this interval and the specified interval.
    *
    * @param interval Another interval to compare against.
    * @return Greater than/equal to/less than comparison.
@@ -88,10 +88,12 @@ trait Interval[T <: Interval[T]] extends Comparable[T] {
   def compareTo(interval: T): Int
 
   /**
-   * Provides a distance, if defined, between two Intervals.
+   * Provides an absolute distance, if defined, between this interval and
+   * the specified interval.
    *
    * @param interval Another interval to compare against.
-   * @return Absolute value istance between two Intervals, if defined.
+   * @return Absolute distance between this interval and the specified
+   *   interval, or None if not defined
    */
   def distance(interval: T): Option[Long]
 }
