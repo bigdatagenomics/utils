@@ -21,10 +21,10 @@ package org.bdgenomics.utils.intervalrdd
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{ Partition, TaskContext, OneToOneDependency, HashPartitioner }
-import org.bdgenomics.utils.intervaltree._
+import org.bdgenomics.utils.rangearray._
 import scala.reflect.ClassTag
 
-class IntervalRDD[K <: Interval: ClassTag, V: ClassTag](
+class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
   /** The underlying representation of the IndexedRDD as an RDD of partitions. */
   private val partitionsRDD: RDD[IntervalPartition[K, V]])
     extends RDD[(K, V)](partitionsRDD.context, List(new OneToOneDependency(partitionsRDD))) {
@@ -63,10 +63,34 @@ class IntervalRDD[K <: Interval: ClassTag, V: ClassTag](
 
   /** The number of elements in the RDD. */
   override def count: Long = {
-    partitionsRDD.map(_.getTree.size).reduce(_ + _)
+    partitionsRDD.map(_.getRangeArray.length).reduce(_ + _)
   }
 
-  override def collect: Array[(K, V)] = partitionsRDD.flatMap(r => r.get()).collect
+  override def first: (K, V) = {
+    partitionsRDD.filter(_.getRangeArray.length > 0).first.getRangeArray.collect()(0)
+  }
+
+  override def collect: Array[(K, V)] = partitionsRDD.flatMap(_.get).collect
+
+  /**
+   * Gets the values corresponding to the specified key, if any
+   * Assume that we're only getting data that exists (if it doesn't exist,
+   * would have been handled by upper LazyMaterialization layer
+   */
+  def collect(interval: K): List[V] = {
+
+    val results: Array[Array[V]] = {
+      context.runJob(partitionsRDD, (context: TaskContext, partIter: Iterator[IntervalPartition[K, V]]) => {
+        if (partIter.hasNext) {
+          val intPart = partIter.next()
+          intPart.filterByInterval(interval).getRangeArray.collect.map(_._2)
+        } else {
+          Array[V]()
+        }
+      })
+    }
+    results.flatten.toList
+  }
 
   def filterByInterval(r: K): IntervalRDD[K, V] = {
     mapIntervalPartitions(_.filterByInterval(r))
@@ -75,8 +99,8 @@ class IntervalRDD[K <: Interval: ClassTag, V: ClassTag](
   /**
    * Performs filtering given a predicate
    */
-  override def filter(pred: Tuple2[K, V] => Boolean): IntervalRDD[K, V] = {
-    this.mapIntervalPartitions(_.filter(Function.untupled(pred)))
+  override def filter(pred: ((K, V)) => Boolean): IntervalRDD[K, V] = {
+    this.mapIntervalPartitions(_.filter(pred))
   }
 
   /**
@@ -93,36 +117,16 @@ class IntervalRDD[K <: Interval: ClassTag, V: ClassTag](
    * @tparam V2 data type
    * @return new IntervalRDD of type [K2, V2]
    */
-  def mapIntervalPartitions[K2 <: Interval: ClassTag, V2: ClassTag](
+  def mapIntervalPartitions[K2 <: Interval[K2]: ClassTag, V2: ClassTag](
     f: (IntervalPartition[K, V]) => IntervalPartition[K2, V2]): IntervalRDD[K2, V2] = {
 
     val newPartitionsRDD = partitionsRDD.mapPartitions(_.map(f), preservesPartitioning = true)
     new IntervalRDD(newPartitionsRDD)
   }
 
-  private def withPartitionsRDD[K2 <: Interval: ClassTag, V2: ClassTag](
+  private def withPartitionsRDD[K2 <: Interval[K2]: ClassTag, V2: ClassTag](
     partitionsRDD: RDD[IntervalPartition[K2, V2]]): IntervalRDD[K2, V2] = {
     new IntervalRDD(partitionsRDD)
-  }
-
-  /**
-   * Gets the values corresponding to the specified key, if any
-   * Assume that we're only getting data that exists (if it doesn't exist,
-   * would have been handled by upper LazyMaterialization layer
-   */
-  def get(interval: K): List[(K, V)] = {
-
-    val results: Array[Array[(K, V)]] = {
-      context.runJob(partitionsRDD, (context: TaskContext, partIter: Iterator[IntervalPartition[K, V]]) => {
-        if (partIter.hasNext) {
-          val intPart = partIter.next()
-          intPart.get(interval).toArray
-        } else {
-          Array[(K, V)]()
-        }
-      })
-    }
-    results.flatten.toList
   }
 
   /**
@@ -144,7 +148,7 @@ class IntervalRDD[K <: Interval: ClassTag, V: ClassTag](
     val partitioned = elems.partitionBy(partitioner.get)
 
     val convertedPartitions: RDD[IntervalPartition[K, V]] = partitioned.mapPartitions[IntervalPartition[K, V]](
-      iter => Iterator(IntervalPartition(iter)),
+      iter => Iterator(IntervalPartition(iter.toIterable)),
       preservesPartitioning = true)
 
     // merge the new partitions with existing partitions
@@ -154,7 +158,7 @@ class IntervalRDD[K <: Interval: ClassTag, V: ClassTag](
   }
 }
 
-class PartitionMerger[K <: Interval, V: ClassTag]() extends Serializable {
+class PartitionMerger[K <: Interval[K], V: ClassTag]() extends Serializable {
   def apply(thisIter: Iterator[IntervalPartition[K, V]], otherIter: Iterator[IntervalPartition[K, V]]): Iterator[IntervalPartition[K, V]] = {
     val thisPart = thisIter.next
     val otherPart = otherIter.next
@@ -167,14 +171,14 @@ object IntervalRDD {
   /**
    * Constructs an IntervalRDD from a set of interval, V tuples
    */
-  def apply[K <: Interval: ClassTag, V: ClassTag](elems: RDD[(K, V)]): IntervalRDD[K, V] = {
+  def apply[K <: Interval[K]: ClassTag, V: ClassTag](elems: RDD[(K, V)]): IntervalRDD[K, V] = {
     val partitioned =
       if (elems.partitioner.isDefined) elems
       else {
         elems.partitionBy(new HashPartitioner(elems.partitions.size))
       }
     val convertedPartitions: RDD[IntervalPartition[K, V]] = partitioned.mapPartitions[IntervalPartition[K, V]](
-      iter => Iterator(IntervalPartition(iter)),
+      iter => Iterator(IntervalPartition(iter.toIterable)),
       preservesPartitioning = true)
 
     new IntervalRDD(convertedPartitions)

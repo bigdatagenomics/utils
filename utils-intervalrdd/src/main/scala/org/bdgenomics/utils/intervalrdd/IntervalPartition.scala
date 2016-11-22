@@ -18,21 +18,19 @@
 
 package org.bdgenomics.utils.intervalrdd
 
-import org.bdgenomics.utils.intervaltree._
+import org.bdgenomics.utils.rangearray._
 import org.bdgenomics.utils.misc.Logging
+import scala.math.max
 import scala.reflect.ClassTag
 
-protected class IntervalPartition[K <: Interval, V: ClassTag](protected val iTree: IntervalTree[K, V]) extends Serializable with Logging {
+protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val array: RangeSearchableArray[K, V])
+    extends Serializable with Logging {
 
-  def this() {
-    this(new IntervalTree[K, V]())
+  def getRangeArray(): RangeSearchableArray[K, V] = {
+    array
   }
 
-  def getTree(): IntervalTree[K, V] = {
-    iTree
-  }
-
-  protected def withMap(map: IntervalTree[K, V]): IntervalPartition[K, V] = {
+  protected def withMap(map: RangeSearchableArray[K, V]): IntervalPartition[K, V] = {
     new IntervalPartition(map)
   }
 
@@ -41,15 +39,8 @@ protected class IntervalPartition[K <: Interval, V: ClassTag](protected val iTre
    *
    * @return Iterator of searched interval and the corresponding (K,V) pairs
    */
-  def get(r: K): Iterator[(K, V)] = {
-    iTree.search(r).filter(kv => intervalOverlap(r, kv._1))
-  }
-
-  /*
-   * Helper function for overlap of intervals
-   */
-  def intervalOverlap(r1: K, r2: K): Boolean = {
-    r1.start < r2.end && r1.end > r2.start
+  def get(r: K): Iterable[(K, V)] = {
+    array.get(r)
   }
 
   /**
@@ -57,27 +48,26 @@ protected class IntervalPartition[K <: Interval, V: ClassTag](protected val iTre
    *
    * @return Iterator of searched interval and the corresponding (K,V) pairs
    */
-  def get(): Iterator[(K, V)] = {
-    iTree.get.toIterator
+  def get(): Iterable[(K, V)] = {
+    array.collect.toIterable
   }
 
-  def filterByInterval(r: K): IntervalPartition[K, V] = {
-    val i: Iterator[(K, V)] = iTree.search(r)
-    IntervalPartition(i)
+  private[utils] def filterByInterval(r: K): IntervalPartition[K, V] = {
+    IntervalPartition(array.get(r))
   }
 
   /**
    * Return a new IntervalPartition filtered by some predicate
    */
-  def filter(pred: (K, V) => Boolean): IntervalPartition[K, V] = {
-    this.withMap(iTree.filter(pred))
+  def filter(pred: ((K, V)) => Boolean): IntervalPartition[K, V] = {
+    this.withMap(array.filter(pred))
   }
 
   /**
    * Applies a map function over the interval tree
    */
   def mapValues[V2: ClassTag](f: V => V2): IntervalPartition[K, V2] = {
-    val retTree: IntervalTree[K, V2] = iTree.mapValues(f)
+    val retTree: RangeSearchableArray[K, V2] = array.mapValues(f)
     new IntervalPartition(retTree)
   }
 
@@ -86,10 +76,8 @@ protected class IntervalPartition[K <: Interval, V: ClassTag](protected val iTre
    *
    * @return IntervalPartition with new data
    */
-  def multiput(r: K, vs: Iterator[V]): IntervalPartition[K, V] = {
-    val newTree = iTree.snapshot()
-    newTree.insert(r, vs)
-    this.withMap(newTree)
+  def multiput(kvs: Iterator[(K, V)]): IntervalPartition[K, V] = {
+    this.withMap(array.insert(kvs))
   }
 
   /**
@@ -97,8 +85,8 @@ protected class IntervalPartition[K <: Interval, V: ClassTag](protected val iTre
    *
    * @return IntervalPartition with new data
    */
-  def put(r: K, v: V): IntervalPartition[K, V] = {
-    multiput(r, Iterator(v))
+  def put(kv: (K, V)): IntervalPartition[K, V] = {
+    multiput(Iterator(kv))
   }
 
   /**
@@ -107,18 +95,16 @@ protected class IntervalPartition[K <: Interval, V: ClassTag](protected val iTre
    * @return Iterator of searched interval and the corresponding (K,V) pairs
    */
   def mergePartitions(p: IntervalPartition[K, V]): IntervalPartition[K, V] = {
-    val newTree = iTree.merge(p.getTree)
-    this.withMap(newTree)
+    this.withMap(array.insert(p.getRangeArray().collect.toIterator))
   }
 
 }
 
 private[intervalrdd] object IntervalPartition {
 
-  def apply[K <: Interval, K2 <: Interval, V: ClassTag](iter: Iterator[(K, V)]): IntervalPartition[K, V] = {
-    val map = new IntervalTree[K, V]()
-    map.insert(iter)
+  def apply[K <: Interval[K], K2 <: Interval[K2], V: ClassTag](iter: Iterable[(K, V)]): IntervalPartition[K, V] = {
+    val array = iter.toArray
+    val map = new RangeSearchableArray[K, V](array, array.map(_._1.width).fold(0L)(max(_, _)))
     new IntervalPartition(map)
   }
-
 }

@@ -43,9 +43,9 @@ class IntervalRDDSuite extends SparkFunSuite {
     val intArrRDD: RDD[(Region, String)] = sc.parallelize(intArr).partitionBy(new HashPartitioner(10))
 
     val intRDD: IntervalRDD[Region, String] = IntervalRDD(intArrRDD)
-    val results = intRDD.get(region3)
+    val results = intRDD.collect(region3)
 
-    assert(results.head == (region3, rec3))
+    assert(results.head == rec3)
     assert(results.size == 1)
 
   }
@@ -59,7 +59,7 @@ class IntervalRDDSuite extends SparkFunSuite {
     intArr = Array((region2, rec4), (region3, rec5))
 
     val newRDD: IntervalRDD[Region, String] = testRDD.multiput(intArr)
-    val results = newRDD.get(region3)
+    val results = newRDD.collect(region3)
 
     assert(results.size == 2)
   }
@@ -81,9 +81,9 @@ class IntervalRDDSuite extends SparkFunSuite {
     val onePutRDD: IntervalRDD[Region, String] = testRDD.multiput(onePutInput)
     val twoPutRDD: IntervalRDD[Region, String] = onePutRDD.multiput(twoPutInput)
 
-    val resultsOrig = testRDD.get(region)
-    val resultsOne = onePutRDD.get(region)
-    val resultsTwo = twoPutRDD.get(region)
+    val resultsOrig = testRDD.collect(region)
+    val resultsOne = onePutRDD.collect(region)
+    val resultsTwo = twoPutRDD.collect(region)
 
     assert(resultsOrig.size == 3) //size of results for the one region we queried
     assert(resultsOne.size == 5) //size after adding two records
@@ -129,13 +129,13 @@ class IntervalRDDSuite extends SparkFunSuite {
 
     val testRDD: IntervalRDD[Region, String] = IntervalRDD(arrRDD)
 
-    val results1 = testRDD.get(region1)
+    val results1 = testRDD.collect(region1)
     assert(results1.size == 1)
 
-    val results2 = testRDD.get(region2)
+    val results2 = testRDD.collect(region2)
     assert(results2.size == 1)
 
-    val results3 = testRDD.get(region3)
+    val results3 = testRDD.collect(region3)
     assert(results3.size == 1)
 
   }
@@ -149,7 +149,7 @@ class IntervalRDDSuite extends SparkFunSuite {
 
     val testRDD: IntervalRDD[Region, String] = IntervalRDD(arrRDD)
     val filteredRDD = testRDD.filter(elem => elem._2 == "data1")
-    val results = filteredRDD.get(overlapReg)
+    val results = filteredRDD.collect(overlapReg)
     assert(results.size == 1)
 
   }
@@ -184,8 +184,8 @@ class IntervalRDDSuite extends SparkFunSuite {
 
     val testRDD: IntervalRDD[Region, String] = IntervalRDD(arrRDD)
     val mapRDD: IntervalRDD[Region, String] = testRDD.mapValues(elem => elem + "_mapped")
-    val results = mapRDD.get(overlapReg)
-    assert(results(0) == (region1, "data1_mapped"))
+    val results = mapRDD.collect(overlapReg)
+    assert(results(0) == "data1_mapped")
   }
 
   sparkTest("Attempt to access data from non existing key") {
@@ -210,9 +210,11 @@ class IntervalRDDSuite extends SparkFunSuite {
     val alignmentRDD: RDD[(Region, Int)] = rdd.map(v => (Region(v.toLong, v + 1), v))
 
     var intRDD: IntervalRDD[Region, Int] = IntervalRDD(alignmentRDD)
-    intRDD = intRDD.filter(r => r._1.start < 90)
 
-    assert(intRDD.count == 45)
+    val filteredRegion = Region(80L, 100L)
+    intRDD = intRDD.filterByInterval(filteredRegion)
+
+    assert(intRDD.count == 10)
   }
 
 }
