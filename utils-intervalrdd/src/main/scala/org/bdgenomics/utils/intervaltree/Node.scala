@@ -18,10 +18,10 @@
 
 package org.bdgenomics.utils.intervaltree
 
-import java.io.Serializable
+import org.bdgenomics.utils.intervalarray.Interval
 import scala.reflect.ClassTag
 
-protected class Node[K <: Interval, T: ClassTag](interval: K) extends Serializable {
+protected class Node[K <: Interval[K], T: ClassTag](interval: K) extends Serializable {
 
   /* left and right children of this node */
   var leftChild: Node[K, T] = null
@@ -136,5 +136,5 @@ object Node {
    * @tparam T data type
    * @return new Node[K, V] constructed from data
    */
-  def apply[K <: Interval, T: ClassTag](interval: K, data: Array[T]) = new Node(interval, data)
+  def apply[K <: Interval[K], T: ClassTag](interval: K, data: Array[T]) = new Node(interval, data)
 }

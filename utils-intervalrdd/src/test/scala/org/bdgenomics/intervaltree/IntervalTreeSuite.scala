@@ -18,9 +18,9 @@
 
 package org.bdgenomics.utils.intervaltree
 
+import org.bdgenomics.utils.intervalrdd.Region
+import org.bdgenomics.utils.intervalarray.Interval
 import org.scalatest.FunSuite
-
-case class Region(start: Long, end: Long) extends Interval
 
 class IntervalTreeSuite extends FunSuite {
 

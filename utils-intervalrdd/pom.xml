@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
     <artifactId>utils-parent_2.10</artifactId>
-    <version>0.2.10-SNAPSHOT</version>
+    <version>0.2.10-INTERVAL</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>utils-intervalrdd_2.10</artifactId>
@@ -93,10 +93,10 @@
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
-  <dependency>
+    <dependency>
       <groupId>org.bdgenomics.utils</groupId>
       <artifactId>utils-misc_2.10</artifactId>
-  </dependency>
+    </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-core_2.10</artifactId>

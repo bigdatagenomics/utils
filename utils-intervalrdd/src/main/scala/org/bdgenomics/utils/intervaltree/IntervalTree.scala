@@ -18,6 +18,7 @@
 
 package org.bdgenomics.utils.intervaltree
 
+import org.bdgenomics.utils.intervalarray.Interval
 import scala.reflect.ClassTag
 import scala.collection.mutable.ListBuffer
 
@@ -41,7 +42,7 @@ import scala.collection.mutable.ListBuffer
  * surpasses the other subtree depth past a given threshold.
  */
 
-class IntervalTree[K <: Interval, T: ClassTag] extends Serializable {
+class IntervalTree[K <: Interval[K], T: ClassTag] extends Serializable {
   var root: Node[K, T] = null
   var leftDepth: Long = 0
   var rightDepth: Long = 0
