@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.intervalarray
+package org.bdgenomics.utils.interval.array
 
 /**
  * An interval is a 2-dimensional 0-based coordinate consisting of a closed start value and open end value.

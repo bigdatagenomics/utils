@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.intervalarray
+package org.bdgenomics.utils.interval.array
 
-import org.bdgenomics.utils.intervalrdd.Region
+import org.bdgenomics.utils.interval.rdd.Region
 import org.bdgenomics.utils.misc.SparkFunSuite
 
 class IntervalArraySuite extends SparkFunSuite {

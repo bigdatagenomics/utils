@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.utils.intervalrdd
+package org.bdgenomics.utils.interval.rdd
 
 package object intervalrdd {
 
