@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.utils.intervalrdd
+package org.bdgenomics.utils.interval.rdd
 
-import org.bdgenomics.utils.intervalarray._
+import org.bdgenomics.utils.interval.array._
 import org.bdgenomics.utils.misc.Logging
 import scala.math.max
 import scala.reflect.ClassTag
@@ -100,7 +100,7 @@ protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val a
 
 }
 
-private[intervalrdd] object IntervalPartition {
+private[rdd] object IntervalPartition {
 
   def apply[K <: Interval[K], K2 <: Interval[K2], V: ClassTag](iter: Iterable[(K, V)]): IntervalPartition[K, V] = {
     val array = iter.toArray

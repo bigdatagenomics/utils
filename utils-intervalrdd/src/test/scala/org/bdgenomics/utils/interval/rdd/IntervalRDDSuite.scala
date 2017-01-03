@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.utils.intervalrdd
+package org.bdgenomics.utils.interval.rdd
 
 import org.apache.spark.HashPartitioner
 import org.apache.spark.rdd.RDD

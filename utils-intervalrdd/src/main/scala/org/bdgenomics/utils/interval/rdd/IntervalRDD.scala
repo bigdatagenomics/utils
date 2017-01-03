@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 
-package org.bdgenomics.utils.intervalrdd
+package org.bdgenomics.utils.interval.rdd
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
 import org.apache.spark.{ Partition, TaskContext, OneToOneDependency, HashPartitioner }
-import org.bdgenomics.utils.intervalarray._
+import org.bdgenomics.utils.interval.array._
 import scala.reflect.ClassTag
 
 class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](

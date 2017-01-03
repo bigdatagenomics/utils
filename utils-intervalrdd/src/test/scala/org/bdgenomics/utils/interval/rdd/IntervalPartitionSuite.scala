@@ -15,9 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.intervalrdd
+package org.bdgenomics.utils.interval.rdd
 
-import org.bdgenomics.utils.intervalarray._
+import org.bdgenomics.utils.interval.array._
 import org.scalatest.FunSuite
 
 case class Region(start: Long, end: Long) extends Interval[Region] {
