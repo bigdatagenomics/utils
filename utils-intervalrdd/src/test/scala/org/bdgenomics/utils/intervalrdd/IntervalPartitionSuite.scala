@@ -61,7 +61,7 @@ class IntervalPartitionSuite extends FunSuite {
   val read6 = 250L
 
   def createEmptyPartition: IntervalPartition[Region, Long] = {
-    new IntervalPartition[Region, Long](new IntervalArray(Array[(Region, Long)](), 0L))
+    new IntervalPartition[Region, Long](new ConcreteIntervalArray(Array[(Region, Long)](), 0L))
   }
 
   test("create new partition") {

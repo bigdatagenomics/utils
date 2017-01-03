@@ -48,7 +48,9 @@ object IntervalArray extends Serializable {
    * @param rdd RDD to build a IntervalArray from.
    * @return The IntervalArray built from this RDD.
    */
-  def apply[K <: Interval[K]: ClassTag, T: ClassTag](rdd: RDD[(K, T)]): IntervalArray[K, T] = {
+  def apply[K <: Interval[K]: ClassTag, T: ClassTag](
+    rdd: RDD[(K, T)],
+    buildFn: (Array[(K, T)], Long) => IntervalArray[K, T]): IntervalArray[K, T] = {
 
     val accum = {
       implicit val accumParam = new MaxAccumulatorParam
@@ -65,7 +67,32 @@ object IntervalArray extends Serializable {
       }).sortByKey()
         .collect
 
-    new IntervalArray(sortedArray, accum.value, sorted = true)
+    buildFn(sortedArray, accum.value)
+  }
+
+  /**
+   * Sorts the RDD and collects it to build an IntervalArray, a sorted array that searches
+   * over ranges. This is used for a left side of the broadcast region join in ADAM.
+   *
+   * @param rdd RDD to build a IntervalArray from.
+   * @return The IntervalArray built from this RDD.
+   */
+  def apply[K <: Interval[K]: ClassTag, T: ClassTag](
+    rdd: RDD[(K, T)]): IntervalArray[K, T] = {
+
+    apply(rdd, apply(_, _, sorted = true))
+  }
+
+  def apply[K <: Interval[K]: ClassTag, T: ClassTag](
+    array: Array[(K, T)],
+    maxIntervalWidth: Long,
+    sorted: Boolean = true): IntervalArray[K, T] = {
+    val sortedArray = if (sorted) {
+      array
+    } else {
+      array.sortBy(_._1)
+    }
+    new ConcreteIntervalArray(sortedArray, maxIntervalWidth)
   }
 }
 
@@ -78,18 +105,14 @@ object IntervalArray extends Serializable {
  * @param maxIntervalWidth The maximum width across all intervals in this array.
  * @param sorted True if arr is sorted. If false, we sort arr.
  */
-class IntervalArray[K <: Interval[K], T: ClassTag](
-    arr: Array[(K, T)],
-    private[intervalarray] val maxIntervalWidth: Long,
-    sorted: Boolean = false) extends Serializable {
-
-  // ensure that array is sorted
-  private[intervalarray] val array =
-    if (sorted) arr
-    else arr.sortBy(_._1)
+trait IntervalArray[K <: Interval[K], T] extends Serializable {
+  val array: Array[(K, T)]
+  val maxIntervalWidth: Long
 
   def length = array.length
   def midpoint = pow2ceil()
+
+  protected def replace(arr: Array[(K, T)], maxWidth: Long): IntervalArray[K, T]
 
   @tailrec private def pow2ceil(i: Int = 1): Int = {
     if (2 * i >= length) {
@@ -184,7 +207,7 @@ class IntervalArray[K <: Interval[K], T: ClassTag](
     val maxWidth = sortedKvs.map(_._1.width).fold(0L)(max(_, _))
 
     val allSorted = merge(sortedKvs, new Array[(K, T)](array.length + sortedKvs.length))
-    new IntervalArray(allSorted, max(maxIntervalWidth, maxWidth), sorted = true)
+    replace(allSorted, max(maxIntervalWidth, maxWidth))
   }
 
   /**
@@ -232,7 +255,7 @@ class IntervalArray[K <: Interval[K], T: ClassTag](
    * @return new IntervalArray with filtered elements
    */
   def filter(pred: ((K, T)) => Boolean): IntervalArray[K, T] = {
-    new IntervalArray(array.filter(r => pred(r._1, r._2)), maxIntervalWidth)
+    replace(array.filter(r => pred(r._1, r._2)), maxIntervalWidth)
   }
 
   /**
@@ -243,7 +266,7 @@ class IntervalArray[K <: Interval[K], T: ClassTag](
    * @return new IntervalArray with mapped values
    */
   def mapValues[T2: ClassTag](f: T => T2): IntervalArray[K, T2] = {
-    new IntervalArray(array.map(r => (r._1, f(r._2))), maxIntervalWidth)
+    ConcreteIntervalArray(array.map(r => (r._1, f(r._2))), maxIntervalWidth)
   }
 
   /**
@@ -346,20 +369,43 @@ class IntervalArray[K <: Interval[K], T: ClassTag](
   def collect(): Array[(K, T)] = array
 }
 
-class IntervalArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag](kryo: Kryo)
-    extends Serializer[IntervalArray[K, T]] {
+class ConcreteIntervalArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag](kryo: Kryo)
+    extends IntervalArraySerializer[K, T, ConcreteIntervalArray[K, T]] {
 
-  private def tTag: ClassTag[T] = implicitly[ClassTag[T]]
-  private def kTag: ClassTag[K] = implicitly[ClassTag[K]]
-
-  private val kSerializer = kryo
+  protected val kSerializer = kryo
     .getSerializer(kTag.runtimeClass.asInstanceOf[Class[K]])
     .asInstanceOf[Serializer[K]]
-  private val tSerializer = kryo
+  protected val tSerializer = kryo
     .getSerializer(tTag.runtimeClass.asInstanceOf[Class[T]])
     .asInstanceOf[Serializer[T]]
 
-  def write(kryo: Kryo, output: Output, obj: IntervalArray[K, T]) {
+  protected def builder(
+    arr: Array[(K, T)],
+    maxIntervalWidth: Long): ConcreteIntervalArray[K, T] = {
+    ConcreteIntervalArray[K, T](arr, maxIntervalWidth)
+  }
+}
+
+case class ConcreteIntervalArray[K <: Interval[K], T: ClassTag](
+    array: Array[(K, T)],
+    maxIntervalWidth: Long) extends IntervalArray[K, T] {
+
+  protected def replace(arr: Array[(K, T)],
+                        maxWidth: Long): IntervalArray[K, T] = {
+    new ConcreteIntervalArray(arr, maxWidth)
+  }
+}
+
+abstract class IntervalArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, A <: IntervalArray[K, T]]
+    extends Serializer[A] {
+
+  protected def tTag: ClassTag[T] = implicitly[ClassTag[T]]
+  protected def kTag: ClassTag[K] = implicitly[ClassTag[K]]
+
+  protected val kSerializer: Serializer[K]
+  protected val tSerializer: Serializer[T]
+
+  def write(kryo: Kryo, output: Output, obj: A) {
 
     // write the max width
     output.writeLong(obj.maxIntervalWidth)
@@ -374,21 +420,30 @@ class IntervalArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag](kryo: Kry
     })
   }
 
-  def read(kryo: Kryo, input: Input, klazz: Class[IntervalArray[K, T]]): IntervalArray[K, T] = {
+  protected def builder(arr: Array[(K, T)], maxIntervalWidth: Long): A
+
+  def read(kryo: Kryo,
+           input: Input,
+           klazz: Class[A]): A = {
 
     // read the max width
-    val maxWidth = input.readInt()
+    val maxWidth = input.readLong()
 
     // read the array size and allocate
     val length = input.readInt()
-    val array = new Array[(K, T)](length)
+    /*val array = new Array[(K, T)](length)
 
     // loop and read
-    (0 until length).foreach(idx => {
+    array.indices.foreach(idx => {
       array(idx) = (kSerializer.read(kryo, input, kTag.runtimeClass.asInstanceOf[Class[K]]),
         tSerializer.read(kryo, input, tTag.runtimeClass.asInstanceOf[Class[T]]))
-    })
+    })*/
 
-    new IntervalArray[K, T](array, maxWidth)
+    val array = (0 until length).map(idx => {
+      (kSerializer.read(kryo, input, kTag.runtimeClass.asInstanceOf[Class[K]]),
+        tSerializer.read(kryo, input, tTag.runtimeClass.asInstanceOf[Class[T]]))
+    }).toArray
+
+    builder(array, maxWidth)
   }
 }
