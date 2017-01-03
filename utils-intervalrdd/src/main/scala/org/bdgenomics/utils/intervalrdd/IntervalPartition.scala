@@ -104,7 +104,7 @@ private[intervalrdd] object IntervalPartition {
 
   def apply[K <: Interval[K], K2 <: Interval[K2], V: ClassTag](iter: Iterable[(K, V)]): IntervalPartition[K, V] = {
     val array = iter.toArray
-    val map = new IntervalArray[K, V](array, array.map(_._1.width).fold(0L)(max(_, _)))
+    val map = new ConcreteIntervalArray[K, V](array, array.map(_._1.width).fold(0L)(max(_, _)))
     new IntervalPartition(map)
   }
 }

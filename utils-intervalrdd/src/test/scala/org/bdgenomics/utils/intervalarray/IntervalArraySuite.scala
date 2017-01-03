@@ -23,7 +23,7 @@ import org.bdgenomics.utils.misc.SparkFunSuite
 class IntervalArraySuite extends SparkFunSuite {
 
   test("succeeds in searching empty IntervalArray") {
-    val array = new IntervalArray(Array[(Region, Long)](), 0L)
+    val array = new ConcreteIntervalArray(Array[(Region, Long)](), 0L)
 
     // retrieve a value wholly for nonexistant key
     val wholly = array.get(Region(11L, 12L))
@@ -32,7 +32,7 @@ class IntervalArraySuite extends SparkFunSuite {
   }
 
   test("build a IntervalArray with a single item and retrieve data") {
-    val array = new IntervalArray(Array((Region(10L, 15L), 1)), 5L)
+    val array = new ConcreteIntervalArray(Array((Region(10L, 15L), 1)), 5L)
 
     assert(array.length === 1)
     assert(array.midpoint === 1)
@@ -132,7 +132,7 @@ class IntervalArraySuite extends SparkFunSuite {
   }
 
   test("inserts new elements into IntervalArray") {
-    val array = new IntervalArray(Array((Region(10L, 15L), 1),
+    val array = new ConcreteIntervalArray(Array((Region(10L, 15L), 1),
       (Region(19L, 24L), 0),
       (Region(100L, 150L), 4),
       (Region(80L, 95L), 2),
