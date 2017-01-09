@@ -23,7 +23,7 @@ import org.bdgenomics.utils.misc.Logging
 import scala.math.max
 import scala.reflect.ClassTag
 
-protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val array: IntervalArray[K, V])
+protected class IntervalPartition[K <: Interval[K]: ClassTag, V: ClassTag](protected val array: IntervalArray[K, V])
     extends Serializable with Logging {
 
   def getIntervalArray(): IntervalArray[K, V] = {
@@ -102,9 +102,9 @@ protected class IntervalPartition[K <: Interval[K], V: ClassTag](protected val a
 
 private[rdd] object IntervalPartition {
 
-  def apply[K <: Interval[K], K2 <: Interval[K2], V: ClassTag](iter: Iterable[(K, V)]): IntervalPartition[K, V] = {
+  def apply[K <: Interval[K]: ClassTag, K2 <: Interval[K2]: ClassTag, V: ClassTag](iter: Iterable[(K, V)]): IntervalPartition[K, V] = {
     val array = iter.toArray
-    val map = new ConcreteIntervalArray[K, V](array, array.map(_._1.width).fold(0L)(max(_, _)))
+    val map = IntervalArray(array, array.map(_._1.width).fold(0L)(max(_, _)), sorted = false)
     new IntervalPartition(map)
   }
 }
