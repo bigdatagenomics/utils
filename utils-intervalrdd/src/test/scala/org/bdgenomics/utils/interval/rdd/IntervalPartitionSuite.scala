@@ -93,6 +93,19 @@ class IntervalPartitionSuite extends FunSuite {
 
   }
 
+  test("correctly fetches data that is initially unsorted") {
+
+    val region = Region(0L, 20L)
+    val iter = (0 until 100).map(r => (Region(r, r + 1), r)).reverse.toIterable
+    val partition = IntervalPartition(iter)
+
+    val results: List[Int] = partition.get(region).toList.map(_._2)
+
+    assert(results.length == region.width)
+    assert(results.max == region.end - 1)
+
+  }
+
   test("put some for iterator of intervals and key-values") {
 
     val partition: IntervalPartition[Region, Long] = createEmptyPartition
