@@ -154,6 +154,10 @@ class ServoTimer(name: String, @transient tags: Tag*) extends ConfigurableMonito
     java.lang.Long.valueOf(getTotalTime)
   }
 
+  override def getValue(pollerIndex: Int): Object = {
+    getValue()
+  }
+
   private def withTag(tag: Tag): Seq[Tag] = {
     tags ++ Seq(tag)
   }
@@ -162,6 +166,9 @@ class ServoTimer(name: String, @transient tags: Tag*) extends ConfigurableMonito
       extends ConfigurableMonitor(name, tags) with Monitor[Long] {
     override def getValue: Long = {
       function.apply()
+    }
+    override def getValue(pollerIndex: Int): Long = {
+      getValue()
     }
   }
 
@@ -191,6 +198,9 @@ class ServoTimer(name: String, @transient tags: Tag*) extends ConfigurableMonito
     }
     override def getValue: java.lang.Long = {
       if (set) value.get() else null
+    }
+    override def getValue(pollerIndex: Int): java.lang.Long = {
+      getValue()
     }
     private def setInitialValue(newValue: Long) {
       if (!set) {

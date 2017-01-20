@@ -328,6 +328,9 @@ object Metrics {
     override def getValue: String = {
       value
     }
+    override def getValue(pollerIndex: Int): String = {
+      getValue()
+    }
   }
 
 }
