@@ -217,4 +217,14 @@ class IntervalRDDSuite extends SparkFunSuite {
     assert(intRDD.count == 10)
   }
 
+  sparkTest("Repartitions IntervalRDD") {
+    val rdd: RDD[(Region, Int)] = sc.parallelize(Array.range(0, 100).filter(_ % 2 == 0))
+      .map(v => (Region(v.toLong, v + 1), v))
+
+    val intRDD = IntervalRDD(rdd)
+    val numPartitions = 10
+
+    val repartitioned = intRDD.partitionBy(new HashPartitioner(numPartitions))
+    assert(repartitioned.partitions.length == numPartitions)
+  }
 }
