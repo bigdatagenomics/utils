@@ -20,7 +20,7 @@ package org.bdgenomics.utils.interval.rdd
 
 import org.apache.spark.rdd.RDD
 import org.apache.spark.storage.StorageLevel
-import org.apache.spark.{ Partition, TaskContext, OneToOneDependency, HashPartitioner }
+import org.apache.spark._
 import org.bdgenomics.utils.interval.array._
 import scala.reflect.ClassTag
 
@@ -43,6 +43,16 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
 
   def toRDD: RDD[(K, V)] = {
     partitionsRDD.flatMap(_.get)
+  }
+
+  /**
+   * Repartitions underlying data in IntervalRDD.
+   *
+   * @param partitioner new Partitioner to partition data by
+   * @return repartitioned IntervalRDD
+   */
+  def partitionBy(partitioner: Partitioner): IntervalRDD[K, V] = {
+    IntervalRDD(partitionsRDD.flatMap(_.get()).partitionBy(partitioner))
   }
 
   override def setName(_name: String): this.type = {
