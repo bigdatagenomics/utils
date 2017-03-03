@@ -19,7 +19,7 @@ package org.bdgenomics.utils.instrumentation
 
 import org.apache.spark.Accumulable
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.any
+import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{ times, verify }
 import org.scalatest.FunSuite
 import org.scalatest.mock.MockitoSugar._
