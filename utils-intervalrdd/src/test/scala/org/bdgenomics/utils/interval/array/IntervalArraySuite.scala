@@ -112,7 +112,7 @@ class IntervalArraySuite extends SparkFunSuite {
     assert(after.isEmpty)
   }
 
-  sparkTest("verify getNearest on IntervalArray retrieves nearest data") {
+  sparkTest("verify get with requireOverlap set to false on IntervalArray retrieves nearest data") {
     val rdd = sc.parallelize(Seq((Region(10L, 15L), 1),
       (Region(9L, 12L), 0),
       (Region(100L, 150L), 4),
@@ -128,37 +128,37 @@ class IntervalArraySuite extends SparkFunSuite {
     })
 
     // retrieve a value overlapping the first two keys
-    val firstTwo = array.getNearest(Region(10L, 12L)).map(_._2).toSet
+    val firstTwo = array.get(Region(10L, 12L), false).map(_._2).toSet
     assert(firstTwo.size === 2)
     assert(firstTwo(0))
     assert(firstTwo(1))
 
     // retrieve a value overlapping the last three keys
-    val lastThree = array.getNearest(Region(90L, 105L)).map(_._2).toSet
+    val lastThree = array.get(Region(90L, 105L), false).map(_._2).toSet
     assert(lastThree.size === 3)
     assert(lastThree(2))
     assert(lastThree(3))
     assert(lastThree(4))
 
     // retrieve a value overlapping just the last key
-    val last = array.getNearest(Region(130L, 140L))
+    val last = array.get(Region(130L, 140L), false)
     assert(last.size === 1)
     assert(last.head === (Region(100L, 150L), 4))
 
     // retrieve a value before the first key
-    val before = array.getNearest(Region(2L, 5L))
+    val before = array.get(Region(2L, 5L), false)
     assert(before.size == 1)
     // should return the first element
     assert(before.toList(0) == array.collect.apply(0))
 
     // retrieve a value between the second and third keys
-    val between = array.getNearest(Region(21L, 22L))
+    val between = array.get(Region(21L, 22L), false)
     assert(between.size == 1)
     // should return the second element
     assert(between.toList(0) == array.collect.apply(1))
 
     // retrieve a value after the last key
-    val after = array.getNearest(Region(500L, 675L))
+    val after = array.get(Region(500L, 675L), false)
     assert(after.size == 1)
     // should return the last element
     assert(after.toList(0) == array.collect.apply(4))
