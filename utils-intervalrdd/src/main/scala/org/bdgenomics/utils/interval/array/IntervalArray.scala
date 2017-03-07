@@ -108,6 +108,7 @@ object IntervalArray extends Serializable {
 trait IntervalArray[K <: Interval[K], T] extends Serializable {
   val array: Array[(K, T)]
   val maxIntervalWidth: Long
+  var optLastIndex: Option[Int] = None
 
   def length = array.length
   def midpoint = pow2ceil()
@@ -141,6 +142,36 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
         stepIdx
       }
       binarySearch(rr, nextIdx, step / 2)
+    }
+  }
+
+  /**
+   * Finds an index in array that overlaps with the query rr, or if none exists
+   * returns the closest non-overlapping index.
+   *
+   * @see binarySearch
+   *
+   * @param rr the query region.
+   * @param idx the current index to search.
+   * @param step the step size of the current search in array
+   * @return the index of array that overlaps or is closest to query region rr.
+   */
+  @tailrec private def binaryNearestSearch(rr: K,
+                                           idx: Int = 0,
+                                           step: Int = midpoint): Int = {
+
+    if (array.length == 0 || rr.covers(array(idx)._1) || step == 0) {
+      idx
+    } else {
+      val stepIdx = idx + step
+      val nextIdx = if (stepIdx >= length ||
+        (!rr.covers(array(stepIdx)._1) &&
+          rr.compareTo(array(stepIdx)._1) < 0)) {
+        idx
+      } else {
+        stepIdx
+      }
+      binaryNearestSearch(rr, nextIdx, step / 2)
     }
   }
 
@@ -353,12 +384,30 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     //    of the query region, and thus, there cannot be any intervals earlier
     //    in the array that overlap the query region.
 
-    val optIdx = binarySearch(rr)
+    optLastIndex = optLastIndex.filter(array(_)._1.covers(rr)).orElse(binarySearch(rr))
 
-    optIdx.toIterable
+    optLastIndex.toIterable
       .flatMap(idx => {
         expandBackward(rr, idx) ::: expandForward(rr, idx + 1)
       })
+  }
+
+  /**
+   * Gets all overlapping regions for a given K, however if no overlapping
+   * regions are found, uses the element that is the closest to the query.
+   *
+   * @see get
+   *
+   * @param rr interval to filter by.
+   * @return iterable of elements filtered by region rr containing overlapping
+   *         or the closest element in array.
+   */
+  def getNearest(rr: K): Iterable[(K, T)] = {
+    val lastIndex = binaryNearestSearch(rr)
+
+    expandBackward(rr, lastIndex - 1) :::
+      List(array(lastIndex)) :::
+      expandForward(rr, lastIndex + 1)
   }
 
   /**

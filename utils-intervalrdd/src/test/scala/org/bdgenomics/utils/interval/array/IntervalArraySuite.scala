@@ -112,6 +112,58 @@ class IntervalArraySuite extends SparkFunSuite {
     assert(after.isEmpty)
   }
 
+  sparkTest("verify getNearest on IntervalArray retrieves nearest data") {
+    val rdd = sc.parallelize(Seq((Region(10L, 15L), 1),
+      (Region(9L, 12L), 0),
+      (Region(100L, 150L), 4),
+      (Region(80L, 95L), 2),
+      (Region(80L, 110L), 3)))
+
+    val array = IntervalArray(rdd)
+    assert(array.maxIntervalWidth === 50)
+    assert(array.length === 5)
+    assert(array.midpoint === 4)
+    (0 until array.length).foreach(idx => {
+      assert(array.array(idx)._2 === idx)
+    })
+
+    // retrieve a value overlapping the first two keys
+    val firstTwo = array.getNearest(Region(10L, 12L)).map(_._2).toSet
+    assert(firstTwo.size === 2)
+    assert(firstTwo(0))
+    assert(firstTwo(1))
+
+    // retrieve a value overlapping the last three keys
+    val lastThree = array.getNearest(Region(90L, 105L)).map(_._2).toSet
+    assert(lastThree.size === 3)
+    assert(lastThree(2))
+    assert(lastThree(3))
+    assert(lastThree(4))
+
+    // retrieve a value overlapping just the last key
+    val last = array.getNearest(Region(130L, 140L))
+    assert(last.size === 1)
+    assert(last.head === (Region(100L, 150L), 4))
+
+    // retrieve a value before the first key
+    val before = array.getNearest(Region(2L, 5L))
+    assert(before.size == 1)
+    // should return the first element
+    assert(before.toList(0) == array.collect.apply(0))
+
+    // retrieve a value between the second and third keys
+    val between = array.getNearest(Region(21L, 22L))
+    assert(between.size == 1)
+    // should return the second element
+    assert(between.toList(0) == array.collect.apply(1))
+
+    // retrieve a value after the last key
+    val after = array.getNearest(Region(500L, 675L))
+    assert(after.size == 1)
+    // should return the last element
+    assert(after.toList(0) == array.collect.apply(4))
+  }
+
   sparkTest("verify IntervalArray fetches all valid ranges") {
     val longRegion = Region(1L, 200L)
     val rdd = sc.parallelize(Seq((longRegion, 0),
