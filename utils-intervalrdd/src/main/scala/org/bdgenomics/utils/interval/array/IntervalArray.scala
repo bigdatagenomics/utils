@@ -43,7 +43,7 @@ object IntervalArray extends Serializable {
 
   /**
    * Sorts the RDD and collects it to build an IntervalArray, a sorted array that searches
-   * over ranges. This is used for a left side of the broadcast region join in ADAM.
+   * over intervals. This is used for a left side of the broadcast region join in ADAM.
    *
    * @param rdd RDD to build a IntervalArray from.
    * @return The IntervalArray built from this RDD.
@@ -72,7 +72,7 @@ object IntervalArray extends Serializable {
 
   /**
    * Sorts the RDD and collects it to build an IntervalArray, a sorted array that searches
-   * over ranges. This is used for a left side of the broadcast region join in ADAM.
+   * over intervals. This is used for a left side of the broadcast region join in ADAM.
    *
    * @param rdd RDD to build a IntervalArray from.
    * @return The IntervalArray built from this RDD.
@@ -97,9 +97,15 @@ object IntervalArray extends Serializable {
 }
 
 /**
- * Originally, a IntervalArray was a collection of trees.
+ * Originally, an IntervalArray was a collection of trees.
  * Alas, we have no trees anymore.
  * I blame global warming.
+ *
+ * WARNING: CONTAINS A VARIABLE THAT IS NOT THREAD SAFE
+ * TO SAFELY USE THIS VARIABLE IN A SPARK CONTEXT, CREATE A SHALLOW COPY OF
+ * THE INTERVAL ARRAY.
+ *
+ * @see optLastIndex
  *
  * @param arr An array of values for the left side of the join.
  * @param maxIntervalWidth The maximum width across all intervals in this array.
@@ -108,7 +114,13 @@ object IntervalArray extends Serializable {
 trait IntervalArray[K <: Interval[K], T] extends Serializable {
   val array: Array[(K, T)]
   val maxIntervalWidth: Long
-  var optLastIndex: Option[Int] = None
+  // maintains the last index returned from the most recent binarySearch result.
+  // !!!
+  // WARNING: NOT THREAD SAFE
+  // TO SAFELY USE THIS VARIABLE IN A SPARK CONTEXT, CREATE A SHALLOW COPY OF
+  // THE INTERVAL ARRAY.
+  // !!!
+  private var optLastIndex: Option[Int] = None
 
   def length = array.length
   def midpoint = pow2ceil()
@@ -123,6 +135,15 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     }
   }
 
+  /**
+   * Recursively finds an index in array that overlaps with the query interval,
+   * if exists.
+   * @param rr The interval to query for.
+   * @param idx The current index to search.
+   * @param step The step size of the current search in array.
+   * @return If exists, an option containing the index of an overlapping
+   *         interval in array. If not exists, returns None.
+   */
   @tailrec private def binarySearch(rr: K,
                                     idx: Int = 0,
                                     step: Int = midpoint): Option[Int] = {
@@ -146,15 +167,16 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
   }
 
   /**
-   * Finds an index in array that overlaps with the query rr, or if none exists
-   * returns the closest non-overlapping index.
+   * Recursively finds an index in array that overlaps with the query interval,
+   * or if none exists returns the closest non-overlapping index.
    *
    * @see binarySearch
    *
-   * @param rr the query region.
-   * @param idx the current index to search.
-   * @param step the step size of the current search in array
-   * @return the index of array that overlaps or is closest to query region rr.
+   * @param rr The interval to query for.
+   * @param idx The current index to search.
+   * @param step The step size of the current search in array.
+   * @return The index of array that overlaps or is closest to query the
+   *         interval.
    */
   @tailrec private def binaryNearestSearch(rr: K,
                                            idx: Int = 0,
@@ -175,6 +197,19 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     }
   }
 
+  /**
+   * Recursively expands the list containing all intervals in array that overlap
+   * with the query interval. Expands the list forward from the given index.
+   *
+   * @see expandBackward
+   *
+   * @param rr The query interval.
+   * @param idx The index in array to begin expanding from.
+   * @param list The current list of tuples from array that overlap with the
+   *        query interval.
+   * @return The list of tuples expanded forward from array that overlap with
+   *         the query interval.
+   */
   @tailrec private def expandForward(rr: K,
                                      idx: Int,
                                      list: List[(K, T)] = List.empty): List[(K, T)] = {
@@ -197,6 +232,19 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     }
   }
 
+  /**
+   * Recursively expands the list containing all intervals in array that overlap
+   * with the query interval. Expands the list backward from the given index.
+   *
+   * @see expandForward
+   *
+   * @param rr The query interval.
+   * @param idx The index in array to begin expanding from.
+   * @param list The current list of tuples from array that overlap with the
+   *        query interval.
+   * @return The list of tuples expanded backward from array that overlap with
+   *         the query interval.
+   */
   @tailrec private def expandBackward(rr: K,
                                       idx: Int,
                                       list: List[(K, T)] = List.empty): List[(K, T)] = {
@@ -205,7 +253,7 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     } else {
       val arrayElem = array(idx)
 
-      // get the distance between the current and query regions
+      // get the distance between the current and query intervals
       val distance = arrayElem._1.distance(rr)
 
       // are we out of range?
@@ -224,10 +272,10 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
   }
 
   /**
-   * Insert an Iterator of (K,V) items into existing IntervalArray.
+   * Insert an Iterator of items into existing IntervalArray.
    *
-   * @param kvs (K,V) tuples to insert into IntervalArray
-   * @return new IntervalArray with inserted values
+   * @param kvs The tuples to insert into IntervalArray.
+   * @return new IntervalArray with inserted values.
    */
   def insert(kvs: Iterator[(K, T)], sorted: Boolean = false): IntervalArray[K, T] = {
 
@@ -242,14 +290,16 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
   }
 
   /**
-   * Merges the sorted array from this class with a new sorted array into a new array.
+   * Merges the sorted array from this class with a new sorted array into a
+   * new array.
    *
-   * @param arr Sorted array to merge into this sorted array
-   * @param allSorted Array to merge sorted arrays into
-   * @param k index of current position in allSorted array
-   * @param idx1 index of current position in this array
-   * @param idx2 index of current position in new array arr
-   * @return new sorted array with merged components from new array arr and base array
+   * @param arr A sorted array to merge into this sorted array.
+   * @param allSorted An array to merge sorted arrays into.
+   * @param k The index of current position in allSorted array.
+   * @param idx1 The index of current position in this array.
+   * @param idx2 The index of current position in new array arr.
+   * @return A new sorted array with merged components from new array arr and
+   *         base array.
    */
   @tailrec private def merge(arr: Array[(K, T)],
                              allSorted: Array[(K, T)],
@@ -280,10 +330,10 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
   }
 
   /**
-   * Filters items in IntervalArray based on predicate on (K,V) tuples.
+   * Filters items in an IntervalArray based on a given predicate.
    *
-   * @param pred predicate to filter elements by
-   * @return new IntervalArray with filtered elements
+   * @param pred The predicate to filter elements by.
+   * @return A new IntervalArray with filtered elements.
    */
   def filter(pred: ((K, T)) => Boolean): IntervalArray[K, T] = {
     replace(array.filter(r => pred(r._1, r._2)), maxIntervalWidth)
@@ -292,19 +342,21 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
   /**
    * Maps values from T to T2.
    *
-   * @param f Function mapping T to T2
-   * @tparam T2 new type to map values to
-   * @return new IntervalArray with mapped values
+   * @param f Function mapping T to T2.
+   * @tparam T2 The new type to map values to.
+   * @return new IntervalArray with mapped values.
    */
   def mapValues[T2: ClassTag](f: T => T2): IntervalArray[K, T2] = {
     ConcreteIntervalArray(array.map(r => (r._1, f(r._2))), maxIntervalWidth)
   }
 
   /**
-   * Filters elements in this array by an overlapping Interval.
+   * Gets all overlapping intervals in array for a given query interval.
    *
-   * @param rr Interval to filter by
-   * @return Iterable of elements filtered by Interval rr
+   * @param rr The interval to filter by.
+   * @return Iterable of elements filtered by the query interval containing
+   *         overlapping elements in array. If none exist, returns an empty
+   *         Iterable.
    */
   def get(rr: K): Iterable[(K, T)] = {
 
@@ -330,14 +382,14 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     //     have a defined order that sort coordinate spaces
     // 
     // as arguments, we take:
-    // - a query region
+    // - a query interval
     // - a sorted array (again, sorted first by coordinate plane, and then by
     //   start position on a given coordinate plane)
     // - the width of the largest interval
     //
     // our algorithm runs two phases:
-    // 1. we run binary search to find a key that overlaps the query region
-    // 2. if we find a key that overlaps the query region, we "expand" from this
+    // 1. we run binary search to find a key that overlaps the query interval
+    // 2. if we find a key that overlaps the query interval, we "expand" from this
     //    key to identify the range of all keys that overlap the query sequence
     //
     // we take as a given that binary search works. the only nuance of our
@@ -349,22 +401,22 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     // find all overlapping key/value pairs. we need to expand the array both
     // forward and backward. these two expansions have separate approaches:
     // 1. expanding forward: we walk forward (increment the array index) until
-    //    we hit a region that sorts after the query region, and that does not
-    //    cover the query region. since the array is sorted by start position,
-    //    once we hit an array element that sorts after the query region, that
+    //    we hit a interval that sorts after the query interval, and that does not
+    //    cover the query interval. since the array is sorted by start position,
+    //    once we hit an array element that sorts after the query interval, that
     //    implies that:
     //      * the start position of the array element is greater than the start
-    //        position of the query region, or
+    //        position of the query interval, or
     //      * the array element is on a different coordinate plane
     //
     //    if the array element is on a different coordinate plane, by definition
     //    all intervals that are later in the array will also be on a different
-    //    coordinate plane from the query region, and intervals on different
+    //    coordinate plane from the query interval, and intervals on different
     //    coordinate planes cannot overlap.
     //
     //    if the array element is on the same coordinate plane as the query
-    //    region, the sort order implies that the two intervals will overlap
-    //    iff the end position of the query region is greater than/equal to the
+    //    interval, the sort order implies that the two intervals will overlap
+    //    iff the end position of the query interval is greater than/equal to the
     //    start position of the array element, and the start position of the
     //    array elements increases monotonically moving forward in the array.
     //    thus, once we see an array element that is sorted after the query
@@ -381,8 +433,8 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     //    coordinate plane. if the distance is defined and greater than the
     //    longest interval length, this implies that the end of the array
     //    element is more than the maximum interval length away from the start
-    //    of the query region, and thus, there cannot be any intervals earlier
-    //    in the array that overlap the query region.
+    //    of the query interval, and thus, there cannot be any intervals earlier
+    //    in the array that overlap the query interval.
 
     optLastIndex = optLastIndex.filter(array(_)._1.covers(rr)).orElse(binarySearch(rr))
 
@@ -393,27 +445,29 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
   }
 
   /**
-   * Gets all overlapping regions for a given K, however if no overlapping
-   * regions are found, uses the element that is the closest to the query.
+   * Gets all overlapping intervals in array for a given K, however if no
+   * overlapping intervals are found, uses the element that is the closest
+   * to the query.
    *
-   * @see get
-   *
-   * @param rr interval to filter by.
-   * @return iterable of elements filtered by region rr containing overlapping
-   *         or the closest element in array.
+   * @param rr The interval to filter by.
+   * @return An Iterable of elements filtered by the query interval containing
+   *         overlapping or the closest element in array.
    */
-  def getNearest(rr: K): Iterable[(K, T)] = {
-    val lastIndex = binaryNearestSearch(rr)
+  def get(rr: K, requireOverlap: Boolean = true): Iterable[(K, T)] = {
+    if (requireOverlap) {
+      get(rr)
+    } else {
+      val lastIndex = binaryNearestSearch(rr)
 
-    expandBackward(rr, lastIndex - 1) :::
-      List(array(lastIndex)) :::
-      expandForward(rr, lastIndex + 1)
+      expandBackward(rr, lastIndex - 1) :::
+        (array(lastIndex) :: expandForward(rr, lastIndex + 1))
+    }
   }
 
   /**
    * Collects and returns all elements in this array.
    *
-   * @return array containing all elements
+   * @return An array containing all elements.
    */
   def collect(): Array[(K, T)] = array
 }
