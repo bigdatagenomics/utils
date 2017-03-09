@@ -431,13 +431,6 @@ abstract class IntervalArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag, 
 
     // read the array size and allocate
     val length = input.readInt()
-    /*val array = new Array[(K, T)](length)
-
-    // loop and read
-    array.indices.foreach(idx => {
-      array(idx) = (kSerializer.read(kryo, input, kTag.runtimeClass.asInstanceOf[Class[K]]),
-        tSerializer.read(kryo, input, tTag.runtimeClass.asInstanceOf[Class[T]]))
-    })*/
 
     val array = (0 until length).map(idx => {
       (kSerializer.read(kryo, input, kTag.runtimeClass.asInstanceOf[Class[K]]),
