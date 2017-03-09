@@ -35,12 +35,23 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
 
   override protected def getPartitions: Array[Partition] = partitionsRDD.partitions
 
-  /** Provides the `RDD[(K, V)]` equivalent output. */
+  /**
+   * Provides the `RDD[(K, V)]` equivalent output.
+   *
+   * @param part Partition
+   * @param context TaskContext
+   * @return Iterator of (K, V) pairs
+   */
   override def compute(part: Partition, context: TaskContext): Iterator[(K, V)] = {
     // This needs to be present to compile
     null
   }
 
+  /**
+   * Converts to normal RDD of (K, V) pairs
+   *
+   * @return RDD of (K, V) pairs
+   */
   def toRDD: RDD[(K, V)] = {
     partitionsRDD.flatMap(_.get)
   }
@@ -55,6 +66,11 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
     IntervalRDD(partitionsRDD.flatMap(_.get()).partitionBy(partitioner))
   }
 
+  /**
+   * Resets RDD name
+   * @param _name RDD name
+   * @return
+   */
   override def setName(_name: String): this.type = {
     partitionsRDD.setName(_name)
     this
@@ -76,16 +92,29 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
     partitionsRDD.map(_.getIntervalArray.length).reduce(_ + _)
   }
 
+  /**
+   * Gets first element in the RDD.
+   *
+   * @return first (K,V) pair
+   */
   override def first: (K, V) = {
     partitionsRDD.filter(_.getIntervalArray.length > 0).first.getIntervalArray.collect()(0)
   }
 
+  /**
+   * Collects all elements in RDD into an array of (K, V) pairs.
+   *
+   * @return Array of (K, V) pairs
+   */
   override def collect: Array[(K, V)] = partitionsRDD.flatMap(_.get).collect
 
   /**
    * Gets the values corresponding to the specified key, if any
    * Assume that we're only getting data that exists (if it doesn't exist,
    * would have been handled by upper LazyMaterialization layer
+   *
+   * @param interval Interval to collect overlapping data from
+   * @return List of V records overlapping interval
    */
   def collect(interval: K): List[V] = {
 
@@ -102,12 +131,21 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
     results.flatten.toList
   }
 
+  /**
+   * Filters IntervalRDD by interval and returns new IntervalRDD.
+   *
+   * @param r Interval to filter by
+   * @return filtered IntervalRDD
+   */
   def filterByInterval(r: K): IntervalRDD[K, V] = {
     mapIntervalPartitions(_.filterByInterval(r))
   }
 
   /**
-   * Performs filtering given a predicate
+   * Performs filtering given a predicate.
+   *
+   * @param pred Predicate to filter (K,V) pairs by
+   * @return new IntervalRDD with filtered predicate
    */
   override def filter(pred: ((K, V)) => Boolean): IntervalRDD[K, V] = {
     this.mapIntervalPartitions(_.filter(pred))
@@ -115,13 +153,17 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
 
   /**
    * Maps each value, preserving the index.
+   *
+   * @param f: Function that maps values V to new type V2
+   * @return new IntervalRDD with values V2
    */
   def mapValues[V2: ClassTag](f: V => V2): IntervalRDD[K, V2] = {
     this.mapIntervalPartitions(_.mapValues(f))
   }
 
   /**
-   * Maps interval partitions in partitionsRDD
+   * Maps interval partitions in partitionsRDD.
+   *
    * @param f mapping function for interval partitions
    * @tparam K2 key type extending Interval
    * @tparam V2 data type
@@ -134,31 +176,49 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
     new IntervalRDD(newPartitionsRDD)
   }
 
+  /**
+   * Generates new IntervalRDD from an RDD of IntervalPartitions.
+   *
+   * @param partitionsRDD RDD of IntervalPartitions
+   * @tparam K2 Interval type for IntervalPartitions
+   * @tparam V2 Value type for IntervalPartitions
+   * @return new IntervalRDD
+   */
   private def withPartitionsRDD[K2 <: Interval[K2]: ClassTag, V2: ClassTag](
     partitionsRDD: RDD[IntervalPartition[K2, V2]]): IntervalRDD[K2, V2] = {
     new IntervalRDD(partitionsRDD)
   }
 
   /**
-   * Unconditionally updates the specified keys to have the specified value. Returns a new IntervalRDD
+   * Unconditionally updates the specified keys to have the specified value. Returns a new IntervalRDD.
+   *
+   * @param elems Array of (K,V) pairs
+   * @return IntervalRDD with inserted elems
    */
-  def multiput(elems: Array[(K, V)]): IntervalRDD[K, V] = {
-    multiput(context.parallelize(elems.toSeq))
+  def multiput(elems: Array[(K, V)], isSorted: Boolean = false): IntervalRDD[K, V] = {
+    multiputRDD(context.parallelize(elems.toSeq), isSorted)
   }
 
   /**
-   * Unconditionally updates the specified keys to have the specified value. Returns a new IntervalRDD
+   * Unconditionally updates the specified keys to have the specified value. Returns a new IntervalRDD.
+   *
+   * @param elem (K,V) pair
+   * @return IntervalRDD with inserted elem
    */
-  def multiput(elem: (K, V)): IntervalRDD[K, V] = multiput(Array(elem))
+  def put(elem: (K, V)): IntervalRDD[K, V] = multiput(Array(elem), true)
 
   /**
-   * Unconditionally updates the specified keys to have the specified value. Returns a new IntervalRDD
+   * Unconditionally updates the specified keys to have the specified value. Returns a new IntervalRDD.
+   *
+   * @param elems RDD of (K,V) pairs
+   * @param sorted Boolean that determines whether elems is sorted
+   * @return IntervalRDD with inserted elems
    */
-  def multiput(elems: RDD[(K, V)]): IntervalRDD[K, V] = {
+  def multiputRDD(elems: RDD[(K, V)], sorted: Boolean = false): IntervalRDD[K, V] = {
     val partitioned = elems.partitionBy(partitioner.get)
 
     val convertedPartitions: RDD[IntervalPartition[K, V]] = partitioned.mapPartitions[IntervalPartition[K, V]](
-      iter => Iterator(IntervalPartition(iter.toIterable)),
+      iter => Iterator(IntervalPartition(iter.toIterable, sorted)),
       preservesPartitioning = true)
 
     // merge the new partitions with existing partitions
@@ -169,6 +229,14 @@ class IntervalRDD[K <: Interval[K]: ClassTag, V: ClassTag](
 }
 
 class PartitionMerger[K <: Interval[K], V: ClassTag]() extends Serializable {
+
+  /**
+   * Merges two Iterators of IntervalPartitions together.
+   *
+   * @param thisIter First iterator of IntervalPartitions
+   * @param otherIter Iterator of IntervalPartitions to merge
+   * @return Merged iterator of IntervalPartitions
+   */
   def apply(thisIter: Iterator[IntervalPartition[K, V]], otherIter: Iterator[IntervalPartition[K, V]]): Iterator[IntervalPartition[K, V]] = {
     val thisPart = thisIter.next
     val otherPart = otherIter.next
@@ -179,16 +247,22 @@ class PartitionMerger[K <: Interval[K], V: ClassTag]() extends Serializable {
 object IntervalRDD {
 
   /**
-   * Constructs an IntervalRDD from a set of interval, V tuples
+   *  Constructs an IntervalRDD from a set of interval, V tuples.
+   *
+   * @param elems RDD of (K,V) pairs
+   * @param sorted Determines whether RDD has been sorted
+   * @tparam K
+   * @tparam V
+   * @return new IntervalRDD
    */
-  def apply[K <: Interval[K]: ClassTag, V: ClassTag](elems: RDD[(K, V)]): IntervalRDD[K, V] = {
+  def apply[K <: Interval[K]: ClassTag, V: ClassTag](elems: RDD[(K, V)], sorted: Boolean = false): IntervalRDD[K, V] = {
     val partitioned =
       if (elems.partitioner.isDefined) elems
       else {
         elems.partitionBy(new HashPartitioner(elems.partitions.size))
       }
     val convertedPartitions: RDD[IntervalPartition[K, V]] = partitioned.mapPartitions[IntervalPartition[K, V]](
-      iter => Iterator(IntervalPartition(iter.toIterable)),
+      iter => Iterator(IntervalPartition(iter.toIterable, sorted)),
       preservesPartitioning = true)
 
     new IntervalRDD(convertedPartitions)

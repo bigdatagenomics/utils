@@ -74,14 +74,14 @@ class IntervalPartitionSuite extends FunSuite {
   test("create partition from iterator") {
 
     val iter = Iterable((region1, read1), (region2, read1))
-    val partition = IntervalPartition(iter)
+    val partition = IntervalPartition(iter, true)
     assert(partition != null)
   }
 
   test("get values from iterator-created partition") {
 
     val iter = Iterable((region1, read1), (region1, read3), (region2, read2), (region2, read4))
-    val partition = IntervalPartition(iter)
+    val partition = IntervalPartition(iter, true)
 
     var results: List[Long] = partition.get(region1).toList.map(_._2)
     results = results ++ partition.get(region2).toList.map(_._2)
@@ -97,7 +97,7 @@ class IntervalPartitionSuite extends FunSuite {
 
     val region = Region(0L, 20L)
     val iter = (0 until 100).map(r => (Region(r, r + 1), r)).reverse.toIterable
-    val partition = IntervalPartition(iter)
+    val partition = IntervalPartition(iter, false)
 
     val results: List[Int] = partition.get(region).toList.map(_._2)
 
@@ -131,7 +131,7 @@ class IntervalPartitionSuite extends FunSuite {
     val read3 = (2L, 6L)
     val read4 = (2L, 500L)
     val iter = Iterable((region1, read1), (region2, read2), (region1, read3), (region2, read4))
-    val partition = IntervalPartition(iter)
+    val partition = IntervalPartition(iter, false)
     val results = partition.get(region1).toList
     assert(results.contains((region1, read1)))
 
