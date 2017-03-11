@@ -3,6 +3,8 @@ utils
 
 General (non-omics) code used across BDG products. Apache 2 licensed.
 
+[![Coverage Status](https://coveralls.io/repos/github/bigdatagenomics/utils/badge.svg?branch=master)](https://coveralls.io/github/bigdatagenomics/utils?branch=master)
+
 # Usage
 
 ## Instrumentation
