@@ -25,10 +25,9 @@ import java.io.PrintWriter
  */
 object InstrumentationFunctions {
 
-  def renderTable(out: PrintWriter, name: String, timers: Seq[Monitor[_]], header: Seq[TableHeader]) = {
+  def renderTable(name: String, timers: Seq[Monitor[_]], header: Seq[TableHeader]): String = {
     val monitorTable = new MonitorTable(header.toArray, timers.toArray)
-    out.println(name)
-    monitorTable.print(out)
+    "%s\n%s".format(name, monitorTable.toString)
   }
 
   def formatNanos(number: Any): String = {

@@ -54,7 +54,7 @@ class MonitorTableSuite extends FunSuite {
   private def getRenderedTable(table: MonitorTable): String = {
     val stringWriter = new StringWriter()
     val out = new PrintWriter(stringWriter)
-    table.print(out)
+    out.print(table.toString)
     out.flush()
     stringWriter.getBuffer.toString
   }
