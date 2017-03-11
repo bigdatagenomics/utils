@@ -111,27 +111,4 @@
       <artifactId>hadoop-client</artifactId>
     </dependency>
   </dependencies>
-
-  <profiles>
-    <profile>
-      <id>coverage</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.scoverage</groupId>
-            <artifactId>maven-scoverage-plugin</artifactId>
-            <version>${scoverage.version}</version>
-            <executions>
-              <execution>
-                <id>test</id>
-                <goals>
-                  <goal>report</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>
