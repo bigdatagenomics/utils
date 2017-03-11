@@ -323,11 +323,6 @@
         <scope>test</scope>
       </dependency>
       <dependency>
-        <groupId>org.scoverage</groupId>
-        <artifactId>scalac-scoverage-plugin_2.10</artifactId>
-        <version>${scoverage.plugin.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-library</artifactId>
         <version>${scala.version}</version>
@@ -441,66 +436,39 @@
       <build>
         <plugins>
           <plugin>
-            <groupId>net.alchim31.maven</groupId>
-            <artifactId>scala-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>scala-compile-first</id>
-                <phase>process-resources</phase>
-                <goals>
-                  <goal>add-source</goal>
-                  <goal>compile</goal>
-                </goals>
-                <configuration>
-                  <args>
-                    <arg>-g:vars</arg>
-                    <arg>-Yrangepos</arg>
-                    <arg>-P:scoverage:dataDir:${project.build.directory}</arg>
-                  </args>
-                </configuration>
-              </execution>
-              <execution>
-                <id>scala-test-compile-first</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>testCompile</goal>
-                </goals>
-              </execution>
-              <execution>
-                <id>attach-scaladocs</id>
-                <phase>verify</phase>
-                <goals>
-                  <goal>doc-jar</goal>
-                </goals>
-              </execution>
-            </executions>
+            <groupId>org.scoverage</groupId>
+            <artifactId>scoverage-maven-plugin</artifactId>
+            <version>${scoverage.plugin.version}</version>
             <configuration>
               <scalaVersion>${scala.version}</scalaVersion>
-              <useZincServer>true</useZincServer>
-              <args>
-                <arg>-unchecked</arg>
-                <arg>-optimise</arg>
-                <arg>-deprecation</arg>
-                <arg>-Xlog-implicits</arg>
-              </args>
-              <jvmArgs>
-                <jvmArg>-Xms64m</jvmArg>
-                <jvmArg>-Xms1024m</jvmArg>
-                <jvmArg>-Xmx1024m</jvmArg>
-              </jvmArgs>
-              <javacArgs>
-                <javacArg>-source</javacArg>
-                <javacArg>${java.version}</javacArg>
-                <javacArg>-target</javacArg>
-                <javacArg>${java.version}</javacArg>
-              </javacArgs>
-              <compilerPlugins>
-                <compilerPlugin>
-                  <groupId>org.scoverage</groupId>
-                  <artifactId>scalac-scoverage-plugin_2.10</artifactId>
-                  <version>${scoverage.plugin.version}</version>
-                </compilerPlugin>
-              </compilerPlugins>
+              <aggregate>true</aggregate>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>coveralls</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eluder.coveralls</groupId>
+            <artifactId>coveralls-maven-plugin</artifactId>
+            <version>3.0.1</version>
+            <configuration>
+              <coberturaReports>
+                <param>${project.build.directory}/cobertura.xml</param>
+              </coberturaReports>
+              <sourceDirectories>
+                <param>utils-cli/src/main/scala</param>
+                <param>utils-intervalrdd/src/main/scala</param>
+                <param>utils-io/src/main/scala</param>
+                <param>utils-metrics/src/main/scala</param>
+                <param>utils-minhash/src/main/scala</param>
+                <param>utils-misc/src/main/scala</param>
+                <param>utils-serialization/src/main/scala</param>
+                <param>utils-statistics/src/main/scala</param>
+              </sourceDirectories>
             </configuration>
           </plugin>
         </plugins>
