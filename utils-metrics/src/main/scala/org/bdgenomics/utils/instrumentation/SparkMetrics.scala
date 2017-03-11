@@ -44,13 +44,17 @@ abstract class SparkMetrics {
     val ordering = getOrdering(overallMonitors)
     val monitorsByHost = taskTimers.flatMap(_.getHostTimings).sorted(ordering)
     val monitorsByStageName = taskTimers.flatMap(_.getStageTimings).map(addStageName).sorted(ordering)
-    renderTable(out, "Task Timings", overallMonitors, createTaskHeader())
+    out.print(renderTable("Task Timings", overallMonitors, createTaskHeader()))
     out.println()
-    renderTable(out, "Task Timings By Host", monitorsByHost,
-      createHeaderWith(TableHeader(name = "Host", valueExtractor = forTagValueWithKey(HostTagKey), alignment = Alignment.Left), 1))
+    out.print(renderTable("Task Timings By Host", monitorsByHost,
+      createHeaderWith(TableHeader(name = "Host",
+        valueExtractor = forTagValueWithKey(HostTagKey),
+        alignment = Alignment.Left), 1)))
     out.println()
-    renderTable(out, "Task Timings By Stage", monitorsByStageName,
-      createHeaderWith(TableHeader(name = "Stage ID & Name", valueExtractor = forTagValueWithKey(StageNameTagKey), alignment = Alignment.Left), 1))
+    out.print(renderTable("Task Timings By Stage", monitorsByStageName,
+      createHeaderWith(TableHeader(name = "Stage ID & Name",
+        valueExtractor = forTagValueWithKey(StageNameTagKey),
+        alignment = Alignment.Left), 1)))
   }
 
   def mapStageIdToName(stageId: Int, stageName: String) {

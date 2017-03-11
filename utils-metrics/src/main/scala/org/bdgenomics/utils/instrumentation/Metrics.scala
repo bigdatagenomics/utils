@@ -124,19 +124,25 @@ object Metrics {
    * [[SparkMetrics]] to print details of any Spark operations that have occurred.
    */
   def print(out: PrintWriter, sparkStageTimings: Option[Seq[StageTiming]]) {
+    out.print(toString)
+    out.println()
+    val rec = Recorder.value.get
+    val accumulable = rec.accumulable
+    sparkStageTimings.foreach(printRddOperations(out, _, accumulable))
+  }
+
+  override def toString: String = {
     if (!Metrics.Recorder.value.isDefined) {
       throw new IllegalStateException("Trying to print metrics for an uninitialized Metrics class! " +
         "Call the initialize method to initialize it.")
     }
-    Recorder.value.foreach { (rec) =>
-      val accumulable = rec.accumulable
-      val treeRoots = buildTree(accumulable).toSeq.sortWith((a, b) => { a.timingPath.sequenceId < b.timingPath.sequenceId })
-      val treeNodeRows = new mutable.ArrayBuffer[Monitor[_]]()
-      treeRoots.foreach(treeNode => { treeNode.addToTable(treeNodeRows) })
-      renderTable(out, "Timings", treeNodeRows, createTreeViewHeader())
-      out.println()
-      sparkStageTimings.foreach(printRddOperations(out, _, accumulable))
-    }
+    val rec = Recorder.value.get
+    val accumulable = rec.accumulable
+    val treeRoots = buildTree(accumulable).toSeq
+      .sortWith((a, b) => { a.timingPath.sequenceId < b.timingPath.sequenceId })
+    val treeNodeRows = new mutable.ArrayBuffer[Monitor[_]]()
+    treeRoots.foreach(treeNode => { treeNode.addToTable(treeNodeRows) })
+    renderTable("Timings", treeNodeRows, createTreeViewHeader())
   }
 
   /**
@@ -173,7 +179,7 @@ object Metrics {
       subMonitors += findMonitor(rddOperation._2.getMonitors.asScala, DriverTotalTimeTag)
       new BasicCompositeMonitor(monitorConfig.build(), subMonitors.asJava)
     })
-    renderTable(out, "Spark Operations", rddMonitors, createRDDOperationsHeader())
+    out.write(renderTable("Spark Operations", rddMonitors, createRDDOperationsHeader()))
   }
 
   private def createRDDOperationsHeader(): ArrayBuffer[TableHeader] = {

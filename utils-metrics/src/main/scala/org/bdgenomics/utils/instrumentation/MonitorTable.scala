@@ -36,11 +36,11 @@ import scala.collection.mutable.ArrayBuffer
  */
 class MonitorTable(headerRow: Array[TableHeader], rows: Array[Monitor[_]]) {
 
-  def print(out: PrintWriter) = {
+  override def toString: String = {
     val tableHeader = headerRow.map(e => { new ASCIITableHeader(e.name, e.alignment) })
     val tableRows = createRows()
     val table = new ASCIITable(tableHeader, tableRows)
-    table.print(out)
+    table.toString
   }
 
   private def createRows(): Array[Array[String]] = {

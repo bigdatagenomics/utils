@@ -36,45 +36,45 @@ class ASCIITable(header: Array[ASCIITableHeader], rows: Array[Array[String]]) {
     }
   })
 
-  /**
-   * Prints this table to the specified [[PrintWriter]]
-   */
-  def print(out: PrintWriter) {
+  override def toString: String = {
     val columnWidths = new Array[Int](header.length)
     updateColumnWidths(columnWidths, header.map(_.name))
     rows.foreach(row => {
       updateColumnWidths(columnWidths, row)
     })
-    printSeparator(out, columnWidths)
-    printRow(out, header.map(_.name), Array.fill(header.length)(Alignment.Center), columnWidths)
-    printSeparator(out, columnWidths)
-    printRows(out, rows, header, columnWidths)
-    printSeparator(out, columnWidths)
+    "%s\n".format(Seq(separatorToString(columnWidths),
+      rowToString(header.map(_.name),
+        Array.fill(header.length)(Alignment.Center),
+        columnWidths),
+      separatorToString(columnWidths),
+      rowsToString(rows, header, columnWidths),
+      separatorToString(columnWidths)).mkString("\n"))
   }
 
-  private def printSeparator(out: PrintWriter, columnWidths: Array[Int]) = {
-    columnWidths.foreach(columnWidth => {
-      out.print('+')
-      out.print(StringUtils.repeat("-", getRealColumnWidth(columnWidth)))
-    })
-    out.println('+')
+  private def separatorToString(columnWidths: Array[Int]): String = {
+    "+%s+".format(columnWidths.map(columnWidth => {
+      StringUtils.repeat("-", getRealColumnWidth(columnWidth))
+    }).mkString("+"))
   }
 
-  private def printRows(out: PrintWriter, rows: Array[Array[String]], header: Array[ASCIITableHeader], columnWidths: Array[Int]) = {
-    rows.foreach(row => {
-      printRow(out, row, header.map(_.alignment), columnWidths)
-    })
+  private def rowsToString(rows: Array[Array[String]],
+                           header: Array[ASCIITableHeader],
+                           columnWidths: Array[Int]): String = {
+    rows.map(row => {
+      rowToString(row, header.map(_.alignment), columnWidths)
+    }).mkString("\n")
   }
 
-  private def printRow(out: PrintWriter, row: Array[String], alignments: Array[Alignment], columnWidths: Array[Int]) {
+  private def rowToString(row: Array[String],
+                          alignments: Array[Alignment],
+                          columnWidths: Array[Int]): String = {
     var i = 0
-    row.foreach(column => {
-      out.print('|')
+    "|%s|".format(row.map(column => {
       val columnWidth = getRealColumnWidth(columnWidths(i))
-      out.print(paddedValue(column, columnWidth, alignments(i)))
+      val col = paddedValue(column, columnWidth, alignments(i))
       i += 1
-    })
-    out.println('|')
+      col
+    }).mkString("|"))
   }
 
   private def getRealColumnWidth(columnWidth: Int): Int = {
