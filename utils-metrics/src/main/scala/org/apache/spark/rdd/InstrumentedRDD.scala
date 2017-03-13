@@ -21,6 +21,7 @@ import org.apache.hadoop.io.compress.CompressionCodec
 import org.apache.spark.annotation.{ DeveloperApi, Experimental }
 import org.apache.spark.partial.{ BoundedDouble, PartialResult }
 import org.apache.spark.rdd.InstrumentedRDD._
+import org.apache.spark.storage.StorageLevel
 import org.apache.spark.util.Utils
 import org.apache.spark.{ Partition, Partitioner, TaskContext }
 import org.bdgenomics.utils.instrumentation.{ Clock, Metrics, MetricsRecorder }
@@ -310,6 +311,20 @@ class InstrumentedRDD[T: ClassTag](private[rdd] val decoratedRDD: RDD[T])
     instrument(decoratedRDD.keyBy((t) => recordFunction(f(t))))
   }
 
+  override def cache(): this.type = {
+    decoratedRDD.cache()
+    this
+  }
+
+  override def persist(): this.type = {
+    decoratedRDD.persist()
+    this
+  }
+
+  override def persist(newLevel: StorageLevel): this.type = {
+    decoratedRDD.persist(newLevel)
+    this
+  }
 }
 
 object InstrumentedRDD {
