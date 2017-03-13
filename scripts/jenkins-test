@@ -69,6 +69,9 @@ then
     exit 1
 fi
 
+# clean before building
+mvn clean
+
 # if those pass, build the distribution package and the integration tests
 mvn -U \
     test \
