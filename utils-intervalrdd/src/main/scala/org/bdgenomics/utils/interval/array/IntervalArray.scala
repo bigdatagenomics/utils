@@ -127,6 +127,12 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
 
   protected def replace(arr: Array[(K, T)], maxWidth: Long): IntervalArray[K, T]
 
+  /**
+   * @return Makes a copy of the interval array. The underlying array is shallow
+   *   copied, but the thread unsafe optLastIndex variable is not shared.
+   */
+  def duplicate(): IntervalArray[K, T]
+
   @tailrec private def pow2ceil(i: Int = 1): Int = {
     if (2 * i >= length) {
       i
@@ -492,6 +498,10 @@ class ConcreteIntervalArraySerializer[K <: Interval[K]: ClassTag, T: ClassTag](k
 case class ConcreteIntervalArray[K <: Interval[K], T: ClassTag](
     array: Array[(K, T)],
     maxIntervalWidth: Long) extends IntervalArray[K, T] {
+
+  def duplicate(): IntervalArray[K, T] = {
+    new ConcreteIntervalArray(array, maxIntervalWidth)
+  }
 
   protected def replace(arr: Array[(K, T)],
                         maxWidth: Long): IntervalArray[K, T] = {
