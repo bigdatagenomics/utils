@@ -101,12 +101,6 @@ object IntervalArray extends Serializable {
  * Alas, we have no trees anymore.
  * I blame global warming.
  *
- * WARNING: CONTAINS A VARIABLE THAT IS NOT THREAD SAFE
- * TO SAFELY USE THIS VARIABLE IN A SPARK CONTEXT, CREATE A SHALLOW COPY OF
- * THE INTERVAL ARRAY.
- *
- * @see optLastIndex
- *
  * @param arr An array of values for the left side of the join.
  * @param maxIntervalWidth The maximum width across all intervals in this array.
  * @param sorted True if arr is sorted. If false, we sort arr.
@@ -114,13 +108,6 @@ object IntervalArray extends Serializable {
 trait IntervalArray[K <: Interval[K], T] extends Serializable {
   val array: Array[(K, T)]
   val maxIntervalWidth: Long
-  // maintains the last index returned from the most recent binarySearch result.
-  // !!!
-  // WARNING: NOT THREAD SAFE
-  // TO SAFELY USE THIS VARIABLE IN A SPARK CONTEXT, CREATE A SHALLOW COPY OF
-  // THE INTERVAL ARRAY.
-  // !!!
-  private var optLastIndex: Option[Int] = None
 
   def length = array.length
   def midpoint = pow2ceil()
@@ -436,12 +423,11 @@ trait IntervalArray[K <: Interval[K], T] extends Serializable {
     //    of the query interval, and thus, there cannot be any intervals earlier
     //    in the array that overlap the query interval.
 
-    optLastIndex = optLastIndex.filter(array(_)._1.covers(rr)).orElse(binarySearch(rr))
+    val optLastIndex = binarySearch(rr)
 
-    optLastIndex.toIterable
-      .flatMap(idx => {
-        expandBackward(rr, idx) ::: expandForward(rr, idx + 1)
-      })
+    optLastIndex.toIterable.flatMap(idx => {
+      expandBackward(rr, idx) ::: expandForward(rr, idx + 1)
+    })
   }
 
   /**
