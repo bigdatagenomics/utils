@@ -9,7 +9,7 @@
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
-  <artifactId>utils-parent_2.10</artifactId>
+  <artifactId>utils-parent-spark2_2.10</artifactId>
   <version>0.2.13-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
@@ -22,7 +22,7 @@
   <properties>
     <java.version>1.8</java.version>
     <scala.version>2.10.6</scala.version>
-    <spark.version>1.6.3</spark.version>
+    <spark.version>2.1.0</spark.version>
     <parquet.version>1.8.1</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
     <hadoop.version>2.7.3</hadoop.version>
@@ -87,7 +87,7 @@
             <mavenExecutorId>forked-path</mavenExecutorId>
             <useReleaseProfile>false</useReleaseProfile>
             <arguments>-Psonatype-oss-release</arguments>
-            <tagNameFormat>utils-parent_2.10-${project.version}</tagNameFormat>
+            <tagNameFormat>utils-parent-spark2_2.10-${project.version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
@@ -285,24 +285,24 @@
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_2.10</artifactId>
+        <artifactId>utils-misc-spark2_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc_2.10</artifactId>
+        <artifactId>utils-misc-spark2_2.10</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-io_2.10</artifactId>
+        <artifactId>utils-io-spark2_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-metrics_2.10</artifactId>
+        <artifactId>utils-metrics-spark2_2.10</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
