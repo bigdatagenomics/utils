@@ -132,13 +132,22 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
   }
 
   /**
+   * Makes a temporary directory.
+   *
+   * @return Returns the absolute path to a temp directory.
+   */
+  def tmpDir(): String = {
+    Files.createTempDirectory("").toAbsolutePath.toString
+  }
+
+  /**
    * Makes a temporary directory, and returns a path to a file in that directory.
    *
    * @param path The name of the file in a directory.
    * @return Returns the absolute path to a temp file.
    */
   def tmpFile(path: String): String = {
-    Files.createTempDirectory("").toAbsolutePath.toString + "/" + path
+    tmpDir() + "/" + path
   }
 
   /**
