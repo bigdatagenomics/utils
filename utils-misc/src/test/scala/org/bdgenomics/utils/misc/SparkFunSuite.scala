@@ -23,12 +23,15 @@ import java.net.{ URI, URL }
 import java.nio.file.{ Files, Path }
 import org.scalatest.{ Tag, BeforeAndAfter, FunSuite }
 import org.apache.spark.{ SparkConf, SparkContext }
+import org.apache.spark.sql.{ SparkSession, SQLContext }
 import org.apache.log4j.Level
 import scala.io.Source
 
 trait SparkFunSuite extends FunSuite with BeforeAndAfter {
 
   var sc: SparkContext = _
+  var spark: SparkSession = _
+  var sqlContext: SQLContext = _
   val appName: String = "bdg-utils"
   val master: String = "local[4]"
   val properties: Map[String, String] = Map()
@@ -41,9 +44,9 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
   }
 
   def setupSparkContext(sparkName: String) {
-    var maybeSc: Option[SparkContext] = None
+    var maybeSpark: Option[SparkSession] = None
 
-    while (maybeSc.isEmpty) {
+    while (maybeSpark.isEmpty) {
       val conf = new SparkConf(false)
         .setAppName(appName + ": " + sparkName)
         .setMaster(master)
@@ -53,7 +56,9 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
 
       properties.foreach(kv => conf.set(kv._1, kv._2))
       try {
-        maybeSc = Some(new SparkContext(conf))
+        maybeSpark = Some(SparkSession.builder()
+          .config(conf)
+          .getOrCreate())
       } catch {
         // Retry in the case of a bind exception
         case bindException: java.net.BindException =>
@@ -61,12 +66,16 @@ trait SparkFunSuite extends FunSuite with BeforeAndAfter {
         case e: Exception                          => throw e
       }
     }
-    sc = maybeSc.get
+    spark = maybeSpark.get
+    sqlContext = spark.sqlContext
+    sc = spark.sparkContext
   }
 
   def teardownSparkContext() {
     // Stop the context
-    sc.stop()
+    spark.stop()
+    spark = null
+    sqlContext = null
     sc = null
   }
 
