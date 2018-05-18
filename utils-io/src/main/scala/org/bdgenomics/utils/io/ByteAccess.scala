@@ -41,10 +41,14 @@ trait ByteAccess {
     var totalBytesRead: Int = 0
     val buffer = new Array[Byte](length)
     val is = readByteStream(offset, length)
-    while (totalBytesRead < length) {
-      val bytesRead = is.read(buffer, totalBytesRead, length - totalBytesRead)
-      totalBytesRead += bytesRead
+    try {
+      while (totalBytesRead < length) {
+        val bytesRead = is.read(buffer, totalBytesRead, length - totalBytesRead)
+        totalBytesRead += bytesRead
+      }
+      buffer
+    } finally {
+      is.close()
     }
-    buffer
   }
 }
