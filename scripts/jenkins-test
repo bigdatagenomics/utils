@@ -24,7 +24,6 @@ if ! [[ ${HADOOP_VERSION} ]];
 then
     echo "HADOOP_VERSION environment variable is not set."
     echo "Please set this variable before running."
-    
     exit 1
 fi
 
@@ -33,12 +32,37 @@ if ! [[ ${SPARK_VERSION} ]];
 then
     echo "SPARK_VERSION environment variable is not set."
     echo "Please set this variable before running."
-    
     exit 1
 fi
 
+# is the scala version set?
+if ! [[ ${SCALA_VERSION} ]];
+then
+    echo "SCALA_VERSION environment variable is not set."
+    echo "Please set this variable before running."
+    exit 1
+fi
+
+if [ ${SCALA_VERSION} == 2.11 ];
+then
+    # shouldn't be able to move to scala 2.11 twice
+    set +e
+    ./scripts/move_to_scala_2.11.sh
+    if [[ $? == 0 ]];
+    then
+        echo "We have already moved to Scala 2.11, so running move_to_scala_2.11.sh a second time should fail, but error code was 0 (success)."
+        exit 1
+    fi
+    set -e
+fi
+
+if [ ${SCALA_VERSION} == 2.12 ];
+then
+    ./scripts/move_to_scala_2.12.sh
+fi
+
 # print versions
-echo "Testing UTILS version ${VERSION} on Spark ${SPARK_VERSION} and Hadoop ${HADOOP_VERSION}"
+echo "Testing UTILS version ${VERSION} on Spark ${SPARK_VERSION} and Hadoop ${HADOOP_VERSION} and Scala ${SCALA_VERSION}"
 
 # if this is a pull request, we need to set the coveralls pr id
 if [[ ! -z $ghprbPullId ]];
@@ -70,24 +94,6 @@ set -x -v
 # we are done with maven, so clean up the maven temp dir
 find ${UTILS_MVN_TMP_DIR}
 rm -rf ${UTILS_MVN_TMP_DIR}
-
-# run integration tests on scala 2.10; prebuilt spark distributions are not available for 2.11
-if [ ${SCALAVER} == 2.10 ];
-then
-
-    # test that the source is formatted correctly
-    # we had modified the poms to add a temp dir, so check those out first
-    pushd ${PROJECT_ROOT}
-    find . -name pom.xml -exec git checkout {} \;
-    ./scripts/format-source
-    if test -n "$(git status --porcelain)"
-    then
-        echo "Please run './scripts/format-source'"
-        exit 1
-    fi
-    popd
-    
-fi
 
 echo
 echo "All the tests passed"
