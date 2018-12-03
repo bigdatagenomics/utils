@@ -16,18 +16,15 @@
   <description>General utility code used across BDG projects</description>
   <url>http://bdgenomics.org/</url>
 
-  <prerequisites>
-    <maven>3.1.1</maven>
-  </prerequisites>
   <properties>
     <java.version>1.8</java.version>
-    <scala.version>2.11.8</scala.version>
-    <spark.version>2.1.0</spark.version>
-    <parquet.version>1.8.1</parquet.version>
+    <scala.version>2.11.12</scala.version>
+    <spark.version>2.3.2</spark.version>
+    <parquet.version>1.8.3</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
-    <hadoop.version>2.7.3</hadoop.version>
+    <hadoop.version>2.7.5</hadoop.version>
     <scoverage.plugin.version>1.1.1</scoverage.plugin.version>
-    <slf4j.version>1.7.22</slf4j.version>
+    <slf4j.version>1.7.25</slf4j.version>
   </properties>
 
   <modules>
@@ -77,7 +74,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-javadoc-plugin</artifactId>
-          <version>2.10.4</version>
+          <version>3.0.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -87,7 +84,6 @@
             <mavenExecutorId>forked-path</mavenExecutorId>
             <useReleaseProfile>false</useReleaseProfile>
             <arguments>-Psonatype-oss-release</arguments>
-            <tagNameFormat>utils-parent-spark2_2.11-${project.version}</tagNameFormat>
           </configuration>
         </plugin>
         <plugin>
@@ -103,12 +99,12 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>3.0.0</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.5.1</version>
+          <version>3.8.0</version>
           <configuration>
             <source>${java.version}</source>
             <target>${java.version}</target>
@@ -152,7 +148,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.0.1</version>
+          <version>3.1.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -162,7 +158,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.19.1</version>
+          <version>2.22.1</version>
         </plugin>
         <plugin>
           <groupId>org.scalatest</groupId>
@@ -198,7 +194,7 @@
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.12</version>
+          <version>3.0.0</version>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -319,7 +315,7 @@
       <dependency>
         <groupId>org.scalatest</groupId>
         <artifactId>scalatest_2.11</artifactId>
-        <version>2.2.5</version>
+        <version>3.0.5</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -403,7 +399,7 @@
       <dependency>
         <groupId>org.mockito</groupId>
         <artifactId>mockito-core</artifactId>
-        <version>2.6.4</version>
+        <version>2.23.4</version>
         <scope>test</scope>
       </dependency>
       <dependency>
