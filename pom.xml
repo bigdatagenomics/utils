@@ -279,6 +279,11 @@
         <version>2.24.0</version>
       </dependency>
       <dependency>
+        <groupId>com.thoughtworks.paranamer</groupId>
+        <artifactId>paranamer</artifactId>
+        <version>2.8</version>
+      </dependency>
+      <dependency>
         <groupId>org.bdgenomics.utils</groupId>
         <artifactId>utils-misc-spark2_2.11</artifactId>
         <version>${project.version}</version>
