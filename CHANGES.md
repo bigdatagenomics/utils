@@ -1,5 +1,25 @@
 # bdg-utils Changelog #
 
+### Version 0.2.14 ###
+
+**Closed issues:**
+
+ - Support Scala 2.12 [\#124](https://github.com/bigdatagenomics/utils/issues/124)
+ - Upgrade SparkFunSuite to return a SparkSession [\#120](https://github.com/bigdatagenomics/utils/issues/120)
+ - Update args4j dependency version [\#118](https://github.com/bigdatagenomics/utils/issues/118)
+
+**Merged and closed pull requests:**
+
+ - Minor doc cleanup before release. [\#129](https://github.com/bigdatagenomics/utils/pull/129) ([heuermh](https://github.com/heuermh))
+ - [UTILS-124] Add support for Scala 2.12. [\#128](https://github.com/bigdatagenomics/utils/pull/128) ([heuermh](https://github.com/heuermh))
+ - [UTILS-118]  Update args4j dependency version to 2.33 [\#127](https://github.com/bigdatagenomics/utils/pull/127) ([heuermh](https://github.com/heuermh))
+ - Update plugin and dependency versions. [\#126](https://github.com/bigdatagenomics/utils/pull/126) ([heuermh](https://github.com/heuermh))
+ -  [UTILS-120] Set up SparkSession in SparkFunSuite [\#125](https://github.com/bigdatagenomics/utils/pull/125) ([heuermh](https://github.com/heuermh))
+ - Close InputStream opened in readByteStream [\#123](https://github.com/bigdatagenomics/utils/pull/123) ([bkempe](https://github.com/bkempe))
+ - Create SparkSession in SparkFunSuite [\#122](https://github.com/bigdatagenomics/utils/pull/122) ([fnothaft](https://github.com/fnothaft))
+ - Add a method to create an empty temporary directory. [\#121](https://github.com/bigdatagenomics/utils/pull/121) ([heuermh](https://github.com/heuermh))
+ - Adding code of contact adapted from the Contributor Convenant, version 1.4. [\#119](https://github.com/bigdatagenomics/utils/pull/119) ([heuermh](https://github.com/heuermh))
+
 ### Version 0.2.8 ###
 * ISSUE [75](https://github.com/bigdatagenomics/bdg-utils/pull/75): Added IntervalRDD submodule and its interval tree dependency.
 
