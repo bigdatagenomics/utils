@@ -13,7 +13,7 @@
   <version>0.2.14-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
-  <description>General utility code used across BDG projects</description>
+  <description>General utility code used across BDG projects.</description>
   <url>http://bdgenomics.org/</url>
 
   <properties>
@@ -129,11 +129,11 @@
                 <rules>
                   <requireMavenVersion>
                     <version>[3.1.1,)</version>
-                    <message>UTILS requires Maven 3.1.1 or greater</message>
+                    <message>bgd-utils requires Maven 3.1.1 or greater</message>
                   </requireMavenVersion>
                   <requireJavaVersion>
                     <version>[1.7,)</version>
-                    <message>UTILS requires Java 1.7 or greater</message>
+                    <message>bdg-utils requires Java 1.7 or greater</message>
                   </requireJavaVersion>
                 </rules>
               </configuration>
