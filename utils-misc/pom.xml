@@ -9,7 +9,7 @@
   </parent>
   <artifactId>utils-misc-spark2_2.11</artifactId>
   <packaging>jar</packaging>
-  <name>utils-misc-spark2_2.11: Miscellaneous Spark helper code</name>
+  <name>utils-misc-spark2_2.11: Miscellaneous Spark utility code</name>
   <build>
     <plugins>
       <!-- disable surefire -->

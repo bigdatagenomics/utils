@@ -1,9 +1,11 @@
-utils
+bdg-utils
 =========
 
-General (non-omics) code used across BDG products. Apache 2 licensed.
+General utility code used across BDG products. Apache 2 licensed.
 
+[![Build Status](https://img.shields.io/jenkins/s/https/amplab.cs.berkeley.edu/jenkins/view/Big%20Data%20Genomics/job/bdg-utils.svg)](https://amplab.cs.berkeley.edu/jenkins/view/Big%20Data%20Genomics/job/bdg-utils/)
 [![Coverage Status](https://coveralls.io/repos/github/bigdatagenomics/utils/badge.svg?branch=master)](https://coveralls.io/github/bigdatagenomics/utils?branch=master)
+[![Maven Central](https://img.shields.io/maven-central/v/org.bdgenomics.utils/utils-parent-spark2_2.11.svg?maxAge=600)](http://search.maven.org/#search%7Cga%7C1%7Corg.bdgenomics.utils)
 
 # Usage
 

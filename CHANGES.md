@@ -1,13 +1,7 @@
-# UTILS #
+# bdg-utils Changelog #
 
 ### Version 0.2.8 ###
-
-### Version 0.2.8 ###
-
-### Version SNAPSHOT ###
 * ISSUE [75](https://github.com/bigdatagenomics/bdg-utils/pull/75): Added IntervalRDD submodule and its interval tree dependency.
-
-### Version plugin] prepare release 0.2.6 ###
 
 ### Version 0.2.6 ###
 * ISSUE [72](https://github.com/bigdatagenomics/bdg-utils/pull/72): Remove dependency on Spark internal Logging
@@ -15,7 +9,7 @@
 ### Version 0.2.5 ###
 * ISSUE [67](https://github.com/bigdatagenomics/bdg-utils/pull/67): Modifying pom.xml files to move back to Scala 2.10 for development.
 
-### Version SNAPSHOT ###
+### Version 0.2.4 ###
 * ISSUE [64](https://github.com/bigdatagenomics/bdg-utils/pull/64): Add exception for maven-javadoc-plugin in move_to_scala_2.11.sh
 * ISSUE [63](https://github.com/bigdatagenomics/bdg-utils/pull/63): Remove extraneous git-commit-id-plugin configuration
 * ISSUE [62](https://github.com/bigdatagenomics/bdg-utils/pull/62): Update spark, hadoop, and parquet dependency versions
