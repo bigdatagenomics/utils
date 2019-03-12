@@ -18,8 +18,8 @@
 package org.bdgenomics.utils.cli
 
 import java.io.{ StringWriter, PrintWriter }
+import grizzled.slf4j.Logging
 import org.apache.spark.{ SparkConf, SparkContext }
-import org.bdgenomics.utils.misc.Logging
 import org.bdgenomics.utils.instrumentation._
 
 trait BDGCommandCompanion {
@@ -79,7 +79,7 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
   }
 
   def printMetrics(totalTime: Long, metricsListener: Option[MetricsListener]) {
-    logInfo("Overall Duration: " + DurationFormatting.formatNanosecondDuration(totalTime))
+    info("Overall Duration: " + DurationFormatting.formatNanosecondDuration(totalTime))
     if (args.printMetrics && metricsListener.isDefined) {
       // Set the output buffer size to 4KB by default
       val stringWriter = new StringWriter()
@@ -90,7 +90,7 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
       out.println()
       metricsListener.foreach(_.metrics.sparkMetrics.print(out))
       out.flush()
-      logInfo(stringWriter.getBuffer.toString)
+      info(stringWriter.getBuffer.toString)
     }
   }
 }

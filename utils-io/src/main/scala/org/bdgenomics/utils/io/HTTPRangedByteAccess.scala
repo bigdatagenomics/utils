@@ -19,11 +19,9 @@ package org.bdgenomics.utils.io
 
 import java.io.InputStream
 import java.net.URI
-
 import org.apache.http.client.HttpClient
 import org.apache.http.client.methods.{ HttpGet, HttpHead }
 import org.apache.http.impl.client.{ HttpClients, StandardHttpRequestRetryHandler }
-import org.bdgenomics.utils.misc.Logging
 
 /**
  * HTTPRangedByteAccess supports Ranged GET queries against HTTP resources.
@@ -31,7 +29,7 @@ import org.bdgenomics.utils.misc.Logging
  * @param uri The URL of the resource, which should support ranged queries
  * @param retries Number of times to retry a failed connection before giving up
  */
-class HTTPRangedByteAccess(uri: URI, retries: Int = 3) extends ByteAccess with Logging {
+class HTTPRangedByteAccess(uri: URI, retries: Int = 3) extends ByteAccess {
   private def getClient: HttpClient = {
     HttpClients.custom()
       .setRetryHandler(new StandardHttpRequestRetryHandler(retries, true))
@@ -57,9 +55,8 @@ class HTTPRangedByteAccess(uri: URI, retries: Int = 3) extends ByteAccess with L
         case "none" => throw new IllegalStateException(
           "Server for \"%s\" doesn't accept range requests (\"Accept-Ranges: none\" header in HEAD request response)"
             .format(uri.toString))
-        case "bytes" =>
-        case value: String => logWarning(
-          "Server returned a header of \"Accept-Ranges: %s\", but the only values that we can handle are \"none\" and \"bytes\"".format(value))
+        case "bytes"       =>
+        case value: String =>
       }
       case None =>
     }

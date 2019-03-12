@@ -58,7 +58,7 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
 
     // return soft assignment and ECLL contribution
     if (weight <= 0.0) {
-      log.warn("Value %d had zero probabilities under all distributions and was dropped.".format(value))
+      warn("Value %d had zero probabilities under all distributions and was dropped.".format(value))
     }
     (membership, pointEcll)
   }
@@ -99,10 +99,10 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
         lastWeighting)
 
       if (ecll < lastEcll) {
-        log.info("Quitting on iteration " + iteration + " due to insufficient improvement.")
+        info("Quitting on iteration " + iteration + " due to insufficient improvement.")
         lastDistributions
       } else if (iteration > maxIterations) {
-        log.info("Quitting as have exceeded max iteration count.")
+        info("Quitting as have exceeded max iteration count.")
         lastDistributions
       } else {
         // run maximization stage - updates distributions
@@ -110,9 +110,9 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
           weighting) = mStep(classAssignments.zip(rdd), lastDistributions)
 
         // print logging info
-        log.info("After iteration " + iteration + ":")
+        info("After iteration " + iteration + ":")
         distributions.indices.foreach(i => {
-          log.info("Distribution " + i + " has weight " + weighting(i) +
+          info("Distribution " + i + " has weight " + weighting(i) +
             " and distribution: " + distributions(i))
         })
 
@@ -240,8 +240,10 @@ trait DiscreteKMeansMixtureModel[D <: DiscreteDistr[Int]]
     val weights = pointsPerCentroid.map(p => p.toDouble / totalPoints)
 
     // print log info
-    log.info("After k-means initialization, have:")
-    (0 until k).foreach(i => log.info("Distribution " + i + ": " + initialDistributions(i)))
+    info("After k-means initialization, have:")
+    if (isInfoEnabled) {
+      (0 until k).foreach(i => info("Distribution " + i + ": " + initialDistributions(i)))
+    }
 
     (initialDistributions, weights)
   }

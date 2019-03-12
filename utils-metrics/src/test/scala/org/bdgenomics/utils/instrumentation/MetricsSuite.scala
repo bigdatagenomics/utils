@@ -18,14 +18,13 @@
 package org.bdgenomics.utils.instrumentation
 
 import java.io.{ PrintWriter, StringWriter, BufferedReader, StringReader }
-import org.bdgenomics.utils.misc.Logging
 import org.apache.spark.rdd.Timer
 import org.bdgenomics.utils.instrumentation.InstrumentationTestingUtil._
 import org.bdgenomics.utils.misc.SparkFunSuite
 import org.scalatest.BeforeAndAfterAll
 import scala.concurrent.duration.Duration
 
-class MetricsSuite extends SparkFunSuite with Logging with BeforeAndAfterAll {
+class MetricsSuite extends SparkFunSuite with BeforeAndAfterAll {
 
   sparkBefore("Before") {
     Metrics.initialize(sc)
