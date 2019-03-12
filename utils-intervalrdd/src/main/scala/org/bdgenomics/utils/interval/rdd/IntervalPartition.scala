@@ -19,12 +19,11 @@
 package org.bdgenomics.utils.interval.rdd
 
 import org.bdgenomics.utils.interval.array._
-import org.bdgenomics.utils.misc.Logging
 import scala.math.max
 import scala.reflect.ClassTag
 
 protected class IntervalPartition[K <: Interval[K]: ClassTag, V: ClassTag](protected val array: IntervalArray[K, V])
-    extends Serializable with Logging {
+    extends Serializable {
 
   /**
    * Fetches IntervalArray

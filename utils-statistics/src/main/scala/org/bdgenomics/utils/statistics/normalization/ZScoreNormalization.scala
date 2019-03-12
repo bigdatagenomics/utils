@@ -17,7 +17,7 @@
  */
 package org.bdgenomics.utils.statistics.normalization
 
-import org.bdgenomics.utils.misc.Logging
+import grizzled.slf4j.Logging
 import org.apache.spark.rdd.RDD
 import scala.math.sqrt
 
@@ -44,7 +44,7 @@ object ZScoreNormalization extends Serializable with Logging {
     val sigma = sqrt(variance(cachedRdd.map(kv => kv._1), n, mu))
 
     // update keys
-    log.info("Normalizing by z-score with µ: " + mu + " and σ: " + sigma)
+    info("Normalizing by z-score with µ: " + mu + " and σ: " + sigma)
     val update = cachedRdd.map(kv => ((kv._1 - mu) / sigma, kv._2))
 
     // unpersist rdd
