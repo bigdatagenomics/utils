@@ -20,7 +20,7 @@ package org.bdgenomics.utils.misc
 import org.slf4j.{ Logger, LoggerFactory }
 
 /**
- * @deprecated to be removed in version 0.2.16, use grizzled.slf4j.Logging
+ * @deprecated to be removed in version 0.3.0, use grizzled.slf4j.Logging
  */
 trait Logging {
   // Make the log field transient so that objects with Logging can

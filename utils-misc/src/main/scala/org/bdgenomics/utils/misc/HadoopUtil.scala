@@ -22,6 +22,9 @@ import org.apache.spark.SparkContext
 import org.apache.hadoop.fs.FileStatus
 import org.apache.hadoop.conf.Configuration
 
+/**
+ * @deprecated to be removed in version 0.3.0
+ */
 object HadoopUtil {
 
   def newJob(): Job = {
