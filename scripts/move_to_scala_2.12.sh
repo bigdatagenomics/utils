@@ -7,7 +7,7 @@ then
     echo "Cowardly refusing to move to Scala 2.12 a second time..."
     exit 1
 fi
-find . -name "pom.xml" -exec sed -e "s/2.11.12/2.12.6/g" \
+find . -name "pom.xml" -exec sed -e "s/2.11.12/2.12.8/g" \
     -e "s/2.11/2.12/g" \
     -i.2.12.bak '{}' \;
 
