@@ -1,5 +1,26 @@
 # bdg-utils Changelog #
 
+### Version 0.2.15 ###
+
+**Closed issues:**
+
+ - Update Scala 2.12 dependency version to 2.12.8 [\#144](https://github.com/bigdatagenomics/utils/issues/144)
+ - Deprecate HadoopUtil, version 1.x is no longer supported [\#142](https://github.com/bigdatagenomics/utils/issues/142)
+ - Update Spark dependency version to 2.4.3 [\#140](https://github.com/bigdatagenomics/utils/issues/140)
+ - Deprecate and remove usage of Logging trait [\#131](https://github.com/bigdatagenomics/utils/issues/131)
+ - Add github-changes-maven-plugin configuration to release script [\#130](https://github.com/bigdatagenomics/utils/issues/130)
+
+**Merged and closed pull requests:**
+
+ - [UTILS-144] Update Scala 2.12 dependency version to 2.12.8 [\#145](https://github.com/bigdatagenomics/utils/pull/145) ([heuermh](https://github.com/heuermh))
+ - [UTILS-142] Deprecate HadoopUtil, version 1.x is no longer supported [\#143](https://github.com/bigdatagenomics/utils/pull/143) ([heuermh](https://github.com/heuermh))
+ - [UTILS-140] Update Spark dependency version to 2.4.3 [\#141](https://github.com/bigdatagenomics/utils/pull/141) ([heuermh](https://github.com/heuermh))
+ - [UTILS-133] Update Spark dependency to 2.4.2, Parquet to 1.10.1 [\#136](https://github.com/bigdatagenomics/utils/pull/136) ([heuermh](https://github.com/heuermh))
+ - [UTILS-130] Adding github-changes-maven-plugin configuration to release script. [\#135](https://github.com/bigdatagenomics/utils/pull/135) ([heuermh](https://github.com/heuermh))
+ - Update dependency and plugin versions. [\#134](https://github.com/bigdatagenomics/utils/pull/134) ([heuermh](https://github.com/heuermh))
+ - [UTILS-131] Deprecate and remove usage of Logging trait. [\#132](https://github.com/bigdatagenomics/utils/pull/132) ([heuermh](https://github.com/heuermh))
+
+
 ### Version 0.2.14 ###
 
 **Closed issues:**
