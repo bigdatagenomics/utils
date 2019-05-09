@@ -9,7 +9,7 @@
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
-  <artifactId>utils-parent-spark2_2.11</artifactId>
+  <artifactId>utils-parent-spark2_2.12</artifactId>
   <version>0.2.15-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
@@ -18,8 +18,8 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <scala.version>2.11.12</scala.version>
-    <scala.version.prefix>2.11</scala.version.prefix>
+    <scala.version>2.12.8</scala.version>
+    <scala.version.prefix>2.12</scala.version.prefix>
     <spark.version>2.4.3</spark.version>
     <parquet.version>1.10.1</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
@@ -292,24 +292,24 @@
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc-spark2_2.11</artifactId>
+        <artifactId>utils-misc-spark2_2.12</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc-spark2_2.11</artifactId>
+        <artifactId>utils-misc-spark2_2.12</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-io-spark2_2.11</artifactId>
+        <artifactId>utils-io-spark2_2.12</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-metrics-spark2_2.11</artifactId>
+        <artifactId>utils-metrics-spark2_2.12</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -325,7 +325,7 @@
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_2.11</artifactId>
+        <artifactId>scalatest_2.12</artifactId>
         <version>3.0.7</version>
         <scope>test</scope>
       </dependency>
@@ -368,13 +368,13 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-sql_2.11</artifactId>
+        <artifactId>spark-sql_2.12</artifactId>
         <version>${spark.version}</version>
 	<scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_2.11</artifactId>
+        <artifactId>spark-core_2.12</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
         <exclusions>
@@ -384,7 +384,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.twitter</groupId>
-            <artifactId>chill_2.11</artifactId>
+            <artifactId>chill_2.12</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.apache.hadoop</groupId>
@@ -394,7 +394,7 @@
       </dependency>
       <dependency>
         <groupId>org.scalanlp</groupId>
-        <artifactId>breeze_2.11</artifactId>
+        <artifactId>breeze_2.12</artifactId>
         <version>0.13</version>
       </dependency>
       <dependency>
@@ -415,7 +415,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-mllib_2.11</artifactId>
+        <artifactId>spark-mllib_2.12</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
       </dependency>
