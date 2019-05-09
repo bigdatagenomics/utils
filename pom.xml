@@ -10,7 +10,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
   <artifactId>utils-parent-spark2_2.12</artifactId>
-  <version>0.2.15-SNAPSHOT</version>
+  <version>0.2.15</version>
   <packaging>pom</packaging>
   <name>utils</name>
   <description>General utility code used across BDG projects.</description>
@@ -51,7 +51,7 @@
     <connection>scm:git:git@github.com:bigdatagenomics/utils.git</connection>
     <developerConnection>scm:git:git@github.com:bigdatagenomics/utils.git</developerConnection>
     <url>scm:git:git@github.com:bigdatagenomics/utils.git</url>
-    <tag>master</tag>
+    <tag>utils-parent-spark2_2.12-0.2.15</tag>
   </scm>
   <developers>
     <developer>
