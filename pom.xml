@@ -20,7 +20,7 @@
     <java.version>1.8</java.version>
     <scala.version>2.11.12</scala.version>
     <scala.version.prefix>2.11</scala.version.prefix>
-    <spark.version>2.4.3</spark.version>
+    <spark.version>2.4.4</spark.version>
     <parquet.version>1.10.1</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
     <hadoop.version>2.7.5</hadoop.version>
@@ -55,12 +55,9 @@
   </scm>
   <developers>
     <developer>
-      <id>massie</id>
-      <name>Matt Massie</name>
-      <email>massie@cs.berkeley.edu</email>
-      <url>http://www.cs.berkeley.edu/~massie</url>
-      <organization>U.C. Berkeley Computer Science</organization>
-      <organizationUrl>http://www.cs.berkeley.edu/</organizationUrl>
+      <id>heuermh</id>
+      <name>Michael L Heuer</name>
+      <organization>University of California Berkeley</organization>
     </developer>
   </developers>
   <issueManagement>
@@ -150,12 +147,17 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>3.1.1</version>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
           <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>3.2.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -495,7 +497,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-source-plugin</artifactId>
-            <version>3.0.1</version>
+            <version>3.2.0</version>
             <executions>
               <execution>
                 <id>attach-sources</id>
