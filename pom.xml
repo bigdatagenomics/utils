@@ -293,19 +293,19 @@
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc-spark2_2.11</artifactId>
+        <artifactId>utils-misc-spark2_${scala.version.prefix}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc-spark2_2.11</artifactId>
+        <artifactId>utils-misc-spark2_${scala.version.prefix}</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-io-spark2_2.11</artifactId>
+        <artifactId>utils-io-spark2_${scala.version.prefix}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -321,7 +321,7 @@
       </dependency>
       <dependency>
         <groupId>org.scalatest</groupId>
-        <artifactId>scalatest_2.11</artifactId>
+        <artifactId>scalatest_${scala.version.prefix}</artifactId>
         <version>3.0.7</version>
         <scope>test</scope>
       </dependency>
@@ -364,13 +364,13 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-sql_2.11</artifactId>
+        <artifactId>spark-sql_${scala.version.prefix}</artifactId>
         <version>${spark.version}</version>
 	<scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-core_2.11</artifactId>
+        <artifactId>spark-core_${scala.version.prefix}</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
         <exclusions>
@@ -380,7 +380,7 @@
           </exclusion>
           <exclusion>
             <groupId>org.twitter</groupId>
-            <artifactId>chill_2.11</artifactId>
+            <artifactId>chill_${scala.version.prefix}</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.apache.hadoop</groupId>
@@ -390,7 +390,7 @@
       </dependency>
       <dependency>
         <groupId>org.scalanlp</groupId>
-        <artifactId>breeze_2.11</artifactId>
+        <artifactId>breeze_${scala.version.prefix}</artifactId>
         <version>0.13</version>
       </dependency>
       <dependency>
@@ -411,7 +411,7 @@
       </dependency>
       <dependency>
         <groupId>org.apache.spark</groupId>
-        <artifactId>spark-mllib_2.11</artifactId>
+        <artifactId>spark-mllib_${scala.version.prefix}</artifactId>
         <version>${spark.version}</version>
         <scope>provided</scope>
       </dependency>
