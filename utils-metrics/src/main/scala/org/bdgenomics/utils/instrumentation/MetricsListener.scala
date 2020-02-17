@@ -31,6 +31,7 @@ import scala.concurrent.duration._
  * @note This class relies on being run in the same process as the driver. However,
  * this is the way that Spark seems to work.
  */
+@deprecated("to be removed in version 0.3.0")
 class MetricsListener(val metrics: RecordedMetrics) extends SparkListener {
 
   private val sparkMetrics = metrics.sparkMetrics

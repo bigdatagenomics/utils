@@ -27,6 +27,7 @@ import scala.concurrent.duration.Duration
  * - Durations greater than one minute, but less than one hour are formatted as "X mins X secs"
  * - Durations less than one minute are formatted with two digits after the decimal point. Zeros are suppressed.
  */
+@deprecated("to be removed in version 0.3.0")
 object DurationFormatting {
 
   private val TwoDigitNumberFormatter = new DecimalFormat(".0#")

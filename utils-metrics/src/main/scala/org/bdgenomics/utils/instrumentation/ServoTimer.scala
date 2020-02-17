@@ -41,6 +41,7 @@ import scala.collection.mutable
  * @param name the name of this timer; this is propagated to sub-monitors
  * @param tags the tags for this timer; these are propagated to sub-monitors
  */
+@deprecated("to be removed in version 0.3.0")
 class ServoTimer(name: String, @transient tags: Tag*) extends ConfigurableMonitor(name, tags)
     with CompositeMonitor[Object] {
 
@@ -216,6 +217,7 @@ class ServoTimer(name: String, @transient tags: Tag*) extends ConfigurableMonito
   }
 }
 
+@deprecated("to be removed in version 0.3.0")
 abstract class ConfigurableMonitor(val name: String, @transient tags: Seq[Tag])
     extends Taggable with Serializable {
 
@@ -255,6 +257,7 @@ abstract class ConfigurableMonitor(val name: String, @transient tags: Seq[Tag])
 
 private class SerializableTag(val key: String, val value: String) extends Serializable
 
+@deprecated("to be removed in version 0.3.0")
 object ServoTimer {
 
   private final val StatisticTagKey = "statistic"
@@ -276,6 +279,7 @@ object ServoTimer {
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 trait Taggable {
   def addTag(tag: Tag)
 }

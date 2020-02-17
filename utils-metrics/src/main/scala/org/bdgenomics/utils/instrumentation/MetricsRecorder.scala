@@ -29,6 +29,7 @@ import scala.collection.mutable
  * Note: this class is intended to be used in a thread-local context, and therefore it is not
  * thread-safe. Do not attempt to call it concurrently from multiple threads!
  */
+@deprecated("to be removed in version 0.3.0")
 class MetricsRecorder(val accumulable: Accumulable[ServoTimers, RecordedTiming],
                       existingTimings: Option[Seq[TimingPath]] = None) extends Serializable {
 

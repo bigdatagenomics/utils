@@ -31,6 +31,7 @@ import scala.concurrent.duration._
 /**
  * Allows metrics for Spark to be captured and rendered in tabular form.
  */
+@deprecated("to be removed in version 0.3.0")
 abstract class SparkMetrics {
 
   private val taskTimers = new mutable.ArrayBuffer[TaskTimer]()
@@ -131,12 +132,14 @@ abstract class SparkMetrics {
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 protected object SparkMetrics {
   final val HostTagKey = "host"
   final val StageNameTagKey = "stageName"
   final val StageIdTagKey = "stageId"
 }
 
+@deprecated("to be removed in version 0.3.0")
 class TaskTimer(name: String) {
   val overallTimings = buildTimer(name)
   val timingsByHost = new mutable.HashMap[String, ServoTimer]
@@ -168,6 +171,8 @@ class TaskTimer(name: String) {
   }
 }
 
+@deprecated("to be removed in version 0.3.0")
 case class SparkTaskContext(executorId: String, stageId: Int)
 
+@deprecated("to be removed in version 0.3.0")
 case class StageTiming(stageId: Int, stageName: Option[String], duration: Duration)

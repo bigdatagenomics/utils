@@ -34,6 +34,7 @@ import scala.collection.mutable.ArrayBuffer
  * - formatFunction (optional): a function which formats the value extracted from the monitor as a [[String]]
  * - alignment (optional): specifies how the data in a cell is aligned; defaults to right-alignment
  */
+@deprecated("to be removed in version 0.3.0")
 class MonitorTable(headerRow: Array[TableHeader], rows: Array[Monitor[_]]) {
 
   override def toString: String = {
@@ -65,9 +66,11 @@ class MonitorTable(headerRow: Array[TableHeader], rows: Array[Monitor[_]]) {
 /**
  * Specifies the title of a column, as well as how data is extracted to form the cells of this column
  */
+@deprecated("to be removed in version 0.3.0")
 case class TableHeader(name: String, valueExtractor: ValueExtractor, formatFunction: Option[(Any) => String] = None,
                        alignment: Alignment.Alignment = Alignment.Right)
 
+@deprecated("to be removed in version 0.3.0")
 object ValueExtractor {
   /**
    * Creates a [[ValueExtractor]] which extracts values from [[Monitor]]s matching the specified tag.
@@ -93,6 +96,7 @@ object ValueExtractor {
   }
 }
 
+@deprecated("to be removed in version 0.3.0")
 trait ValueExtractor {
   def extractValue(monitor: Monitor[_]): Option[Any]
 }

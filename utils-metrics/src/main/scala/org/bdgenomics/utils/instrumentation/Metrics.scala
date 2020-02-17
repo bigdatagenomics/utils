@@ -51,6 +51,7 @@ import scala.util.DynamicVariable
  *
  * To switch-on recording of metrics for a specific thread, the companion [[Metrics]] object must be used.
  */
+@deprecated("to be removed in version 0.3.0")
 abstract class Metrics(val clock: Clock = new Clock()) extends Serializable {
   /**
    * Creates a timer with the specified name.
@@ -72,6 +73,7 @@ abstract class Metrics(val clock: Clock = new Clock()) extends Serializable {
  * Attempting to record metrics when the initialize method has not been called will not produce an error, and incurs very
  * little overhead. However, attempting to call the print method to print the metrics will produce an error.
  */
+@deprecated("to be removed in version 0.3.0")
 object Metrics {
 
   private implicit val accumulableParam = new ServoTimersAccumulableParam()
@@ -341,6 +343,7 @@ object Metrics {
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 class Clock extends Serializable {
   def nanoTime() = System.nanoTime()
 }
