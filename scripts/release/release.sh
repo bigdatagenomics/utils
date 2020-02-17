@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # do we have enough arguments?
-if [[ $# < 4 ]]; then
+if [[ $# < 3 ]]; then
     echo "Usage:"
     echo
     echo "./release.sh <release version> <development version> <milestone id>"
