@@ -20,7 +20,6 @@ package org.bdgenomics.utils.cli
 import java.io.{ StringWriter, PrintWriter }
 import grizzled.slf4j.Logging
 import org.apache.spark.{ SparkConf, SparkContext }
-import org.bdgenomics.utils.instrumentation._
 
 trait BDGCommandCompanion {
   val commandName: String
@@ -44,13 +43,11 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
   def run(sc: SparkContext)
 
   def run() {
-    val start = System.nanoTime()
     val conf = new SparkConf().setAppName(companion.commandName)
     if (conf.getOption("spark.master").isEmpty) {
       conf.setMaster("local[%d]".format(Runtime.getRuntime.availableProcessors()))
     }
     val sc = new SparkContext(conf)
-    val metricsListener = initializeMetrics(sc)
     val e = try {
       run(sc)
       None
@@ -60,37 +57,6 @@ trait BDGSparkCommand[A <: Args4jBase] extends BDGCommand with Logging {
         Some(e)
       }
     }
-    val totalTime = System.nanoTime() - start
-    printMetrics(totalTime, metricsListener)
     e.foreach(throw _)
-  }
-
-  def initializeMetrics(sc: SparkContext): Option[MetricsListener] = {
-    if (args.printMetrics) {
-      val metricsListener = new MetricsListener(new RecordedMetrics())
-      sc.addSparkListener(metricsListener)
-      Metrics.initialize(sc)
-      Some(metricsListener)
-    } else {
-      // This avoids recording metrics if we have a recorder left over from previous use of this thread
-      Metrics.stopRecording()
-      None
-    }
-  }
-
-  def printMetrics(totalTime: Long, metricsListener: Option[MetricsListener]) {
-    info("Overall Duration: " + DurationFormatting.formatNanosecondDuration(totalTime))
-    if (args.printMetrics && metricsListener.isDefined) {
-      // Set the output buffer size to 4KB by default
-      val stringWriter = new StringWriter()
-      val out = new PrintWriter(stringWriter)
-      out.println("Metrics:")
-      out.println()
-      Metrics.print(out, metricsListener.map(_.metrics.sparkMetrics.stageTimes))
-      out.println()
-      metricsListener.foreach(_.metrics.sparkMetrics.print(out))
-      out.flush()
-      info(stringWriter.getBuffer.toString)
-    }
   }
 }
