@@ -25,6 +25,7 @@ import scala.collection.mutable
 /**
  * Implementation of [[AccumulableParam]] that records timings and returns a [[ServoTimers]] with the accumulated timings.
  */
+@deprecated("to be removed in version 0.3.0")
 class ServoTimersAccumulableParam extends AccumulableParam[ServoTimers, RecordedTiming] {
   override def addAccumulator(timers: ServoTimers, newTiming: RecordedTiming): ServoTimers = {
     timers.recordTiming(newTiming)
@@ -46,6 +47,7 @@ class ServoTimersAccumulableParam extends AccumulableParam[ServoTimers, Recorded
  * specifies all of its ancestors. Timings can be recorded using the `recordTiming` method, which will
  * either update an existing timer if the specified [[TimingPath]] exists already, or will create a new timer.
  */
+@deprecated("to be removed in version 0.3.0")
 class ServoTimers extends Serializable {
 
   val timerMap = new ConcurrentHashMap[TimingPath, ServoTimer]()
@@ -85,11 +87,13 @@ class ServoTimers extends Serializable {
 /**
  * Specifies a timing that is to recorded
  */
+@deprecated("to be removed in version 0.3.0")
 case class RecordedTiming(timingNanos: Long, pathToRoot: TimingPath) extends Serializable
 
 /**
  * Specifies a timer name, along with all of its ancestors.
  */
+@deprecated("to be removed in version 0.3.0")
 class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val sequenceId: Int = 0,
                  val isRDDOperation: Boolean = false, val shouldRecord: Boolean = true) extends Serializable {
 
@@ -164,6 +168,7 @@ class TimingPath(val timerName: String, val parentPath: Option[TimingPath], val 
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 class TimingPathKey(val timerName: String, val sequenceId: Int,
                     val isRDDOperation: Boolean, val shouldRecord: Boolean = true) {
   private val cachedHashCode = computeHashCode()

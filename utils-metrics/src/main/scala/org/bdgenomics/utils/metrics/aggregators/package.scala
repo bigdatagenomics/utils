@@ -15,13 +15,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.bdgenomics.utils.instrumentation
+package org.bdgenomics.utils.metrics
 
 /**
- * Represents alignment of a cell in a table
+ * Deprecated in version 0.2.16, will be removed in version 0.3.0.
  */
-@deprecated("to be removed in version 0.3.0")
-object Alignment extends Enumeration {
-  type Alignment = Value
-  val Left, Right, Center = Value
-}
+package object aggregators {}

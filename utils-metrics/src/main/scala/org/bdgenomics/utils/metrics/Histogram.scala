@@ -20,6 +20,7 @@ package org.bdgenomics.utils.metrics
 import java.io.{ StringWriter, Writer }
 import org.bdgenomics.utils.metrics.aggregators.Aggregated
 
+@deprecated("to be removed in version 0.3.0")
 class Histogram[T](val valueToCount: Map[T, Int]) extends Aggregated[T] with Serializable {
 
   /**
@@ -82,6 +83,7 @@ class Histogram[T](val valueToCount: Map[T, Int]) extends Aggregated[T] with Ser
   }
 }
 
+@deprecated("to be removed in version 0.3.0")
 object Histogram {
 
   def apply[T](valueToCount: Map[T, Int]): Histogram[T] =

@@ -17,6 +17,7 @@
  */
 package org.bdgenomics.utils.metrics
 
+@deprecated("to be removed in version 0.3.0")
 class Collection[T](val values: Seq[T]) extends Serializable {
 }
 

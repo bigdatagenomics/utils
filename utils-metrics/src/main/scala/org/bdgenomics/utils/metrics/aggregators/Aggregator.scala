@@ -20,6 +20,7 @@ package org.bdgenomics.utils.metrics.aggregators
 import java.io.Writer
 import org.bdgenomics.utils.metrics.{ Collection, Histogram }
 
+@deprecated("to be removed in version 0.3.0")
 trait Aggregator[SingleType, AggType <: Aggregated[SingleType]] extends Serializable {
 
   /**
@@ -46,15 +47,18 @@ trait Aggregator[SingleType, AggType <: Aggregated[SingleType]] extends Serializ
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 trait Writable {
   def write(stream: Writer)
 }
 
+@deprecated("to be removed in version 0.3.0")
 trait Aggregated[+T] extends Writable with Serializable {
   def count(): Long
   def countIdentical(): Long
 }
 
+@deprecated("to be removed in version 0.3.0")
 class AggregatedCollection[T, U <: Aggregated[T]](val values: Seq[U])
     extends Aggregated[Collection[Seq[T]]]
     with Serializable {
@@ -68,10 +72,12 @@ class AggregatedCollection[T, U <: Aggregated[T]](val values: Seq[U])
   }
 }
 
+@deprecated("to be removed in version 0.3.0")
 object AggregatedCollection {
   def apply[T, U <: Aggregated[T]](values: Seq[U]) = new AggregatedCollection[T, U](values)
 }
 
+@deprecated("to be removed in version 0.3.0")
 class CombinedAggregator[Single, Agg <: Aggregated[Single]](aggs: Seq[Aggregator[Single, Agg]])
     extends Aggregator[Collection[Seq[Single]], AggregatedCollection[Single, Agg]] {
 
@@ -96,6 +102,7 @@ class CombinedAggregator[Single, Agg <: Aggregated[Single]](aggs: Seq[Aggregator
     })
 }
 
+@deprecated("to be removed in version 0.3.0")
 class UniqueAggregator[T] extends Aggregator[T, UniqueWritable[T]] {
   /**
    * An initial value for the aggregation
@@ -110,6 +117,7 @@ class UniqueAggregator[T] extends Aggregator[T, UniqueWritable[T]] {
   def combine(first: UniqueWritable[T], second: UniqueWritable[T]): UniqueWritable[T] = first.union(second)
 }
 
+@deprecated("to be removed in version 0.3.0")
 class HistogramAggregator[T] extends Aggregator[T, Histogram[T]] {
   /**
    * An initial value for the aggregation
@@ -125,6 +133,7 @@ class HistogramAggregator[T] extends Aggregator[T, Histogram[T]] {
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 class UniqueWritable[T](vals: T*) extends Aggregated[T] with Serializable {
 
   val count = vals.size.toLong

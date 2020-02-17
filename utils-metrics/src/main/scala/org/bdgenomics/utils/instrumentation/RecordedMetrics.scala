@@ -20,6 +20,7 @@ package org.bdgenomics.utils.instrumentation
 /**
  * Currently this consists only of metrics collected from Spark, but there may be others in the future.
  */
+@deprecated("to be removed in version 0.3.0")
 class RecordedMetrics {
 
   val sparkMetrics = new RecordedSparkMetrics()

@@ -23,6 +23,7 @@ import java.io.PrintWriter
 /**
  * Helper functions for instrumentation
  */
+@deprecated("to be removed in version 0.3.0")
 object InstrumentationFunctions {
 
   def renderTable(name: String, timers: Seq[Monitor[_]], header: Seq[TableHeader]): String = {

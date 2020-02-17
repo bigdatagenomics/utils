@@ -27,6 +27,7 @@ import org.bdgenomics.utils.instrumentation.Alignment.Alignment
  *
  * There must be an equal number of items in each row and in the header.
  */
+@deprecated("to be removed in version 0.3.0")
 class ASCIITable(header: Array[ASCIITableHeader], rows: Array[Array[String]]) {
 
   rows.foreach(row => {
@@ -99,4 +100,5 @@ class ASCIITable(header: Array[ASCIITableHeader], rows: Array[Array[String]]) {
 
 }
 
+@deprecated("to be removed in version 0.3.0")
 case class ASCIITableHeader(name: String, alignment: Alignment = Alignment.Right)
