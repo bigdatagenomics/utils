@@ -32,7 +32,6 @@
   <modules>
     <module>utils-misc</module>
     <module>utils-minhash</module>
-    <module>utils-metrics</module>
     <module>utils-io</module>
     <module>utils-statistics</module>
     <module>utils-cli</module>
@@ -310,11 +309,6 @@
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-metrics-spark2_2.11</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
         <groupId>com.netflix.servo</groupId>
         <artifactId>servo-core</artifactId>
         <version>0.12.25</version>
@@ -478,7 +472,6 @@
                 <param>utils-cli/src/main/scala</param>
                 <param>utils-intervalrdd/src/main/scala</param>
                 <param>utils-io/src/main/scala</param>
-                <param>utils-metrics/src/main/scala</param>
                 <param>utils-minhash/src/main/scala</param>
                 <param>utils-misc/src/main/scala</param>
                 <param>utils-serialization/src/main/scala</param>
