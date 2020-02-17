@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
     <artifactId>utils-parent-spark2_2.12</artifactId>
-    <version>0.2.16</version>
+    <version>0.3.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <artifactId>utils-misc-spark2_2.12</artifactId>
