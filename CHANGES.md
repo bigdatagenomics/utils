@@ -1,5 +1,22 @@
 # bdg-utils Changelog #
 
+### Version 0.2.16 ###
+
+**Closed issues:**
+
+ - Deprecate utils-metrics module [\#151](https://github.com/bigdatagenomics/utils/issues/151)
+ - Initializing Metrics across project [\#117](https://github.com/bigdatagenomics/utils/issues/117)
+ - Register your spark package [\#71](https://github.com/bigdatagenomics/utils/issues/71)
+
+**Merged and closed pull requests:**
+
+ - [UTILS-151] Deprecate utils-metrics for removal in version 0.3.0 [\#155](https://github.com/bigdatagenomics/utils/pull/155) ([heuermh](https://github.com/heuermh))
+ - Update Spark dependency version to 2.4.5 [\#150](https://github.com/bigdatagenomics/utils/pull/150) ([heuermh](https://github.com/heuermh))
+ - Replace deprecated AccumulatorParam with AccumulatorV2 [\#149](https://github.com/bigdatagenomics/utils/pull/149) ([heuermh](https://github.com/heuermh))
+ - Remove Jenkins badge [\#147](https://github.com/bigdatagenomics/utils/pull/147) ([heuermh](https://github.com/heuermh))
+ - Update Spark dependency version to 2.4.4 [\#146](https://github.com/bigdatagenomics/utils/pull/146) ([heuermh](https://github.com/heuermh))
+
+
 ### Version 0.2.15 ###
 
 **Closed issues:**
