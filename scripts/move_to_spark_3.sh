@@ -17,5 +17,5 @@ substitution_cmd="s/-spark2_$svp/-spark3_$svp/g"
 find . -name "pom.xml" -exec sed \
     -e "/utils-/ s/-spark2_2\.1/-spark3_2\.1/" \
     -e "/utils-/ $substitution_cmd" \
-    -e "/spark.version/ s/2.4.5/3.0.0-preview2/g" \
+    -e "/spark.version/ s/2.4.6/3.0.0-preview2/g" \
     -i.spark3.bak '{}' \;
