@@ -1,5 +1,31 @@
 # bdg-utils Changelog #
 
+### Version 0.3.0 ###
+
+**Closed issues:**
+
+ - Update Spark dependency version to 3.0.0 [\#166](https://github.com/bigdatagenomics/utils/issues/166)
+ - Update Spark dependency version to 2.4.6 [\#164](https://github.com/bigdatagenomics/utils/issues/164)
+ - Add Spark 3 build configuration to Jenkins [\#161](https://github.com/bigdatagenomics/utils/issues/161)
+ - Remove coveralls from build [\#159](https://github.com/bigdatagenomics/utils/issues/159)
+ - Support Apache Spark 3.x in build [\#153](https://github.com/bigdatagenomics/utils/issues/153)
+ - Remove utils-metrics module from build [\#152](https://github.com/bigdatagenomics/utils/issues/152)
+ - Remove deprecated classes and methods [\#138](https://github.com/bigdatagenomics/utils/issues/138)
+ - Add approximate LSH approach for MinHash [\#23](https://github.com/bigdatagenomics/utils/issues/23)
+
+**Merged and closed pull requests:**
+
+ - [UTILS-166] Update Spark dependency version to 3.0.0 [\#167](https://github.com/bigdatagenomics/utils/pull/167) ([heuermh](https://github.com/heuermh))
+ - [UTILS-164] Update Spark dependency version to 2.4.6 [\#165](https://github.com/bigdatagenomics/utils/pull/165) ([heuermh](https://github.com/heuermh))
+ - Bump slf4j dependency version to 1.7.30 [\#163](https://github.com/bigdatagenomics/utils/pull/163) ([heuermh](https://github.com/heuermh))
+ - Remove -print-metrics argument [\#162](https://github.com/bigdatagenomics/utils/pull/162) ([heuermh](https://github.com/heuermh))
+ - [UTILS-159] Remove coveralls from build [\#160](https://github.com/bigdatagenomics/utils/pull/160) ([heuermh](https://github.com/heuermh))
+ - [UTILS-138] Remove deprecated classes and methods [\#158](https://github.com/bigdatagenomics/utils/pull/158) ([heuermh](https://github.com/heuermh))
+ - [UTILS-152] Remove utils-metrics module from build [\#157](https://github.com/bigdatagenomics/utils/pull/157) ([heuermh](https://github.com/heuermh))
+ - Fix argument check [\#156](https://github.com/bigdatagenomics/utils/pull/156) ([heuermh](https://github.com/heuermh))
+ - [UTILS-153] Support Apache Spark 3.x in build [\#148](https://github.com/bigdatagenomics/utils/pull/148) ([heuermh](https://github.com/heuermh))
+
+
 ### Version 0.2.16 ###
 
 **Closed issues:**
