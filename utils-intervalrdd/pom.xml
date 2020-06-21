@@ -3,13 +3,13 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <groupId>org.bdgenomics.utils</groupId>
-    <artifactId>utils-parent-spark2_2.11</artifactId>
+    <artifactId>utils-parent-spark3_2.12</artifactId>
     <version>0.3.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <artifactId>utils-intervalrdd-spark2_2.11</artifactId>
+  <artifactId>utils-intervalrdd-spark3_2.12</artifactId>
   <packaging>jar</packaging>
-  <name>utils-intervalrdd-spark2_2.11: IntervalRDD based on interval tree</name>
+  <name>utils-intervalrdd-spark3_2.12: IntervalRDD based on interval tree</name>
   <build>
     <plugins>
       <!-- disable surefire -->
@@ -89,13 +89,13 @@
   <dependencies>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc-spark2_${scala.version.prefix}</artifactId>
+      <artifactId>utils-misc-spark3_${scala.version.prefix}</artifactId>
       <scope>test</scope>
       <type>test-jar</type>
     </dependency>
     <dependency>
       <groupId>org.bdgenomics.utils</groupId>
-      <artifactId>utils-misc-spark2_${scala.version.prefix}</artifactId>
+      <artifactId>utils-misc-spark3_${scala.version.prefix}</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.spark</groupId>

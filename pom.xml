@@ -9,7 +9,7 @@
   
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.bdgenomics.utils</groupId>
-  <artifactId>utils-parent-spark2_2.11</artifactId>
+  <artifactId>utils-parent-spark3_2.12</artifactId>
   <version>0.3.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>utils</name>
@@ -18,9 +18,9 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <scala.version>2.11.12</scala.version>
-    <scala.version.prefix>2.11</scala.version.prefix>
-    <spark.version>2.4.6</spark.version>
+    <scala.version>2.12.8</scala.version>
+    <scala.version.prefix>2.12</scala.version.prefix>
+    <spark.version>3.0.0</spark.version>
     <parquet.version>1.10.1</parquet.version>
     <!-- Edit the following line to configure the Hadoop (HDFS) version. -->
     <hadoop.version>2.7.5</hadoop.version>
@@ -293,19 +293,19 @@
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc-spark2_${scala.version.prefix}</artifactId>
+        <artifactId>utils-misc-spark3_${scala.version.prefix}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-misc-spark2_${scala.version.prefix}</artifactId>
+        <artifactId>utils-misc-spark3_${scala.version.prefix}</artifactId>
         <version>${project.version}</version>
         <scope>test</scope>
         <type>test-jar</type>
       </dependency>
       <dependency>
         <groupId>org.bdgenomics.utils</groupId>
-        <artifactId>utils-io-spark2_${scala.version.prefix}</artifactId>
+        <artifactId>utils-io-spark3_${scala.version.prefix}</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
