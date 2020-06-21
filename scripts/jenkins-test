@@ -35,6 +35,11 @@ then
     exit 1
 fi
 
+if [ ${SPARK_VERSION} == 3.0.0 ];
+then
+    ./scripts/move_to_spark_3.sh
+fi
+
 # is the scala version set?
 if ! [[ ${SCALA_VERSION} ]];
 then
