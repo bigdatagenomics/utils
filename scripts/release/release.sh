@@ -25,48 +25,8 @@ echo "releasing from ${commit} on branch ${branch}"
 
 git push origin ${branch}
 
-# do spark 2, scala 2.11 release
-git checkout -b maint_spark2_2.11-${release} ${branch}
-./scripts/move_to_scala_2.11.sh
-git commit -a -m "Modifying pom.xml files for Spark 2, Scala 2.11 release."
-mvn --batch-mode \
-  -Dresume=false \
-  -Dtag=utils-parent-spark2_2.11-${release} \
-  -DreleaseVersion=${release} \
-  -DdevelopmentVersion=${devel} \
-  -DbranchName=utils-spark2_2.11-${release} \
-  release:clean \
-  release:prepare \
-  release:perform
-
-if [ $? != 0 ]; then
-  echo "Releasing Spark 2, Scala 2.11 version failed."
-  exit 1
-fi
-
-# do spark 2, scala 2.12 release
-git checkout -b maint_spark2_2.12-${release} ${branch}
-./scripts/move_to_scala_2.12.sh
-git commit -a -m "Modifying pom.xml files for Spark 2, Scala 2.12 release."
-mvn --batch-mode \
-  -Dresume=false \
-  -Dtag=utils-parent-spark2_2.12-${release} \
-  -DreleaseVersion=${release} \
-  -DdevelopmentVersion=${devel} \
-  -DbranchName=utils-spark2_2.12-${release} \
-  release:clean \
-  release:prepare \
-  release:perform
-
-if [ $? != 0 ]; then
-  echo "Releasing Spark 2, Scala 2.12 version failed."
-  exit 1
-fi
-
 # do spark 3, scala 2.12 release
 git checkout -b maint_spark3_2.12-${release} ${branch}
-./scripts/move_to_scala_2.12.sh
-./scripts/move_to_spark_3.sh
 git commit -a -m "Modifying pom.xml files for Spark 3, Scala 2.12 release."
 mvn --batch-mode \
   -Dresume=false \
