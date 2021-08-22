@@ -110,9 +110,5 @@
       <artifactId>scalatest_${scala.version.prefix}</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.hadoop</groupId>
-      <artifactId>hadoop-client</artifactId>
-    </dependency>
   </dependencies>
 </project>
