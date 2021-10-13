@@ -1,5 +1,25 @@
 # bdg-utils Changelog #
 
+### Version 0.4.0 ###
+
+**Closed issues:**
+
+ - Update Parquet dependency version to 1.12.1 [\#177](https://github.com/bigdatagenomics/utils/issues/177)
+ - Update Spark dependency version to 3.2.0 [\#175](https://github.com/bigdatagenomics/utils/issues/175)
+ - Migrate CI off Jenkins [\#171](https://github.com/bigdatagenomics/utils/issues/171)
+ - Default build to Spark 3/Scala 2.12 [\#154](https://github.com/bigdatagenomics/utils/issues/154)
+
+**Merged and closed pull requests:**
+
+ - Update github-changes-maven-plugin version to 1.2 [\#178](https://github.com/bigdatagenomics/utils/pull/178) ([heuermh](https://github.com/heuermh))
+ - Update Spark dependency version to 3.2.0, Parquet to 1.12.1 [\#176](https://github.com/bigdatagenomics/utils/pull/176) ([heuermh](https://github.com/heuermh))
+ - Bump httpclient from 4.5.7 to 4.5.13 [\#174](https://github.com/bigdatagenomics/utils/pull/174) ([dependabot[bot]](https://github.com/apps/dependabot))
+ - Update guava dependency version to 30.1-jre [\#173](https://github.com/bigdatagenomics/utils/pull/173) ([heuermh](https://github.com/heuermh))
+ - Add GitHub Actions CI and deploy snapshots configuration [\#172](https://github.com/bigdatagenomics/utils/pull/172) ([heuermh](https://github.com/heuermh))
+ - Bump guava from 27.0-jre to 29.0-jre [\#170](https://github.com/bigdatagenomics/utils/pull/170) ([dependabot[bot]](https://github.com/apps/dependabot))
+ - Default build to Spark 3.0.1 and Scala 2.12 [\#169](https://github.com/bigdatagenomics/utils/pull/169) ([heuermh](https://github.com/heuermh))
+
+
 ### Version 0.3.0 ###
 
 **Closed issues:**
