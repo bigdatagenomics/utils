@@ -20,7 +20,7 @@
     <java.version>1.8</java.version>
     <scala.version>2.12.14</scala.version>
     <scala.version.prefix>2.12</scala.version.prefix>
-    <spark.version>3.2.0</spark.version>
+    <spark.version>3.2.1</spark.version>
     <parquet.version>1.12.1</parquet.version>
     <scoverage.plugin.version>1.4.1</scoverage.plugin.version>
     <grizzled-slf4j.version>1.3.4</grizzled-slf4j.version>
@@ -309,7 +309,7 @@
      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>30.1.1-jre</version>
+        <version>31.1-jre</version>
      </dependency>
      <dependency>
         <groupId>com.netflix.servo</groupId>
