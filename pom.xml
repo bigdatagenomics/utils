@@ -18,13 +18,13 @@
 
   <properties>
     <java.version>1.8</java.version>
-    <scala.version>2.12.14</scala.version>
+    <scala.version>2.12.18</scala.version>
     <scala.version.prefix>2.12</scala.version.prefix>
-    <spark.version>3.2.1</spark.version>
-    <parquet.version>1.12.1</parquet.version>
+    <spark.version>3.3.4</spark.version>
+    <parquet.version>1.12.3</parquet.version>
     <scoverage.plugin.version>1.4.1</scoverage.plugin.version>
     <grizzled-slf4j.version>1.3.4</grizzled-slf4j.version>
-    <slf4j.version>1.7.30</slf4j.version>
+    <slf4j.version>1.7.36</slf4j.version>
   </properties>
 
   <modules>
@@ -233,7 +233,6 @@
         </executions>
         <configuration>
           <scalaVersion>${scala.version}</scalaVersion>
-          <useZincServer>true</useZincServer>
           <args>
             <arg>-unchecked</arg>
             <arg>-deprecation</arg>
@@ -309,7 +308,7 @@
      <dependency>
         <groupId>com.google.guava</groupId>
         <artifactId>guava</artifactId>
-        <version>31.1-jre</version>
+        <version>33.0.0-jre</version>
      </dependency>
      <dependency>
         <groupId>com.netflix.servo</groupId>
@@ -358,7 +357,7 @@
       <dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId>
-        <version>4.5.13</version>
+        <version>4.5.14</version>
       </dependency>
       <dependency>
         <groupId>org.mockito</groupId>
@@ -389,7 +388,7 @@
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
+        <artifactId>slf4j-reload4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
     </dependencies>
