@@ -1,5 +1,15 @@
 # bdg-utils Changelog #
 
+### Version 1.0.1 ###
+
+**Closed issues:**
+
+
+**Merged and closed pull requests:**
+
+ - Update Spark dependency version to 3.3.4, and other dependency updates [\#184](https://github.com/bigdatagenomics/utils/pull/184) ([heuermh](https://github.com/heuermh))
+
+
 ### Version 1.0 ###
 
 **Closed issues:**
